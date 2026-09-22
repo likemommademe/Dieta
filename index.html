@@ -118,7 +118,7 @@
   .btn-save { width: 100%; background: var(--train); color: white; border: none; border-radius: 10px; padding: 16px; font-weight: 700; font-size: 16px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(16,185,129,0.3); transition: background 0.2s;}
   .btn-save:active { background: #059669; }
 
-  /* SPESA E PROGRESSI (Stile Omesso per Brevità, usa il CSS precedente intatto) */
+  /* SPESA E PROGRESSI */
   .shop-header { text-align: center; margin-bottom: 24px; padding-top: 10px; }
   .shop-header h1 { font-weight: 700; font-size: 26px; margin: 0 0 8px; }
   .week-tabs { display: flex; overflow-x: auto; gap: 12px; margin-bottom: 24px; padding-bottom: 8px; }
@@ -223,17 +223,6 @@
       <button onclick="changeShopWeek(3)">Settimana 3</button>
       <button onclick="changeShopWeek(4)">Settimana 4</button>
     </div>
-
-    <div class="info-box">
-      <h4>Raccomandazioni Fisse ⚠️</h4>
-      <ul>
-        <li>Olio EVO: 8 cucchiaini al giorno.</li>
-        <li>BCAA 2.1.1: 3 prima e 2 dopo l'allenamento.</li>
-        <li>Banana: 1 entro 30 min da fine allenamento.</li>
-        <li>Creatina: 3g tutte le mattine.</li>
-      </ul>
-    </div>
-    
     <div id="shopContent"></div>
   </div>
 
@@ -391,7 +380,12 @@ let PLAN_DATA = {
     meals: {
       colazione: { 
         name: "Colazione", time: "7:00 – 8:30",
-        fixed: [{t: "🍊 Spremuta / 2 cucch. Vibracell", k: 90}, {t: "☕ Caffè/orzo", k: 0}, {t: "🍞 70g pane segale tostato", k: 170}],
+        fixed: [
+          {t: "💊 1 Pasticca di Creatina da 3g", k: 0},
+          {t: "🍊 Spremuta / 2 cucch. Vibracell", k: 90}, 
+          {t: "☕ Caffè/orzo", k: 0}, 
+          {t: "🍞 70g pane segale tostato", k: 170}
+        ],
         optionsIntro: "Accompagna con:",
         options: [{t: "🦃 60g fesa tacchino + 2 fette formaggio", k: 150}, {t: "🍳 2 uova strapazzate bio", k: 160}, {t: "🐟 50g salmone affumicato + form. light", k: 160}, {t: "🫒 2 cucch. olio e sale", k: 90}, {t: "🧀 50g ricotta vaccina", k: 80}]
       },
@@ -400,7 +394,7 @@ let PLAN_DATA = {
         options: [{t: "🥜 40g frutta oleosa + 1 frutto", k: 340}, {t: "🥣 170g yogurt greco con cereali", k: 250}, {t: "🍎 1 frutto + 1 barretta proteica", k: 260}, {t: "🥤 30g proteine vegane", k: 120}]
       },
       pranzo: { 
-        name: "Pranzo (Allenamento)", time: "13:00 – 14:00", optionsIntro: "Scegli un'opzione:",
+        name: "Pranzo", time: "13:00 – 14:00", optionsIntro: "Scegli un'opzione:",
         options: [
           {t: "🍝 100g pasta integrale, pomodoro, 20g parmigiano, 120g fesa tacchino, verdura", k: 620}, 
           {t: "🥒 100g Riso Basmati, zucchine e 150g gamberi", k: 510}, 
@@ -416,24 +410,47 @@ let PLAN_DATA = {
         options: [{t: "🍅 1 frisella integrale con pomodoro", k: 180}, {t: "🍘 2 fettine Wasa + yocca o 1 scatoletta tonno", k: 220}, {t: "🍘 2 fettine Wasa + 70g bresaola", k: 190}, {t: "🥤 30g proteine vegane", k: 120}]
       },
       cena: { 
-        name: "Cena (Allenamento)", time: "20:00 – 21:00", optionsIntro: "Scegli un'opzione:",
+        name: "Cena", time: "20:00 – 21:00", optionsIntro: "Scegli un'opzione:",
         options: [{t: "🍗 300g carne bianca ai ferri, insalata mista, 1 frutto", k: 550}, {t: "🥩 300g carne magra (manzo), verdura a piacere, 1 frutto", k: 600}]
+      },
+      condimenti: {
+        name: "Condimenti & Integrazione Allenamento", time: "Durante la giornata",
+        fixed: [
+          {t: "🫒 Olio Extravergine d'Oliva (Da usare a pranzo/cena, 8 cucchiaini totali)", k: 360},
+          {t: "💊 BCAA 2.1.1 (3 pasticche 1h prima, 2 subito dopo allenamento)", k: 0},
+          {t: "🍌 1 Banana (Entro 30 min da fine allenamento)", k: 100}
+        ]
       }
     }
   },
   rest: {
     label: "Riposo",
     meals: {
-      colazione: { name: "Colazione", time: "7:00 – 9:00", fixed: [{t:"🥣 170-200g yogurt greco 0%", k: 110}, {t:"🌾 Fiocchi d'avena", k: 150}, {t:"🍓 Frutti rossi", k: 40}, {t:"🌰 3-4 noci", k: 100}] },
+      colazione: { 
+        name: "Colazione", time: "7:00 – 9:00", 
+        fixed: [
+          {t: "💊 1 Pasticca di Creatina da 3g", k: 0},
+          {t:"🥣 170-200g yogurt greco 0%", k: 110}, 
+          {t:"🌾 Fiocchi d'avena", k: 150}, 
+          {t:"🍓 Frutti rossi", k: 40}, 
+          {t:"🌰 3-4 noci", k: 100}
+        ] 
+      },
       spuntinoMattina: { name: "Spuntino Mattina", time: "10:30", fixed: [{t:"🥜 30g frutta oleosa", k: 200}, {t:"🍎 1 frutto", k: 80}] },
       pranzo: { 
-        name: "Pranzo (Riposo)", time: "13:00 – 14:00", optionsIntro: "Scegli un'opzione:",
+        name: "Pranzo", time: "13:00 – 14:00", optionsIntro: "Scegli un'opzione:",
         options: [{t: "🍲 Minestrone verdure/legumi, 50g riso integrale + parmigiano", k: 450}, {t: "🌾 80g farro/riso integrale, ceci, insalata", k: 520}, {t: "🥗 Insalata Greca: Pomodoro, 150g feta, olive, cetrioli, 100g pane segale, 1 frutto", k: 600}, {t: "🍅 80g pasta fredda, pachino, mozzarella, olive, verdura, 1 frutto", k: 580}]
       },
       spuntinoPomeriggio: { name: "Spuntino Pomeriggio", time: "16:30", optionsIntro: "Scegli un'opzione:", options: [{t: "🍎 1 frutto", k: 80}, {t: "🥣 170g yogurt greco 0%", k: 100}, {t: "🥕 Finocchi e carote", k: 40}] },
       cena: { 
-        name: "Cena (Riposo)", time: "20:00 – 21:00", optionsIntro: "Scegli un'opzione:",
+        name: "Cena", time: "20:00 – 21:00", optionsIntro: "Scegli un'opzione:",
         options: [{t: "🎉 CENA LIBERA !!!", k: 1000}, {t: "🐟 300g pesce (merluzzo/orata), verdura cotta, 1 frutto", k: 450}, {t: "🍲 Minestra: 1 barattolo fagioli/ceci con 65g pasta/riso, verdura", k: 550}, {t: "🐟 300g pesce (spada, salmone), insalata, 1 frutto", k: 650}]
+      },
+      condimenti: {
+        name: "Condimenti della Giornata", time: "Durante la giornata",
+        fixed: [
+          {t: "🫒 Olio Extravergine d'Oliva (Da usare a pranzo/cena, 8 cucchiaini totali)", k: 360}
+        ]
       }
     }
   }
@@ -487,7 +504,7 @@ const SHOPPING_DATA = [
   ]}
 ];
 
-const STORAGE_KEY = "menu-oggi-state-v14";
+const STORAGE_KEY = "menu-oggi-state-v15";
 const WEIGHT_KEY = "menu-oggi-weight";
 const PHOTOS_KEY = "menu-oggi-photos";
 const DOW = ["Lun","Mar","Mer","Gio","Ven","Sab","Dom"];
@@ -543,7 +560,7 @@ function calcExerciseKcal(type, mins, weight) {
 function calcDailyFoodKcal(key) {
     let plan = getPlan(key); if(!plan) return 0;
     let cfg = PLAN_DATA[plan.type];
-    let total = 350; // Olio EVO fisso
+    let total = 0;
     Object.keys(cfg.meals).forEach(mk => {
         let meal = cfg.meals[mk];
         if(meal.fixed) meal.fixed.forEach(f => total += f.k);
@@ -624,7 +641,7 @@ function renderDayEditor(){
   let finalBurn = act.overrideBurn ? parseInt(act.overrideBurn) : calcBurn;
   let tdee = bmr + (finalBurn || 0); // Bruciate totali
   
-  let foodKcal = calcDailyFoodKcal(key); // Assunte
+  let foodKcal = calcDailyFoodKcal(key); // Assunte calcolate in automatico
   let netKcal = foodKcal - tdee; // Bilancio netto reale
   
   let startW = state.profile.startWeight || 72;
