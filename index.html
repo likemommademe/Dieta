@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Il Menù di Oggi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFFFF;
+    --surface:#FFFFFF;
+    --surface-muted:#FAFAF9;
+    --ink:#131311;
+    --ink-soft:#6E6E68;
+    --ink-faint:#A6A69F;
+    --line:#E7E6E0;
+    --train:#3D7A4C;
+    --train-soft:#EAF3EB;
+    --rest:#42607A;
+    --rest-soft:#EAF0F5;
+    --warn:#B4772E;
+    --radius-card:20px;
+    --radius-pill:999px;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  :root[data-theme="dark"]{
+    --bg:#111110;
+    --surface:#1A1A18;
+    --surface-muted:#151513;
+    --ink:#F3F2ED;
+    --ink-soft:#B4B3AB;
+    --ink-faint:#75746C;
+    --line:#2B2B27;
+    --train-soft:#1C2A1F;
+    --rest-soft:#1B242C;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#111110; --surface:#1A1A18; --surface-muted:#151513;
+      --ink:#F3F2ED; --ink-soft:#B4B3AB; --ink-faint:#75746C; --line:#2B2B27;
+      --train-soft:#1C2A1F; --rest-soft:#1B242C;
+    }
+  }
+  html,body{height:100%;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Work Sans', sans-serif; -webkit-font-smoothing:antialiased;
+  }
+  .app{ max-width:560px; margin:0 auto; padding:24px 16px 70px; }
+
+  header.hero{ margin-bottom:18px; }
+  .eyebrow-row{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px; }
+  .date-label{ font-size:12.5px; color:var(--ink-faint); }
+  .theme-toggle{ background:none; border:none; font-size:15px; cursor:pointer; color:var(--ink-faint); padding:4px; }
+  h1.title{ font-family:'Fraunces', serif; font-weight:600; font-size:30px; line-height:1.08; margin:0 0 2px; }
+  .subtitle{ font-size:14px; color:var(--ink-soft); margin:0; }
+
+  /* calendar */
+  .calendar{ margin-top:20px; }
+  .cal-nav{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .cal-nav .label{ font-size:14px; font-weight:600; }
+  .cal-nav button{
+    width:32px; height:32px; border-radius:50%; border:1px solid var(--line);
+    background:var(--surface); color:var(--ink); font-size:15px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .cal-today-btn{
+    font-size:12px; border:1px solid var(--line); background:var(--surface-muted);
+    border-radius:var(--radius-pill); padding:5px 11px; cursor:pointer; color:var(--ink-soft); font-weight:600;
+  }
+  .cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+  .cal-day{
+    border:1.5px solid var(--line); border-radius:14px; background:var(--surface);
+    padding:8px 2px 7px; text-align:center; cursor:pointer; position:relative;
+  }
+  .cal-day .dow{ font-size:10.5px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.03em; }
+  .cal-day .num{ font-size:16px; font-weight:600; margin-top:2px; }
+  .cal-day .dot{ width:6px; height:6px; border-radius:50%; margin:5px auto 0; background:transparent; }
+  .cal-day.train{ background:var(--train-soft); }
+  .cal-day.rest{ background:var(--rest-soft); }
+  .cal-day.train .dot{ background:var(--train); }
+  .cal-day.rest .dot{ background:var(--rest); }
+  .cal-day.is-today{ border-color:var(--ink); }
+  .cal-day.selected{ border-color:var(--ink); border-width:2px; }
+  .cal-day .check{ position:absolute; top:4px; right:6px; font-size:9px; color:var(--train); }
+
+  /* day editor */
+  .day-editor{ margin-top:22px; }
+  .empty-day{
+    border:1.5px dashed var(--line); border-radius:var(--radius-card);
+    padding:22px 18px; text-align:center;
+  }
+  .empty-day p{ margin:0 0 14px; font-size:14.5px; color:var(--ink-soft); }
+  .empty-day .row{ display:flex; gap:10px; justify-content:center; }
+  .empty-day button{
+    font-family:'Work Sans'; font-weight:600; font-size:14px; padding:10px 18px;
+    border-radius:var(--radius-pill); border:1.5px solid var(--line); background:var(--surface); cursor:pointer;
+  }
+  .empty-day button.train{ border-color:var(--train); color:var(--train); }
+  .empty-day button.rest{ border-color:var(--rest); color:var(--rest); }
+
+  .type-row{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .type-pill{
+    display:inline-flex; align-items:center; gap:7px; font-weight:600; font-size:13.5px;
+    padding:6px 13px; border-radius:var(--radius-pill);
+  }
+  .type-pill.train{ background:var(--train-soft); color:var(--train); }
+  .type-pill.rest{ background:var(--rest-soft); color:var(--rest); }
+  .type-pill .swatch{ width:8px; height:8px; border-radius:50%; background:currentColor; }
+  .link-btn{ background:none; border:none; font-size:13px; color:var(--ink-faint); cursor:pointer; text-decoration:underline; padding:0; }
+
+  .daypicker{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:6px; }
+  .daypicker button{
+    border:1.5px solid var(--line); background:var(--surface); color:var(--ink-soft);
+    font-weight:600; font-size:13.5px; padding:7px 14px; border-radius:var(--radius-pill); cursor:pointer;
+  }
+  .daypicker button.active{ background:var(--ink); border-color:var(--ink); color:var(--bg); }
+
+  .progress{ margin-top:14px; display:flex; align-items:center; gap:10px; }
+  .progress .track{ flex:1; height:5px; border-radius:3px; background:var(--line); overflow:hidden; }
+  .progress .fill{ height:100%; background:var(--ink); border-radius:3px; transition:width .25s ease; }
+  .progress .count{ font-size:12.5px; color:var(--ink-faint); white-space:nowrap; font-variant-numeric:tabular-nums; }
+
+  section.meal{ margin-top:18px; }
+  .meal-head{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:8px; }
+  .meal-head h2{ font-family:'Fraunces', serif; font-weight:600; font-size:19px; margin:0; }
+  .meal-head .time{ font-size:11.5px; color:var(--ink-faint); white-space:nowrap; }
+
+  .card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-card); padding:14px 14px 12px; }
+  .card.done{ border-color:var(--ink); }
+
+  .fixed-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:7px; }
+  .fixed-list li{ font-size:14.5px; line-height:1.4; padding-left:15px; position:relative; }
+  .fixed-list li::before{ content:""; position:absolute; left:0; top:8px; width:5px; height:5px; border-radius:50%; background:var(--ink-faint); }
+
+  .options-hint{ font-size:12px; color:var(--ink-faint); margin:0 0 6px; }
+  .option{ display:flex; align-items:flex-start; gap:11px; padding:9px 3px; border-radius:12px; cursor:pointer; }
+  .option + .option{ border-top:1px solid var(--line); }
+  .option .dot{ margin-top:3px; width:18px; height:18px; min-width:18px; border-radius:50%; border:2px solid var(--ink-faint); display:flex; align-items:center; justify-content:center; }
+  .option.selected .dot{ border-color:var(--ink); background:var(--ink); }
+  .option.selected .dot::after{ content:""; width:6px; height:6px; border-radius:50%; background:var(--bg); }
+  .option p{ margin:0; font-size:14.5px; line-height:1.4; }
+  .option.selected p{ font-weight:600; }
+
+  .done-row{ margin-top:11px; padding-top:11px; border-top:1px dashed var(--line); display:flex; align-items:center; gap:9px; cursor:pointer; user-select:none; }
+  .done-row .box{ width:20px; height:20px; min-width:20px; border-radius:6px; border:2px solid var(--ink-faint); display:flex; align-items:center; justify-content:center; }
+  .card.done .done-row .box{ background:var(--ink); border-color:var(--ink); }
+  .card.done .done-row .box::after{ content:"✓"; color:var(--bg); font-size:12px; font-weight:700; }
+  .done-row .label{ font-size:13.5px; font-weight:600; color:var(--ink-soft); }
+  .card.done .done-row .label{ color:var(--ink); }
+
+  .notes{ margin-top:24px; }
+  .notes h2, .shop h2, .avoid-title{ font-family:'Fraunces', serif; font-weight:600; font-size:19px; margin:0 0 10px; }
+  .notes ul{ margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .notes li{ font-size:14px; line-height:1.45; color:var(--ink-soft); padding-left:16px; position:relative; }
+  .notes li::before{ content:"•"; position:absolute; left:2px; color:var(--ink-faint); }
+
+  /* shopping */
+  .shop{ margin-top:30px; padding-top:22px; border-top:1px solid var(--line); }
+  .week-tabs{ display:flex; gap:7px; margin-bottom:14px; overflow-x:auto; padding-bottom:2px; }
+  .week-tabs button{
+    flex:none; border:1.5px solid var(--line); background:var(--surface); color:var(--ink-soft);
+    font-weight:600; font-size:13px; padding:8px 13px; border-radius:var(--radius-pill); cursor:pointer;
+    display:flex; flex-direction:column; align-items:flex-start; gap:1px;
+  }
+  .week-tabs button span.range{ font-size:10.5px; font-weight:500; color:var(--ink-faint); }
+  .week-tabs button.active{ background:var(--ink); border-color:var(--ink); color:var(--bg); }
+  .week-tabs button.active span.range{ color:#CFCFC7; }
+
+  .shop-warning{
+    font-size:13px; color:var(--warn); background:var(--surface-muted); border:1px solid var(--line);
+    border-radius:14px; padding:10px 13px; margin-bottom:14px;
+  }
+  .shop-fixed{
+    border:1px solid var(--line); border-radius:16px; background:var(--surface-muted); padding:13px 15px; margin-bottom:16px;
+  }
+  .shop-fixed .cat-title{ font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-faint); margin-bottom:7px; }
+  .shop-fixed ul{ margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:6px; }
+  .shop-fixed li{ font-size:13.5px; color:var(--ink-soft); }
+
+  .cat-group{ margin-bottom:16px; }
+  .cat-group .cat-title{ font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-faint); margin-bottom:8px; }
+  .cat-group ul{ margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .cat-group li{
+    display:flex; justify-content:space-between; gap:10px; font-size:14.5px;
+    padding-bottom:8px; border-bottom:1px solid var(--line);
+  }
+  .cat-group li:last-child{ border-bottom:none; padding-bottom:0; }
+  .cat-group li .qty{ color:var(--ink-soft); white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .shop-empty{ font-size:14px; color:var(--ink-faint); padding:10px 2px; }
+
+  details.avoid{ margin-top:22px; background:var(--surface-muted); border-radius:16px; padding:4px 15px; border:1px solid var(--line); }
+  details.avoid summary{ cursor:pointer; font-weight:600; font-size:14px; padding:12px 0; color:var(--ink-soft); list-style:none; display:flex; align-items:center; justify-content:space-between; }
+  details.avoid summary::-webkit-details-marker{ display:none; }
+  details.avoid summary .chev{ transition:transform .15s ease; color:var(--ink-faint); }
+  details.avoid[open] summary .chev{ transform:rotate(180deg); }
+  .avoid-chips{ display:flex; flex-wrap:wrap; gap:7px; padding-bottom:14px; }
+  .avoid-chips span{ font-size:12px; background:var(--surface); border:1px solid var(--line); color:var(--ink-soft); padding:5px 10px; border-radius:var(--radius-pill); }
+
+  footer.disclaimer{ margin-top:26px; font-size:11.5px; color:var(--ink-faint); line-height:1.5; text-align:center; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="hero">
+    <div class="eyebrow-row">
+      <span class="date-label" id="dateLabel"></span>
+      <button class="theme-toggle" id="themeToggle" title="Cambia tema">◐</button>
+    </div>
+    <h1 class="title">Il menù di oggi</h1>
+    <p class="subtitle">Piano di Emanuele — dott.ssa Arianna Marinazzo</p>
+  </header>
+
+  <section class="calendar">
+    <div class="cal-nav">
+      <button id="prevWeek">‹</button>
+      <span class="label" id="weekLabel"></span>
+      <button class="cal-today-btn" id="gotoToday">Oggi</button>
+      <button id="nextWeek">›</button>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+  </section>
+
+  <div class="day-editor" id="dayEditor"></div>
+
+  <section class="notes" id="notesSection"></section>
+
+  <section class="shop">
+    <h2>Lista della spesa</h2>
+    <div class="week-tabs" id="weekTabs"></div>
+    <div id="shopContent"></div>
+  </section>
+
+  <details class="avoid">
+    <summary>Alimenti da evitare <span class="chev">⌄</span></summary>
+    <div class="avoid-chips" id="avoidChips"></div>
+  </details>
+
+  <footer class="disclaimer">Promemoria personale basato sul piano nutrizionale ricevuto. In caso di dubbi, fai sempre riferimento alla dott.ssa Marinazzo.</footer>
+</div>
+
+<script>
+/* ---------- DATA ---------- */
+const CAT = { VEG:"Frutta e verdura", PROT:"Proteine", FISH:"Pesce", DAIRY:"Latticini e formaggi", CARB:"Cereali e pane", LEG:"Legumi", PANTRY:"Dispensa" };
+
+function I(name, qty, unit, category){ return {name, qty: qty===undefined?null:qty, unit: unit||null, category}; }
+
+const DATA = {
+  train: {
+    label:"Allenamento", days:3,
+    meals:{
+      colazione:{ name:"Colazione", time:"7:00 – 8:30",
+        fixed:[
+          { text:"Spremuta d'arancia o estratto di frutta e verdura (in alternativa 2 cucchiaini di sciroppo Vibracell sciolti in acqua)", ingredients:[ I("Arance o frutta/verdura per estratto", null, null, CAT.VEG) ] },
+          { text:"Caffè o caffè d'orzo (facoltativo), dolcificato con stevia o sciroppo d'acero", ingredients:[] },
+          { text:"70g di pane di segale integrale tostato", ingredients:[ I("Pane di segale integrale", 70, "g", CAT.CARB) ] }
+        ],
+        optionsIntro:"Sul pane, scegli una di queste opzioni:",
+        options:[
+          { text:"60g di fesa di tacchino o prosciutto (cotto/crudo) + 2 fettine di formaggio (Galbanino o Bel Paese)", ingredients:[ I("Fesa di tacchino o prosciutto",60,"g",CAT.PROT), I("Formaggio (Galbanino o Bel Paese)",2,"fette",CAT.DAIRY) ] },
+          { text:"2 uova strapazzate bio", ingredients:[ I("Uova bio",2,"pz",CAT.PROT) ] },
+          { text:"50g di salmone affumicato + formaggio spalmabile light", ingredients:[ I("Salmone affumicato",50,"g",CAT.FISH), I("Formaggio spalmabile light",1,"porzione",CAT.DAIRY) ] },
+          { text:"2 cucchiaini d'olio e sale", ingredients:[] },
+          { text:"50g di ricotta vaccina", ingredients:[ I("Ricotta vaccina",50,"g",CAT.DAIRY) ] }
+        ]
+      },
+      spuntinoMattina:{ name:"Spuntino di metà mattina", time:"10:30",
+        optionsIntro:"Scegli una opzione:",
+        options:[
+          { text:"40g di frutta oleosa (noci, nocciole, mandorle, pistacchi) + 1 frutto", ingredients:[ I("Frutta oleosa (noci, mandorle, ecc.)",40,"g",CAT.PANTRY), I("Frutta fresca",1,"pz",CAT.VEG) ] },
+          { text:"170g di yogurt greco con una manciata di cereali integrali", ingredients:[ I("Yogurt greco",170,"g",CAT.DAIRY), I("Cereali integrali",null,null,CAT.CARB) ] },
+          { text:"1 frutto + 1 barretta proteica (15-20g di proteine)", ingredients:[ I("Frutta fresca",1,"pz",CAT.VEG), I("Barretta proteica",1,"pz",CAT.PANTRY) ] },
+          { text:"30g di proteine vegane sciolte in acqua", ingredients:[ I("Proteine vegane in polvere",30,"g",CAT.PANTRY) ] }
+        ]
+      },
+      spuntinoPomeriggio:{ name:"Spuntino di metà pomeriggio", time:"16:30",
+        optionsIntro:"Scegli una opzione:",
+        options:[
+          { text:"1 frisella integrale con pomodoro", ingredients:[ I("Frisella integrale",1,"pz",CAT.CARB), I("Pomodoro",1,"pz",CAT.VEG) ] },
+          { text:"2 fettine di Wasa con 1 confezione di yocca oppure 1 scatoletta di tonno media", ingredients:[ I("Wasa (cracker di segale integrale)",2,"fette",CAT.CARB), I("Yocca o tonno in scatola",1,"pz",CAT.FISH) ] },
+          { text:"2 fettine di Wasa con 60-80g di bresaola (se non mangiata a colazione)", ingredients:[ I("Wasa (cracker di segale integrale)",2,"fette",CAT.CARB), I("Bresaola",70,"g",CAT.PROT) ] },
+          { text:"30g di proteine vegane sciolte in acqua o latte d'avena (se non prese la mattina)", ingredients:[ I("Proteine vegane in polvere",30,"g",CAT.PANTRY) ] }
+        ]
+      },
+      pranzo:{ name:"Pranzo", time:"13:00 – 14:00", perDay:true },
+      cena:{ name:"Cena", time:"20:00 – 21:00", perDay:true }
+    },
+    dayPlans:[
+      { pranzo:{ fixed:{ text:"100g di pasta integrale con pomodoro pachino e 20g di parmigiano a scaglie, 100-120g di fesa di tacchino, una verdura cotta a piacere.",
+          ingredients:[ I("Pasta integrale",100,"g",CAT.CARB), I("Pomodorini pachino",null,null,CAT.VEG), I("Parmigiano",20,"g",CAT.DAIRY), I("Fesa di tacchino",110,"g",CAT.PROT), I("Verdura cotta a piacere",null,null,CAT.VEG) ] } },
+        cena:{ fixed:{ text:"300g di carne bianca (petto di pollo, tacchino, vitella) ai ferri con olio a crudo, un piatto di insalata mista, 1 frutto.",
+          ingredients:[ I("Petto di pollo, tacchino o vitella",300,"g",CAT.PROT), I("Insalata mista",null,null,CAT.VEG), I("Frutta fresca",1,"pz",CAT.VEG) ] } } },
+      { pranzo:{ optionsIntro:"Scegli il condimento del riso:", options:[
+          { text:"100g di riso Basmati integrale con zucchine e gamberi", ingredients:[ I("Riso Basmati integrale",100,"g",CAT.CARB), I("Zucchine",null,null,CAT.VEG), I("Gamberi",150,"g",CAT.FISH) ] },
+          { text:"100g di riso Basmati integrale con misto mare (pescatora), circa 150-200g di pesce", ingredients:[ I("Riso Basmati integrale",100,"g",CAT.CARB), I("Misto mare (pescatora)",180,"g",CAT.FISH) ] },
+          { text:"100g di riso Basmati integrale con 80g di salmone affumicato e zucchine", ingredients:[ I("Riso Basmati integrale",100,"g",CAT.CARB), I("Salmone affumicato",80,"g",CAT.FISH), I("Zucchine",null,null,CAT.VEG) ] },
+          { text:"100g di riso Basmati integrale con 250g di salmone fresco lessato e zucchine", ingredients:[ I("Riso Basmati integrale",100,"g",CAT.CARB), I("Salmone fresco",250,"g",CAT.FISH), I("Zucchine",null,null,CAT.VEG) ] }
+        ] },
+        cena:{ fixed:{ text:"300g di carne bianca (petto di pollo, tacchino, arista, vitella) ai ferri con olio a crudo, un piatto di insalata mista, 1 frutto.",
+          ingredients:[ I("Petto di pollo, tacchino, arista o vitella",300,"g",CAT.PROT), I("Insalata mista",null,null,CAT.VEG), I("Frutta fresca",1,"pz",CAT.VEG) ] } } },
+      { pranzo:{ optionsIntro:"Scegli il condimento della pasta:", options:[
+          { text:"100g di pasta integrale con sugo di pomodoro semplice, 300g di pesce azzurro (merluzzo, nasello, persico ecc.), una verdura a piacere.", ingredients:[ I("Pasta integrale",100,"g",CAT.CARB), I("Passata o sugo di pomodoro",null,null,CAT.PANTRY), I("Pesce azzurro (merluzzo, nasello o persico)",300,"g",CAT.FISH), I("Verdura a piacere",null,null,CAT.VEG) ] },
+          { text:"100g di pasta integrale con zucchine e parmigiano, 300g di pesce azzurro (merluzzo, nasello, persico ecc.), una verdura a piacere.", ingredients:[ I("Pasta integrale",100,"g",CAT.CARB), I("Zucchine",null,null,CAT.VEG), I("Parmigiano",null,null,CAT.DAIRY), I("Pesce azzurro (merluzzo, nasello o persico)",300,"g",CAT.FISH), I("Verdura a piacere",null,null,CAT.VEG) ] }
+        ] },
+        cena:{ fixed:{ text:"300g di carne magra ai ferri (manzo, bovino, ecc.), verdura a piacere, 1 frutto.",
+          ingredients:[ I("Carne magra (manzo o bovino)",300,"g",CAT.PROT), I("Verdura a piacere",null,null,CAT.VEG), I("Frutta fresca",1,"pz",CAT.VEG) ] } } }
+    ],
+    notes:[
+      "Prendi le BCAA 2.1.1: 3 pasticche un'ora prima dell'allenamento, 2 subito dopo.",
+      "Entro 30 minuti dalla fine dell'allenamento, mangia una banana.",
+      "Ogni mattina: 1 pasticca di creatina da 3g.",
+      "Condisci con olio extravergine d'oliva, circa 8 cucchiaini al giorno.",
+      "Usa la pasta Senatore Cappelli integrale."
+    ]
+  },
+  rest: {
+    label:"Riposo", days:4,
+    meals:{
+      colazione:{ name:"Colazione", time:"7:00 – 9:00",
+        fixed:[
+          { text:"170-200g di yogurt greco 0% di grassi", ingredients:[ I("Yogurt greco 0%",185,"g",CAT.DAIRY) ] },
+          { text:"Una manciata di fiocchi d'avena integrali", ingredients:[ I("Fiocchi d'avena integrali",null,null,CAT.CARB) ] },
+          { text:"Frutti rossi", ingredients:[ I("Frutti di bosco",null,null,CAT.VEG) ] },
+          { text:"3-4 noci", ingredients:[ I("Noci",4,"pz",CAT.PANTRY) ] }
+        ]
+      },
+      spuntinoMattina:{ name:"Spuntino di metà mattina", time:"10:30",
+        fixed:[
+          { text:"30g di frutta oleosa", ingredients:[ I("Frutta oleosa",30,"g",CAT.PANTRY) ] },
+          { text:"1 frutto", ingredients:[ I("Frutta fresca",1,"pz",CAT.VEG) ] }
+        ]
+      },
+      spuntinoPomeriggio:{ name:"Spuntino di metà pomeriggio", time:"16:30",
+        optionsIntro:"Scegli una opzione:",
+        options:[
+          { text:"1 frutto", ingredients:[ I("Frutta fresca",1,"pz",CAT.VEG) ] },
+          { text:"1 yogurt greco da 170g, 0% di grassi", ingredients:[ I("Yogurt greco 0%",170,"g",CAT.DAIRY) ] },
+          { text:"Finocchi e carote", ingredients:[ I("Finocchi",null,null,CAT.VEG), I("Carote",null,null,CAT.VEG) ] }
+        ]
+      },
+      pranzo:{ name:"Pranzo", time:"13:00 – 14:00", perDay:true },
+      cena:{ name:"Cena", time:"20:00 – 21:00", perDay:true }
+    },
+    dayPlans:[
+      { pranzoLabel:"Pranzo", pranzo:{ fixed:{ text:"Minestrone ricco di verdure e legumi con 50g di riso integrale + 2 cucchiaini di parmigiano.",
+          ingredients:[ I("Verdure miste per minestrone",null,null,CAT.VEG), I("Legumi misti",null,null,CAT.LEG), I("Riso integrale",50,"g",CAT.CARB), I("Parmigiano",null,null,CAT.DAIRY) ] } },
+        cenaLabel:"Cena", cena:{ fixed:{ text:"Libera! 🎉", ingredients:[] } } },
+      { pranzoLabel:"Pranzo — insalata di farro", pranzo:{ fixed:{ text:"80g di farro integrale (o riso basmati integrale), verdure miste a piacere, un barattolino di ceci, un piatto di insalata mista.",
+          ingredients:[ I("Farro integrale (o riso basmati integrale)",80,"g",CAT.CARB), I("Verdure miste",null,null,CAT.VEG), I("Ceci (barattolo)",1,"pz",CAT.LEG), I("Insalata mista",null,null,CAT.VEG) ] } },
+        cenaLabel:"Cena", cena:{ fixed:{ text:"300g di pesce (merluzzo, persico, filetto di cernia o orata, nasello), verdura cotta (fagiolini, zucchine, melanzane ecc.), 1 frutto.",
+          ingredients:[ I("Pesce (merluzzo, persico, cernia, orata o nasello)",300,"g",CAT.FISH), I("Verdura cotta (fagiolini, zucchine o melanzane)",null,null,CAT.VEG), I("Frutta fresca",1,"pz",CAT.VEG) ] } } },
+      { pranzoLabel:"Pranzo — insalata greca", pranzo:{ fixed:{ text:"Pomodoro, 150g di feta, olive e cetrioli, 100g di pane di segale integrale, 1 frutto.",
+          ingredients:[ I("Pomodoro",null,null,CAT.VEG), I("Feta",150,"g",CAT.DAIRY), I("Olive",null,null,CAT.PANTRY), I("Cetrioli",null,null,CAT.VEG), I("Pane di segale integrale",100,"g",CAT.CARB), I("Frutta fresca",1,"pz",CAT.VEG) ] } },
+        cenaLabel:"Cena — minestra", cena:{ fixed:{ text:"Un barattolo di fagioli o ceci con 60-70g di pasta o riso integrale, un piatto di verdura a piacere.",
+          ingredients:[ I("Fagioli o ceci (barattolo)",1,"pz",CAT.LEG), I("Pasta o riso integrale",65,"g",CAT.CARB), I("Verdura a piacere",null,null,CAT.VEG) ] } } },
+      { pranzoLabel:"Pranzo", pranzo:{ fixed:{ text:"80g di pasta integrale (piatto freddo) con pachino, mozzarella e olive, un piatto di verdura cotta a piacere, 1 frutto.",
+          ingredients:[ I("Pasta integrale",80,"g",CAT.CARB), I("Pomodorini pachino",null,null,CAT.VEG), I("Mozzarella",null,null,CAT.DAIRY), I("Olive",null,null,CAT.PANTRY), I("Verdura cotta a piacere",null,null,CAT.VEG), I("Frutta fresca",1,"pz",CAT.VEG) ] } },
+        cenaLabel:"Cena", cena:{ fixed:{ text:"300g di pesce (pesce spada, aringa, tonno fresco, salmone), un piatto di insalata, 1 frutto.",
+          ingredients:[ I("Pesce (spada, aringa, tonno fresco o salmone)",300,"g",CAT.FISH), I("Insalata",null,null,CAT.VEG), I("Frutta fresca",1,"pz",CAT.VEG) ] } } }
+    ],
+    notes:[
+      "Condisci con olio extravergine d'oliva, circa 8 cucchiaini al giorno.",
+      "Ogni mattina: 1 pasticca di creatina da 3g.",
+      "Usa la pasta Senatore Cappelli integrale."
+    ]
+  }
+};
+
+const DISPENSA_FISSA = ["Olio extravergine d'oliva", "Creatina (3g)", "BCAA 2.1.1 (nei giorni di allenamento)", "Banana (post-allenamento)", "Pasta Senatore Cappelli integrale", "Caffè o caffè d'orzo", "Dolcificante (stevia o sciroppo d'acero)"];
+
+const AVOID = ["Cachi","Fichi","Uva","Kiwi","Mandarini (i clementini sì)","Mango","Cocco","Frutta molto matura","Succhi di frutta","Melograno","Anguria","Melone","Patate","Zucca gialla","Rape rosse","Carote cotte","Mais e farina di mais","Gallette di riso","Gallette di mais","Farina bianca 0 e 00","Zucchero bianco o di canna","Riso bianco (sostituire con integrale)","Dolci","Marmellate","Alcool","Bibite gassate"];
+
+/* ---------- STATE ---------- */
+const STORAGE_KEY = "menu-oggi-state-v2";
+const DOW = ["Lun","Mar","Mer","Gio","Ven","Sab","Dom"];
+
+function pad(n){ return n<10 ? "0"+n : ""+n; }
+function toKey(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+function fromKey(k){ const [y,m,d]=k.split("-").map(Number); return new Date(y,m-1,d); }
+function addDays(d,n){ const r=new Date(d); r.setDate(r.getDate()+n); return r; }
+function mondayOf(d){ const r=new Date(d); const day=(r.getDay()+6)%7; return addDays(r,-day); }
+function sameDay(a,b){ return toKey(a)===toKey(b); }
+
+let state = null;
+try{ state = JSON.parse(localStorage.getItem(STORAGE_KEY)); }catch(e){}
+const todayKey = toKey(new Date());
+if(!state){ state = { byDate:{}, weekStart: toKey(mondayOf(new Date())), selectedDate: todayKey }; }
+if(!state.weekStart) state.weekStart = toKey(mondayOf(new Date()));
+if(!state.selectedDate) state.selectedDate = todayKey;
+let shopWeekOffset = 0;
+
+function save(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
+
+let theme = (function(){ try{ return localStorage.getItem("menu-oggi-theme") || "auto"; }catch(e){ return "auto"; } })();
+function applyTheme(){ document.documentElement.setAttribute("data-theme", theme==="auto" ? "" : theme); }
+applyTheme();
+
+function getPlan(key){ return state.byDate[key] || null; }
+function setPlanType(key, type){
+  state.byDate[key] = { type, dayIndex:0, selections:{}, completed:{} };
+  save();
+  state.selectedDate = key;
+  render();
+}
+function clearPlan(key){
+  delete state.byDate[key];
+  save();
+  render();
+}
+function setDayIndex(key, i){
+  const p = getPlan(key); if(!p) return;
+  p.dayIndex = i; p.selections = {}; p.completed = {};
+  save(); render();
+}
+function selectOption(key, mealKey, idx){
+  const p = getPlan(key); if(!p) return;
+  p.selections[mealKey] = idx;
+  save(); render();
+}
+function toggleDone(key, mealKey){
+  const p = getPlan(key); if(!p) return;
+  p.completed[mealKey] = !p.completed[mealKey];
+  save(); render();
+}
+
+/* ---------- INGREDIENT HELPERS ---------- */
+function mealChosenContent(cfg, meal, plan, mealKey){
+  // returns { text, ingredients } for a given meal definition + plan selections
+  if(meal.perDay){
+    const dp = cfg.dayPlans[plan.dayIndex];
+    const slot = dp[mealKey];
+    if(slot.fixed) return [slot.fixed];
+    const idx = plan.selections[mealKey] || 0;
+    return [slot.options[idx]];
+  }
+  if(meal.fixed) return meal.fixed;
+  const idx = plan.selections[mealKey] || 0;
+  return [meal.options[idx]];
+}
+
+function collectDayIngredients(key){
+  const plan = getPlan(key); if(!plan) return [];
+  const cfg = DATA[plan.type];
+  let list = [];
+  Object.keys(cfg.meals).forEach(mk=>{
+    const chosen = mealChosenContent(cfg, cfg.meals[mk], plan, mk);
+    chosen.forEach(c=> list = list.concat(c.ingredients||[]));
+  });
+  return list;
+}
+
+function fmtQty(item){
+  if(item.qty==null) return "q.b." + (item.count>1 ? " · in "+item.count+" pasti" : "");
+  const unit = item.unit;
+  if(unit==="g" || unit==="ml") return item.qty + unit;
+  return item.qty + " " + unit;
+}
+
+function buildShoppingList(weekMonday){
+  const days = [];
+  for(let i=0;i<7;i++) days.push(toKey(addDays(weekMonday,i)));
+  const plannedDays = days.filter(k=>getPlan(k));
+  const unplanned = days.filter(k=>!getPlan(k));
+
+  const map = {};
+  let anyTrain = false;
+  plannedDays.forEach(k=>{
+    const plan = getPlan(k);
+    if(plan.type==="train") anyTrain = true;
+    collectDayIngredients(k).forEach(ing=>{
+      if(!ing.name) return;
+      const uKey = ing.name+"|"+(ing.unit||"qb");
+      if(!map[uKey]) map[uKey] = { name:ing.name, category:ing.category, qty: ing.qty==null?null:0, unit: ing.unit, count:0 };
+      if(ing.qty!=null) map[uKey].qty += ing.qty;
+      map[uKey].count += 1;
+    });
+  });
+
+  const byCat = {};
+  Object.values(map).forEach(item=>{
+    if(!byCat[item.category]) byCat[item.category] = [];
+    byCat[item.category].push(item);
+  });
+  Object.values(byCat).forEach(arr=>arr.sort((a,b)=>a.name.localeCompare(b.name,'it')));
+
+  return { byCat, unplanned, plannedCount: plannedDays.length, anyTrain };
+}
+
+/* ---------- RENDER ---------- */
+function fmtDate(){
+  const d = new Date();
+  const s = d.toLocaleDateString("it-IT", { weekday:"long", day:"numeric", month:"long" });
+  return s.charAt(0).toUpperCase()+s.slice(1);
+}
+function fmtRange(monday){
+  const end = addDays(monday,6);
+  const opts1 = { day:"numeric", month: monday.getMonth()===end.getMonth() ? undefined : "short" };
+  const s1 = monday.toLocaleDateString("it-IT", opts1);
+  const s2 = end.toLocaleDateString("it-IT", { day:"numeric", month:"short" });
+  return s1 + " – " + s2;
+}
+
+function renderCalendar(){
+  const monday = fromKey(state.weekStart);
+  document.getElementById("weekLabel").textContent = fmtRange(monday);
+  const grid = document.getElementById("calGrid");
+  grid.innerHTML = "";
+  const today = new Date();
+  for(let i=0;i<7;i++){
+    const d = addDays(monday,i);
+    const key = toKey(d);
+    const plan = getPlan(key);
+    const cell = document.createElement("div");
+    cell.className = "cal-day" + (plan? " "+plan.type : "") + (sameDay(d,today)? " is-today":"") + (key===state.selectedDate? " selected":"");
+    let doneMark = "";
+    if(plan){
+      const cfg = DATA[plan.type];
+      const total = Object.keys(cfg.meals).length;
+      const done = Object.values(plan.completed).filter(Boolean).length;
+      if(done>=total) doneMark = '<span class="check">✓</span>';
+    }
+    cell.innerHTML = `${doneMark}<div class="dow">${DOW[i]}</div><div class="num">${d.getDate()}</div><div class="dot"></div>`;
+    cell.onclick = ()=>{ state.selectedDate = key; save(); render(); };
+    grid.appendChild(cell);
+  }
+}
+
+function renderDayEditor(){
+  const key = state.selectedDate;
+  const plan = getPlan(key);
+  const d = fromKey(key);
+  const dateStr = d.toLocaleDateString("it-IT",{ weekday:"long", day:"numeric", month:"long" });
+  const dateStrCap = dateStr.charAt(0).toUpperCase()+dateStr.slice(1);
+  const el = document.getElementById("dayEditor");
+
+  if(!plan){
+    el.innerHTML = `
+      <div class="empty-day">
+        <p><strong>${dateStrCap}</strong> non è ancora pianificato.</p>
+        <p style="margin-top:-8px;">È un giorno di allenamento o di riposo?</p>
+        <div class="row">
+          <button class="train" onclick="setPlanType('${key}','train')">Allenamento</button>
+          <button class="rest" onclick="setPlanType('${key}','rest')">Riposo</button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const cfg = DATA[plan.type];
+  let html = `
+    <div class="type-row">
+      <span class="type-pill ${plan.type}"><span class="swatch"></span>${dateStrCap} · ${cfg.label}</span>
+      <button class="link-btn" onclick="clearPlan('${key}')">Reimposta</button>
+    </div>`;
+
+  if(cfg.days>1){
+    html += `<div class="daypicker">`;
+    for(let i=0;i<cfg.days;i++){
+      html += `<button class="${plan.dayIndex===i?'active':''}" onclick="setDayIndex('${key}',${i})">Variante ${i+1}</button>`;
+    }
+    html += `</div>`;
+  }
+
+  const totalMeals = Object.keys(cfg.meals).length;
+  const doneCount = Object.values(plan.completed).filter(Boolean).length;
+  html += `
+    <div class="progress">
+      <div class="track"><div class="fill" style="width:${Math.round(doneCount/totalMeals*100)}%"></div></div>
+      <span class="count">${doneCount}/${totalMeals} pasti</span>
+    </div>`;
+
+  Object.keys(cfg.meals).forEach(mk=>{
+    const meal = cfg.meals[mk];
+    const isDone = !!plan.completed[mk];
+    let slotDef;
+    let label = meal.name, time = meal.time;
+    if(meal.perDay){
+      const dp = cfg.dayPlans[plan.dayIndex];
+      slotDef = dp[mk];
+      if(mk==="pranzo" && dp.pranzoLabel) label = dp.pranzoLabel;
+      if(mk==="cena" && dp.cenaLabel) label = dp.cenaLabel;
+    } else {
+      slotDef = meal;
+    }
+
+    let inner = "";
+    if(slotDef.fixed && Array.isArray(slotDef.fixed)){
+      inner += `<ul class="fixed-list">${slotDef.fixed.map(c=>`<li>${c.text}</li>`).join("")}</ul>`;
+    } else if(slotDef.fixed && !Array.isArray(slotDef.fixed)){
+      inner += `<p style="margin:0;font-size:14.5px;line-height:1.5;">${slotDef.fixed.text}</p>`;
+    }
+    if(slotDef.options){
+      if(slotDef.optionsIntro) inner += `<p class="options-hint">${slotDef.optionsIntro}</p>`;
+      inner += slotDef.options.map((opt,i)=>{
+        const sel = plan.selections[mk]===i;
+        return `<div class="option ${sel?'selected':''}" onclick="selectOption('${key}','${mk}',${i})"><div class="dot"></div><p>${opt.text}</p></div>`;
+      }).join("");
+    }
+
+    html += `
+    <section class="meal">
+      <div class="meal-head"><h2>${label}</h2><span class="time">${time||""}</span></div>
+      <div class="card ${isDone?'done':''}">
+        ${inner}
+        <div class="done-row" onclick="toggleDone('${key}','${mk}')">
+          <div class="box"></div>
+          <span class="label">${isDone?"Fatto":"Segna come fatto"}</span>
+        </div>
+      </div>
+    </section>`;
+  });
+
+  el.innerHTML = html;
+}
+
+function renderNotes(){
+  const plan = getPlan(state.selectedDate);
+  const el = document.getElementById("notesSection");
+  if(!plan){
+    el.innerHTML = `<h2>Da ricordare</h2><ul><li>Pianifica il giorno per vedere i promemoria specifici.</li></ul>`;
+    return;
+  }
+  const cfg = DATA[plan.type];
+  el.innerHTML = `<h2>Da ricordare oggi</h2><ul>${cfg.notes.map(n=>`<li>${n}</li>`).join("")}</ul>`;
+}
+
+function renderShopping(){
+  const tabsEl = document.getElementById("weekTabs");
+  const baseMonday = fromKey(state.weekStart);
+  tabsEl.innerHTML = "";
+  for(let w=0; w<4; w++){
+    const monday = addDays(baseMonday, w*7);
+    const btn = document.createElement("button");
+    btn.className = shopWeekOffset===w ? "active" : "";
+    btn.innerHTML = `Settimana ${w+1}<span class="range">${fmtRange(monday)}</span>`;
+    btn.onclick = ()=>{ shopWeekOffset = w; renderShopping(); };
+    tabsEl.appendChild(btn);
+  }
+
+  const monday = addDays(baseMonday, shopWeekOffset*7);
+  const { byCat, unplanned, plannedCount } = buildShoppingList(monday);
+  const contentEl = document.getElementById("shopContent");
+  let html = "";
+
+  if(unplanned.length>0){
+    const names = unplanned.map(k=>{
+      const d = fromKey(k);
+      return DOW[(d.getDay()+6)%7] + " " + d.getDate();
+    }).join(", ");
+    html += `<div class="shop-warning">Giorni non ancora pianificati questa settimana: ${names}. Aprili nel calendario per completare la lista.</div>`;
+  }
+
+  if(plannedCount===0){
+    html += `<p class="shop-empty">Nessun giorno pianificato in questa settimana ancora.</p>`;
+  } else {
+    html += `<div class="shop-fixed"><div class="cat-title">Dispensa fissa</div><ul>${DISPENSA_FISSA.map(i=>`<li>${i}</li>`).join("")}</ul></div>`;
+    const order = [CAT.VEG, CAT.PROT, CAT.FISH, CAT.DAIRY, CAT.CARB, CAT.LEG, CAT.PANTRY];
+    order.forEach(cat=>{
+      if(!byCat[cat] || byCat[cat].length===0) return;
+      html += `<div class="cat-group"><div class="cat-title">${cat}</div><ul>${byCat[cat].map(item=>`<li><span>${item.name}</span><span class="qty">${fmtQty(item)}</span></li>`).join("")}</ul></div>`;
+    });
+  }
+  contentEl.innerHTML = html;
+}
+
+function render(){
+  document.getElementById("dateLabel").textContent = fmtDate();
+  renderCalendar();
+  renderDayEditor();
+  renderNotes();
+  renderShopping();
+  document.getElementById("avoidChips").innerHTML = AVOID.map(a=>`<span>${a}</span>`).join("");
+}
+
+document.getElementById("prevWeek").addEventListener("click", ()=>{
+  const cur = fromKey(state.weekStart);
+  const sel = fromKey(state.selectedDate);
+  const offset = Math.round((sel-cur)/86400000);
+  const newMonday = addDays(cur,-7);
+  state.weekStart = toKey(newMonday);
+  state.selectedDate = toKey(addDays(newMonday, offset));
+  save(); render();
+});
+document.getElementById("nextWeek").addEventListener("click", ()=>{
+  const cur = fromKey(state.weekStart);
+  const sel = fromKey(state.selectedDate);
+  const offset = Math.round((sel-cur)/86400000);
+  const newMonday = addDays(cur,7);
+  state.weekStart = toKey(newMonday);
+  state.selectedDate = toKey(addDays(newMonday, offset));
+  save(); render();
+});
+document.getElementById("gotoToday").addEventListener("click", ()=>{
+  state.weekStart = toKey(mondayOf(new Date()));
+  state.selectedDate = todayKey;
+  shopWeekOffset = 0;
+  save(); render();
+});
+document.getElementById("themeToggle").addEventListener("click", ()=>{
+  const order = ["auto","light","dark"];
+  theme = order[(order.indexOf(theme)+1)%order.length];
+  try{ localStorage.setItem("menu-oggi-theme", theme); }catch(e){}
+  applyTheme();
+});
+
+render();
+</script>
+</body>
+</html>
