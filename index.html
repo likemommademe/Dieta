@@ -118,7 +118,7 @@
   .btn-save { width: 100%; background: var(--train); color: white; border: none; border-radius: 10px; padding: 16px; font-weight: 700; font-size: 16px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(16,185,129,0.3); transition: background 0.2s;}
   .btn-save:active { background: #059669; }
 
-  /* SPESA */
+  /* SPESA E PROGRESSI (Stile Omesso per Brevità, usa il CSS precedente intatto) */
   .shop-header { text-align: center; margin-bottom: 24px; padding-top: 10px; }
   .shop-header h1 { font-weight: 700; font-size: 26px; margin: 0 0 8px; }
   .week-tabs { display: flex; overflow-x: auto; gap: 12px; margin-bottom: 24px; padding-bottom: 8px; }
@@ -258,14 +258,14 @@
         </div>
       </div>
       <div style="font-size:13px; text-align:center; color:var(--ink-soft); margin-top:16px; font-weight:500;">
-        Bilancio Reale: <span id="stat-today-net" style="font-weight:700;">+0</span> kcal
+        Bilancio Reale di Oggi: <span id="stat-today-net" style="font-weight:700;">+0</span> kcal
       </div>
     </div>
 
     <!-- GRAFICO ANDAMENTO CALORIE -->
     <div class="weight-card">
       <h3 style="margin-top:0">Andamento Calorie (Ultimi 7 gg)</h3>
-      <p style="font-size:12px; color:var(--ink-soft); margin-bottom:16px;">Se le barre (Cibo) superano la linea verde (Bruciate), sei in fase di massa!</p>
+      <p style="font-size:12px; color:var(--ink-soft); margin-bottom:16px;">Se le barre blu (Cibo Assunto) superano la linea verde (Bruciate), sei in fase di massa e il piano funziona!</p>
       <div class="chart-container" style="height: 200px;"><canvas id="kcalChart"></canvas></div>
     </div>
 
@@ -290,8 +290,8 @@
         <span>Bilancio Netto Medio</span>
         <strong id="stat-net">+0</strong>
       </div>
-      <p style="font-size:12px; color:var(--ink-soft); margin-top:12px; text-align:center;" id="stat-surplus-note">
-        La dieta della nutrizionista è calibrata per farti stare in surplus rispetto a quanto bruci!
+      <p style="font-size:12px; color:var(--ink-soft); margin-top:12px; text-align:center;">
+        La nutrizionista ha calcolato i tuoi piatti in modo da garantirti questo surplus calorico netto.
       </p>
     </div>
 
@@ -487,7 +487,7 @@ const SHOPPING_DATA = [
   ]}
 ];
 
-const STORAGE_KEY = "menu-oggi-state-v13";
+const STORAGE_KEY = "menu-oggi-state-v14";
 const WEIGHT_KEY = "menu-oggi-weight";
 const PHOTOS_KEY = "menu-oggi-photos";
 const DOW = ["Lun","Mar","Mer","Gio","Ven","Sab","Dom"];
@@ -509,7 +509,6 @@ let kcalChartInstance = null;
 let currentMonthDate = new Date(); currentMonthDate.setDate(1);
 
 function pad(n){ return n<10 ? "0"+n : ""+n; }
-function toKey(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-pad(d.getDate())"; }
 function toKey(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
 function fromKey(k){ const [y,m,d]=k.split("-").map(Number); return new Date(y,m-1,d); }
 function addDays(d,n){ const r=new Date(d); r.setDate(r.getDate()+n); return r; }
@@ -548,18 +547,37 @@ function calcDailyFoodKcal(key) {
     Object.keys(cfg.meals).forEach(mk => {
         let meal = cfg.meals[mk];
         if(meal.fixed) meal.fixed.forEach(f => total += f.k);
-        if(meal.options && plan.selections[mk] !== undefined) {
-            total += meal.options[plan.selections[mk]].k;
+        if(meal.options) {
+            let selIdx = plan.selections[mk] !== undefined ? plan.selections[mk] : 0;
+            total += meal.options[selIdx].k;
         }
     });
     return total;
 }
 
 /* UI DIARIO */
-function setPlanType(key, type) { state.byDate[key] = { type, selections: {}, completed: {} }; save(); render(); }
+function setPlanType(key, type) { 
+    state.byDate[key] = { type, selections: {}, completed: {} }; 
+    updateDailySummary(key);
+    save(); render(); 
+}
 function clearPlan(key) { delete state.byDate[key]; save(); render(); }
-function selectOption(key, mealKey, idx) { getPlan(key).selections[mealKey] = idx; save(); render(); }
+function selectOption(key, mealKey, idx) { 
+    getPlan(key).selections[mealKey] = idx; 
+    updateDailySummary(key);
+    save(); render(); 
+}
 function toggleDone(key, mealKey) { getPlan(key).completed[mealKey] = !getPlan(key).completed[mealKey]; save(); render(); }
+
+function updateDailySummary(key) {
+    let plan = getPlan(key);
+    if(!plan) return;
+    let act = plan.activity || { type:'', mins:'', overrideBurn:'' };
+    let w = getWeightAtDate(key);
+    let bmr = Math.round(calculateBMR(w));
+    let burned = act.overrideBurn ? parseInt(act.overrideBurn) : calcExerciseKcal(act.type, parseInt(act.mins||0), w);
+    plan.summary = { food: calcDailyFoodKcal(key), burned: bmr + burned };
+}
 
 function renderCalendar(){
   const monday = fromKey(state.weekStart);
@@ -592,7 +610,7 @@ function renderDayEditor(){
       if (meal.optionsIntro) contentHtml += `<div class="options-title">${meal.optionsIntro}</div>`;
       meal.options.forEach((opt, i) => {
         let isChecked = (plan.selections[mk] || 0) === i;
-        contentHtml += `<label class="radio-option" onclick="selectOption('${key}','${mk}',${i})"><input type="radio" name="meal_${key}_${mk}" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation()"><span>${opt.t} <br><span class="kcal-badge">${opt.k} kcal</span></span></label>`;
+        contentHtml += `<label class="radio-option"><input type="radio" name="meal_${key}_${mk}" ${isChecked ? 'checked' : ''} onchange="selectOption('${key}','${mk}',${i})"><span>${opt.t} <br><span class="kcal-badge">${opt.k} kcal</span></span></label>`;
       });
     }
     html += `<div class="meal-card ${isDone ? 'is-done' : ''}"><div class="meal-header"><h3>${meal.name}</h3></div><div class="meal-body">${contentHtml}</div><div class="meal-footer" onclick="toggleDone('${key}','${mk}')"><div class="btn-done">${isDone ? '✓ Completato' : 'Segna completato'}</div></div></div>`;
@@ -607,7 +625,7 @@ function renderDayEditor(){
   let tdee = bmr + (finalBurn || 0); // Bruciate totali
   
   let foodKcal = calcDailyFoodKcal(key); // Assunte
-  let netKcal = foodKcal - tdee;
+  let netKcal = foodKcal - tdee; // Bilancio netto reale
   
   let startW = state.profile.startWeight || 72;
   let targetW = state.profile.targetWeight || 80;
@@ -659,12 +677,7 @@ function saveActivity(key) {
     state.byDate[key].activity.mins = document.getElementById("ex-time").value;
     state.byDate[key].activity.overrideBurn = document.getElementById("ex-kcal").value;
     
-    // Aggiorniamo summary in modo che i progressi peschino dati salvati
-    let act = state.byDate[key].activity;
-    let w = getWeightAtDate(key);
-    let bmr = Math.round(calculateBMR(w));
-    let burned = act.overrideBurn ? parseInt(act.overrideBurn) : calcExerciseKcal(act.type, parseInt(act.mins||0), w);
-    state.byDate[key].summary = { food: calcDailyFoodKcal(key), burned: bmr + burned };
+    updateDailySummary(key);
     save(); render();
     alert("Dati salvati! Guarda il resoconto nella scheda Progressi.");
 }
