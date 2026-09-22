@@ -16,15 +16,21 @@
     --ink-soft: #4B5563;
     --ink-faint: #9CA3AF;
     --line: #E5E7EB;
+    
     --primary: #2563EB; 
     --primary-soft: #EFF6FF;
+    
     --train: #10B981; 
     --train-soft: #D1FAE5;
+    
     --rest: #6366F1; 
     --rest-soft: #E0E7FF;
+
     --warn: #F59E0B;
+    
     --radius-card: 16px;
     --radius-pill: 999px;
+    
     box-sizing: border-box;
   }
 
@@ -44,112 +50,120 @@
   @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
   /* HEADER */
-  header.hero { text-align: center; margin-bottom: 20px; padding-top: 10px; }
+  header.hero { text-align: center; margin-bottom: 24px; padding-top: 10px; }
   .date-label { font-size: 13px; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.5px;}
   h1.title { font-weight: 700; font-size: 26px; margin: 4px 0; }
 
   /* CALENDARIO */
-  .calendar { background: var(--surface); border-radius: var(--radius-card); padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 24px; }
-  .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .calendar { background: var(--surface); border-radius: var(--radius-card); padding: 20px 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 24px; border: 1px solid var(--line); }
+  .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
   .cal-nav .label { font-size: 15px; font-weight: 600; text-transform: capitalize; }
-  .cal-nav button { width: 36px; height: 36px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-size: 18px; }
-  .cal-today-btn { font-size: 13px !important; width: auto !important; padding: 0 16px; font-weight: 600; }
+  .cal-nav button { width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-size: 18px; transition: all 0.2s; }
+  .cal-nav button:active { background: var(--surface-muted); }
+  .cal-today-btn { font-size: 13px !important; width: auto !important; padding: 0 20px; font-weight: 600; }
   .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
   .cal-grid-month { gap: 8px; }
-  .cal-day { border-radius: 12px; background: var(--surface-muted); padding: 10px 4px; text-align: center; cursor: pointer; border: 2px solid transparent; }
-  .cal-day.empty { background: transparent; cursor: default; }
-  .cal-day .dow { font-size: 11px; color: var(--ink-faint); font-weight: 600; }
+  .cal-day { border-radius: 12px; background: var(--surface-muted); padding: 12px 4px; text-align: center; cursor: pointer; border: 2px solid transparent; }
+  .cal-day.empty { background: transparent; cursor: default; border: none; }
+  .cal-day .dow { font-size: 11px; color: var(--ink-faint); font-weight: 600; margin-bottom: 4px; }
   .cal-day .num { font-size: 16px; font-weight: 700; }
-  .cal-day .dot { width: 6px; height: 6px; border-radius: 50%; margin: 4px auto 0; background: transparent; }
+  .cal-day .dot { width: 6px; height: 6px; border-radius: 50%; margin: 6px auto 0; background: transparent; }
   .cal-day.train .dot { background: var(--train); }
   .cal-day.rest .dot { background: var(--rest); }
-  .cal-day.selected { border-color: var(--primary); background: var(--primary-soft); }
-  .cal-day .check { position: absolute; top: 3px; right: 4px; font-size: 10px; color: var(--train); font-weight: bold; }
-  .month-dow-row { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 8px; text-align: center; font-size: 11px; font-weight: 600; color: var(--ink-faint); text-transform: uppercase; }
+  .cal-day.selected { border-color: var(--primary); background: var(--primary-soft); box-shadow: 0 2px 6px rgba(37,99,235,0.1); }
+  .cal-day .check { position: absolute; top: 4px; right: 6px; font-size: 11px; color: var(--train); font-weight: bold; }
+  .month-dow-row { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 12px; text-align: center; font-size: 12px; font-weight: 600; color: var(--ink-faint); text-transform: uppercase; }
 
   /* SCELTA TIPO */
-  .day-type-selector { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
-  .btn-big { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-card); padding: 24px; font-size: 18px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 16px; }
+  .day-type-selector { display: flex; flex-direction: column; gap: 16px; margin-top: 24px; }
+  .btn-big { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-card); padding: 24px; font-size: 18px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: transform 0.1s, box-shadow 0.1s; }
+  .btn-big:active { transform: translateY(2px); box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
   .btn-big.train { border-left: 6px solid var(--train); }
   .btn-big.rest { border-left: 6px solid var(--rest); }
-  .active-day-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-  .type-badge { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; padding: 8px 16px; border-radius: var(--radius-pill); }
+  .active-day-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+  .type-badge { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; padding: 10px 16px; border-radius: var(--radius-pill); }
   .type-badge.train { background: var(--train-soft); color: #065F46; }
   .type-badge.rest { background: var(--rest-soft); color: #3730A3; }
-  .btn-reset { background: none; border: none; color: var(--ink-faint); text-decoration: underline; font-size: 13px; cursor: pointer; }
+  .btn-reset { background: none; border: none; color: var(--ink-faint); text-decoration: underline; font-size: 14px; cursor: pointer; padding: 8px; }
 
   /* PASTI E CALORIE */
-  .meal-list { display: flex; flex-direction: column; gap: 16px; }
-  .meal-card { background: var(--surface); border-radius: var(--radius-card); border: 1px solid var(--line); overflow: hidden; }
-  .meal-header { padding: 16px; border-bottom: 1px solid var(--surface-muted); display: flex; justify-content: space-between; align-items: baseline; }
-  .meal-header h3 { margin: 0; font-size: 17px; font-weight: 700; color: var(--ink); }
-  .meal-body { padding: 12px 16px; }
-  .fixed-item { font-size: 15px; line-height: 1.5; color: var(--ink); padding: 8px 0; }
-  .options-title { font-size: 13px; color: var(--primary); font-weight: 700; margin-bottom: 12px; text-transform: uppercase; }
-  .radio-option { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
-  .radio-option input[type="radio"] { margin-top: 3px; width: 22px; height: 22px; accent-color: var(--primary); }
-  .radio-option span { font-size: 15px; line-height: 1.4; flex: 1; }
-  .kcal-badge { font-size: 12px; background: var(--surface-muted); color: var(--ink-soft); padding: 4px 8px; border-radius: 8px; white-space: nowrap; font-weight: 600; border: 1px solid var(--line); }
+  .meal-list { display: flex; flex-direction: column; gap: 20px; }
+  .meal-card { background: var(--surface); border-radius: var(--radius-card); border: 1px solid var(--line); overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+  .meal-header { padding: 18px 20px 14px; border-bottom: 1px solid var(--surface-muted); display: flex; justify-content: space-between; align-items: baseline; }
+  .meal-header h3 { margin: 0; font-size: 18px; font-weight: 700; color: var(--ink); }
+  .meal-body { padding: 16px 20px; }
+  .fixed-item { font-size: 15px; line-height: 1.5; color: var(--ink); padding: 8px 0; margin-bottom: 8px; }
+  .options-title { font-size: 13px; color: var(--primary); font-weight: 700; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .radio-option { display: flex; align-items: flex-start; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+  .radio-option:last-child { border-bottom: none; }
+  .radio-option input[type="radio"] { margin-top: 2px; width: 24px; height: 24px; accent-color: var(--primary); }
+  .radio-option span { font-size: 15px; line-height: 1.5; flex: 1; }
+  .kcal-badge { display: inline-block; font-size: 12px; background: var(--surface-muted); color: var(--ink-soft); padding: 4px 8px; border-radius: 6px; white-space: nowrap; font-weight: 600; border: 1px solid var(--line); margin-top: 4px; }
+  .meal-footer { padding: 16px 20px; background: var(--surface-muted); border-top: 1px solid var(--line); display: flex; justify-content: center; cursor: pointer; }
+  .btn-done { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; color: var(--ink-soft); transition: color 0.2s; }
+  .meal-card.is-done .meal-header h3, .meal-card.is-done .fixed-item { opacity: 0.5; text-decoration: line-through; }
+  .meal-card.is-done .btn-done { color: var(--train); }
   
   /* WIDGET CALORIE E OBIETTIVO MASSA */
-  .obj-card { background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%); color: white; border-radius: var(--radius-card); padding: 20px; margin-top: 16px; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
-  .obj-title { font-size: 15px; font-weight: 600; opacity: 0.9; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;}
-  .obj-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .obj-stat { background: rgba(255,255,255,0.15); padding: 12px; border-radius: 12px; }
-  .obj-stat span { display: block; font-size: 12px; opacity: 0.8; margin-bottom: 4px; }
-  .obj-stat strong { font-size: 20px; font-weight: 700; }
+  .obj-card { background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%); color: white; border-radius: var(--radius-card); padding: 24px; margin-top: 8px; box-shadow: 0 6px 16px rgba(37,99,235,0.25); }
+  .obj-title { font-size: 15px; font-weight: 600; opacity: 0.9; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px;}
+  .obj-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .obj-stat { background: rgba(255,255,255,0.15); padding: 16px; border-radius: 12px; }
+  .obj-stat span { display: block; font-size: 12px; opacity: 0.9; margin-bottom: 6px; line-height: 1.3; }
+  .obj-stat strong { font-size: 24px; font-weight: 700; }
   
-  .calorie-form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
-  .calorie-form-group label { font-size: 13px; font-weight: 600; color: var(--ink-soft); }
-  .calorie-form-group select, .calorie-form-group input { width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 15px; background: var(--surface-muted); }
-  .btn-save { width: 100%; background: var(--train); color: white; border: none; border-radius: 8px; padding: 14px; font-weight: 700; font-size: 16px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;}
+  .calorie-form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+  .calorie-form-group label { font-size: 14px; font-weight: 600; color: var(--ink-soft); }
+  .calorie-form-group select, .calorie-form-group input { width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 16px; background: var(--surface-muted); }
+  .btn-save { width: 100%; background: var(--train); color: white; border: none; border-radius: 10px; padding: 16px; font-weight: 700; font-size: 16px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(16,185,129,0.3); transition: background 0.2s;}
   .btn-save:active { background: #059669; }
 
   /* SPESA */
   .shop-header { text-align: center; margin-bottom: 24px; padding-top: 10px; }
   .shop-header h1 { font-weight: 700; font-size: 26px; margin: 0 0 8px; }
-  .week-tabs { display: flex; overflow-x: auto; gap: 8px; margin-bottom: 20px; padding-bottom: 4px; }
-  .week-tabs button { flex: 0 0 auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-pill); padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; }
-  .week-tabs button.active { background: var(--primary); color: white; border-color: var(--primary); }
-  .shop-cat { margin-bottom: 24px; background: var(--surface); border-radius: var(--radius-card); border: 1px solid var(--line); overflow: hidden; }
-  .shop-cat-title { background: var(--surface-muted); padding: 14px 16px; font-size: 14px; font-weight: 700; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 8px;}
-  .shop-item { display: flex; align-items: flex-start; gap: 12px; padding: 16px; border-bottom: 1px solid var(--line); }
+  .week-tabs { display: flex; overflow-x: auto; gap: 12px; margin-bottom: 24px; padding-bottom: 8px; }
+  .week-tabs button { flex: 0 0 auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-pill); padding: 12px 24px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .week-tabs button.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2); }
+  .shop-cat { margin-bottom: 24px; background: var(--surface); border-radius: var(--radius-card); border: 1px solid var(--line); overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+  .shop-cat-title { background: var(--surface-muted); padding: 16px 20px; font-size: 15px; font-weight: 700; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 10px;}
+  .shop-item { display: flex; align-items: flex-start; gap: 16px; padding: 18px 20px; border-bottom: 1px solid var(--line); }
   .shop-item input[type="checkbox"] { margin-top: 2px; width: 24px; height: 24px; accent-color: var(--primary); }
-  .info-box { background: #FEF3C7; border: 1px solid #FCD34D; border-radius: 12px; padding: 16px; margin-bottom: 20px; }
-  .info-box h4 { margin: 0 0 8px; color: #92400E; font-size: 14px; text-transform: uppercase; }
+  .info-box { background: #FEF3C7; border: 1px solid #FCD34D; border-radius: 16px; padding: 20px; margin-bottom: 24px; }
+  .info-box h4 { margin: 0 0 12px; color: #92400E; font-size: 15px; text-transform: uppercase; }
 
   /* STATISTICHE E PESO */
-  .stat-box { background: var(--surface); border-radius: 12px; padding: 16px; border: 1px solid var(--line); text-align: center; flex: 1;}
+  .stat-box { background: var(--surface-muted); border-radius: 12px; padding: 16px; border: 1px solid var(--line); text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; }
   .stat-box span { display: block; font-size: 12px; color: var(--ink-soft); font-weight: 600; text-transform: uppercase; margin-bottom: 8px;}
-  .stat-box strong { font-size: 22px; color: var(--ink); }
-  .stat-box.surplus strong { color: var(--train); }
-  .weight-card { background: var(--surface); border-radius: var(--radius-card); padding: 24px; border: 1px solid var(--line); margin-bottom: 24px; }
-  .weight-input-container { display: flex; flex-direction: column; gap: 12px; background: var(--surface-muted); padding: 16px; border-radius: 12px; border: 1px solid var(--line); }
-  .weight-row { display: flex; gap: 12px; }
-  .input-wrapper { display: flex; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; flex: 1; }
-  .input-wrapper input { flex: 1; border: none; padding: 14px; font-size: 18px; font-weight: 600; outline: none; }
-  .btn-primary { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 14px; font-weight: 600; font-size: 16px; cursor: pointer; }
-  .chart-container { position: relative; height: 220px; width: 100%; margin-top: 24px; border-bottom: 1px solid var(--line); }
-  .history-item { display: flex; justify-content: space-between; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; margin-top: 8px; font-size: 15px; }
-  .history-item .del { background: #FEE2E2; color: #EF4444; width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; }
+  .stat-box strong { font-size: 24px; color: var(--ink); }
+  .stat-box.surplus strong { color: var(--train); font-size: 28px; }
+  .weight-card { background: var(--surface); border-radius: var(--radius-card); padding: 24px; border: 1px solid var(--line); margin-bottom: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+  .weight-input-container { display: flex; flex-direction: column; gap: 16px; background: var(--surface-muted); padding: 20px; border-radius: 16px; border: 1px solid var(--line); }
+  .weight-row { display: flex; gap: 16px; }
+  .input-wrapper { display: flex; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; flex: 1; align-items: center; }
+  .input-wrapper input { flex: 1; border: none; padding: 16px; font-size: 18px; font-weight: 600; outline: none; background: transparent; }
+  .btn-primary { background: var(--primary); color: white; border: none; border-radius: 10px; padding: 16px; font-weight: 600; font-size: 16px; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
+  .chart-container { position: relative; height: 250px; width: 100%; margin-top: 24px; margin-bottom: 12px; }
+  .history-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--surface-muted); border: 1px solid var(--line); border-radius: 12px; margin-top: 12px; font-size: 16px; }
+  .history-item .del { background: #FEE2E2; color: #EF4444; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; }
 
   /* GALLERIA FOTO */
-  .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
-  .photo-card { position: relative; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); aspect-ratio: 3/4; background: var(--surface-muted); }
+  .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
+  .photo-card { position: relative; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); aspect-ratio: 3/4; background: var(--surface-muted); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
   .photo-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .photo-card .date-badge { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.6); color: white; padding: 8px; font-size: 12px; text-align: center; font-weight: 600; backdrop-filter: blur(4px); }
-  .photo-card .del-btn { position: absolute; top: 8px; right: 8px; background: rgba(239, 68, 68, 0.9); color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; }
+  .photo-card .date-badge { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.65); color: white; padding: 10px; font-size: 13px; text-align: center; font-weight: 600; backdrop-filter: blur(4px); }
+  .photo-card .del-btn { position: absolute; top: 10px; right: 10px; background: rgba(239, 68, 68, 0.9); color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; }
   .file-upload-btn { position: relative; overflow: hidden; display: inline-block; width: 100%; }
   .file-upload-btn input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; height: 100%; }
-  .btn-outline { width: 100%; background: transparent; border: 2px dashed var(--primary); color: var(--primary); border-radius: 8px; padding: 16px; font-weight: 600; text-align: center; font-size: 15px; }
+  .btn-outline { width: 100%; background: var(--primary-soft); border: 2px dashed var(--primary); color: var(--primary); border-radius: 12px; padding: 20px; font-weight: 600; text-align: center; font-size: 16px; }
 
   /* IMPOSTAZIONI */
-  .settings-card { background: var(--surface); border-radius: var(--radius-card); padding: 20px; margin-bottom: 16px; border: 1px solid var(--line); }
+  .settings-card { background: var(--surface); border-radius: var(--radius-card); padding: 24px; margin-bottom: 24px; border: 1px solid var(--line); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+  .settings-card h3 { margin: 0 0 20px; font-size: 18px; display: flex; align-items: center; gap: 8px;}
 
   /* BOTTOM NAVIGATION */
-  .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--surface); border-top: 1px solid var(--line); display: flex; justify-content: space-around; padding: 12px 12px calc(12px + env(safe-area-inset-bottom)); z-index: 1000; }
-  .nav-btn { background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--ink-faint); font-weight: 600; font-size: 11px; cursor: pointer; flex: 1; }
-  .nav-btn .icon { font-size: 22px; margin-bottom: 2px; }
+  .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--surface); border-top: 1px solid var(--line); display: flex; justify-content: space-around; padding: 12px 8px calc(12px + env(safe-area-inset-bottom)); z-index: 1000; }
+  .nav-btn { background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--ink-faint); font-weight: 600; font-size: 11px; cursor: pointer; flex: 1; padding: 8px 0;}
+  .nav-btn .icon { font-size: 24px; transition: transform 0.2s; }
   .nav-btn.active { color: var(--primary); }
   .nav-btn.active .icon { transform: scale(1.15); }
 </style>
@@ -230,31 +244,55 @@
       <p>Tieni traccia del tuo cambiamento</p>
     </div>
 
-    <!-- RESOCONTO CALORIE -->
+    <!-- CALORIE DI OGGI -->
+    <div class="weight-card" style="border: 2px solid var(--primary); background: var(--surface);">
+      <h3 style="margin-top:0; color:var(--primary);">Diario di Oggi</h3>
+      <div style="display:flex; gap:16px;">
+        <div class="stat-box" style="background:var(--surface);">
+          <span>Menù (Assunte)</span>
+          <strong id="stat-today-food">0</strong>
+        </div>
+        <div class="stat-box" style="background:var(--surface);">
+          <span>TDEE (Bruciate)</span>
+          <strong id="stat-today-target">0</strong>
+        </div>
+      </div>
+      <div style="font-size:13px; text-align:center; color:var(--ink-soft); margin-top:16px; font-weight:500;">
+        Bilancio Reale: <span id="stat-today-net" style="font-weight:700;">+0</span> kcal
+      </div>
+    </div>
+
+    <!-- GRAFICO ANDAMENTO CALORIE -->
     <div class="weight-card">
-      <h3 style="margin-top:0">Resoconto Calorie</h3>
-      <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
-        <select id="stats-range" onchange="renderStats()" style="padding:8px; border-radius:8px; border:1px solid var(--line);">
-          <option value="7">Ultimi 7 Giorni</option>
-          <option value="30">Ultimi 30 Giorni</option>
+      <h3 style="margin-top:0">Andamento Calorie (Ultimi 7 gg)</h3>
+      <p style="font-size:12px; color:var(--ink-soft); margin-bottom:16px;">Se le barre (Cibo) superano la linea verde (Bruciate), sei in fase di massa!</p>
+      <div class="chart-container" style="height: 200px;"><canvas id="kcalChart"></canvas></div>
+    </div>
+
+    <!-- RESOCONTO MEDIO -->
+    <div class="weight-card">
+      <h3 style="margin-top:0">Media Calorie</h3>
+      <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
+        <select id="stats-range" onchange="renderStats()" style="padding:10px; border-radius:10px; border:1px solid var(--line); font-size:15px; width:100%; outline:none;">
+          <option value="7">Media ultimi 7 Giorni</option>
+          <option value="30">Media ultimi 30 Giorni</option>
         </select>
       </div>
-      
-      <div style="display:flex; gap:12px;">
+      <div style="display:flex; gap:16px;">
         <div class="stat-box">
-          <span>Assunte (Cibo)</span>
-          <strong id="stat-food">0</strong> kcal
+          <span>Assunte (Menù)</span><strong id="stat-food">0</strong>
         </div>
         <div class="stat-box">
-          <span>Consumate (TDEE)</span>
-          <strong id="stat-burned">0</strong> kcal
+          <span>Bruciate (TDEE)</span><strong id="stat-burned">0</strong>
         </div>
       </div>
-      <div class="stat-box surplus" style="margin-top:12px;">
-        <span>Bilancio Netto (Surplus/Deficit)</span>
-        <strong id="stat-net" style="font-size:26px;">+0</strong> kcal
+      <div class="stat-box surplus" style="margin-top:16px;">
+        <span>Bilancio Netto Medio</span>
+        <strong id="stat-net">+0</strong>
       </div>
-      <p style="font-size:12px; color:var(--ink-soft); margin-top:12px; text-align:center;">Il tuo surplus impostato è di <span id="stat-surplus-note" style="font-weight:bold;">15%</span> sulle calorie bruciate.</p>
+      <p style="font-size:12px; color:var(--ink-soft); margin-top:12px; text-align:center;" id="stat-surplus-note">
+        La dieta della nutrizionista è calibrata per farti stare in surplus rispetto a quanto bruci!
+      </p>
     </div>
 
     <!-- PESO -->
@@ -263,23 +301,25 @@
       <div class="weight-input-container">
         <div class="weight-row">
           <div class="input-wrapper">
-            <span style="padding:14px;">⚖️</span>
+            <span style="padding:0 16px; font-size:20px;">⚖️</span>
             <input type="number" id="weightInput" placeholder="75.0" step="0.1">
           </div>
         </div>
-        <div class="weight-row"><input type="date" id="weightDate" style="width:100%; padding:14px; border:1px solid var(--line); border-radius:8px;"></div>
+        <div class="weight-row">
+          <input type="date" id="weightDate" style="width:100%; padding:16px; border:1px solid var(--line); border-radius:10px; font-size:16px; background:var(--surface);">
+        </div>
         <button class="btn-primary" onclick="addWeight()">Salva Peso</button>
       </div>
       <div class="chart-container"><canvas id="weightChart"></canvas></div>
-      <div class="weight-history" id="weightHistory" style="margin-top:20px;"></div>
+      <div class="weight-history" id="weightHistory" style="margin-top:24px;"></div>
     </div>
     
     <!-- GALLERIA FOTO -->
     <div class="weight-card">
       <h3 style="margin-top:0">📸 Foto Fisico</h3>
-      <p style="font-size:13px; color:var(--ink-soft); margin-bottom:16px;">Carica una foto per monitorare visivamente i progressi.</p>
+      <p style="font-size:14px; color:var(--ink-soft); margin-bottom:20px;">Carica una foto per monitorare visivamente i progressi.</p>
       <div class="file-upload-btn" style="margin-bottom:12px;">
-        <div class="btn-outline">+ Aggiungi Foto</div>
+        <div class="btn-outline">+ Scatta o Aggiungi Foto</div>
         <input type="file" accept="image/*" onchange="handlePhotoUpload(event)">
       </div>
       <div class="photo-grid" id="photoGrid"></div>
@@ -291,21 +331,20 @@
     <div class="shop-header"><h1>Impostazioni ⚙️</h1></div>
     
     <div class="settings-card">
-      <h3>🎯 Obiettivi e Surplus</h3>
+      <h3>🎯 Obiettivi (Massa)</h3>
+      <div class="calorie-form-group">
+        <label>Peso di Partenza (kg)</label>
+        <input type="number" id="prof-start-weight" placeholder="es. 72" onchange="saveProfile()">
+      </div>
       <div class="calorie-form-group">
         <label>Obiettivo di Peso (kg)</label>
         <input type="number" id="prof-target-weight" placeholder="es. 80" onchange="saveProfile()">
-      </div>
-      <div class="calorie-form-group">
-        <label>Surplus per Massa (%)</label>
-        <input type="number" id="prof-surplus" placeholder="es. 15" onchange="saveProfile()">
-        <span style="font-size:12px; color:var(--ink-soft); margin-top:4px;">(Es: se bruci 2000kcal, un +15% aggiungerà 300kcal al tuo target).</span>
       </div>
     </div>
     
     <div class="settings-card">
       <h3>👤 Dati Fisici Base</h3>
-      <p style="font-size:13px; color:var(--ink-soft); margin-bottom:12px;">Usati per calcolare il Metabolismo Basale (BMR).</p>
+      <p style="font-size:14px; color:var(--ink-soft); margin-bottom:16px;">Usati per calcolare il Metabolismo Basale (BMR).</p>
       <div class="calorie-form-group">
         <label>Altezza (cm)</label><input type="number" id="prof-height" onchange="saveProfile()">
       </div>
@@ -319,7 +358,7 @@
     </div>
     <div class="settings-card">
       <h3>🗑️ Cancella Dati App</h3>
-      <button class="btn-primary" style="background:#EF4444; width:100%" onclick="resetAppData()">Azzera Dati</button>
+      <button class="btn-primary" style="background:#EF4444; width:100%" onclick="resetAppData()">Azzera Dati App</button>
     </div>
   </div>
 
@@ -418,7 +457,7 @@ const SHOPPING_DATA = [
   ]},
   { icon: "🥩", cat: "Proteine (Carne e Uova)", items: [
     {n: "Uova bio", q: "1 confezione (6 pz)"}, 
-    {n: "Carne bianca (Pollo/Tacchino/Vitella)", q: "600g (2 porzioni da 300g)"}, 
+    {n: "Carne bianca (Pollo/Tacchino)", q: "600g (2 porzioni da 300g)"}, 
     {n: "Carne magra (Manzo/Bovino)", q: "300g"},
     {n: "Affettati (Fesa/Cotto/Bresaola)", q: "350-400g"}
   ]},
@@ -429,10 +468,10 @@ const SHOPPING_DATA = [
     {n: "Tonno in scatola", q: "2 scatolette medie"}
   ]},
   { icon: "🧀", cat: "Latticini", items: [
-    {n: "Yogurt greco 0%", q: "1 kg (2 secchielli da 500g o 6 monoporzioni)"}, 
+    {n: "Yogurt greco 0%", q: "1 kg (2 secchielli da 500g)"}, 
     {n: "Feta", q: "150g (1 conf.)"}, 
     {n: "Parmigiano", q: "1 trancio piccolo"},
-    {n: "Yocca / Formaggio spalmabile light", q: "1-2 conf."},
+    {n: "Yocca / Formaggio light", q: "1-2 conf."},
     {n: "Formaggio a fette (Galbanino)", q: "1 busta"},
     {n: "Mozzarella / Ricotta", q: "1 pz ciascuno"}
   ]},
@@ -448,25 +487,29 @@ const SHOPPING_DATA = [
   ]}
 ];
 
-const STORAGE_KEY = "menu-oggi-state-v11";
+const STORAGE_KEY = "menu-oggi-state-v13";
 const WEIGHT_KEY = "menu-oggi-weight";
 const PHOTOS_KEY = "menu-oggi-photos";
 const DOW = ["Lun","Mar","Mer","Gio","Ven","Sab","Dom"];
 
 let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || { 
   byDate: {}, weekStart: toKey(mondayOf(new Date())), selectedDate: toKey(new Date()), shopChecks: {1:{},2:{},3:{},4:{}}, 
-  profile: { height: 175, age: 30, gender: 'M', targetWeight: 80, surplusPercent: 15 } 
+  profile: { height: 175, age: 30, gender: 'M', targetWeight: 80, startWeight: 72 } 
 };
 
 // Integrazione vecchi salvataggi
 if(!state.profile.targetWeight) state.profile.targetWeight = 80;
-if(!state.profile.surplusPercent) state.profile.surplusPercent = 15;
+if(!state.profile.startWeight) state.profile.startWeight = 72;
 
 let weightData = JSON.parse(localStorage.getItem(WEIGHT_KEY)) || [];
 let photosData = JSON.parse(localStorage.getItem(PHOTOS_KEY)) || [];
-let currentShopWeek = 1; let weightChartInstance = null; let currentMonthDate = new Date(); currentMonthDate.setDate(1);
+let currentShopWeek = 1; 
+let weightChartInstance = null; 
+let kcalChartInstance = null;
+let currentMonthDate = new Date(); currentMonthDate.setDate(1);
 
 function pad(n){ return n<10 ? "0"+n : ""+n; }
+function toKey(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-pad(d.getDate())"; }
 function toKey(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
 function fromKey(k){ const [y,m,d]=k.split("-").map(Number); return new Date(y,m-1,d); }
 function addDays(d,n){ const r=new Date(d); r.setDate(r.getDate()+n); return r; }
@@ -475,16 +518,29 @@ function mondayOf(d){ const r=new Date(d); const day=(r.getDay()+6)%7; return ad
 function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 function getPlan(key) { return state.byDate[key] || null; }
 
-/* CALCOLI CALORIE */
-function getLatestWeight() { return weightData.length ? weightData[weightData.length-1].weight : 72; }
-function calculateBMR() {
-    let p = state.profile; let w = getLatestWeight();
+/* CALCOLI CALORIE E PESO */
+function getWeightAtDate(dKey) {
+    let dTime = fromKey(dKey).getTime();
+    let closestW = state.profile.startWeight || 72;
+    let closestTime = 0;
+    weightData.forEach(w => {
+        let wTime = fromKey(w.date).getTime();
+        if(wTime <= dTime && wTime > closestTime) { closestTime = wTime; closestW = w.weight; }
+    });
+    return closestW;
+}
+function getLatestWeight() { return weightData.length ? weightData[weightData.length-1].weight : (state.profile.startWeight || 72); }
+
+function calculateBMR(weight) {
+    let p = state.profile; let w = weight || getWeightAtDate(toKey(new Date()));
     return p.gender === 'M' ? (10 * w) + (6.25 * p.height) - (5 * p.age) + 5 : (10 * w) + (6.25 * p.height) - (5 * p.age) - 161;
 }
-function calcExerciseKcal(type, mins) {
+
+function calcExerciseKcal(type, mins, weight) {
     const met = { corsa: 8, pesi: 5, piscina: 7, casa: 4.5 }[type] || 0;
-    return Math.round(met * getLatestWeight() * (mins / 60));
+    return Math.round(met * (weight || getWeightAtDate(toKey(new Date()))) * (mins / 60));
 }
+
 function calcDailyFoodKcal(key) {
     let plan = getPlan(key); if(!plan) return 0;
     let cfg = PLAN_DATA[plan.type];
@@ -531,12 +587,12 @@ function renderDayEditor(){
   // PASTI
   Object.keys(cfg.meals).forEach(mk => {
     const meal = cfg.meals[mk]; const isDone = !!plan.completed[mk]; let contentHtml = "";
-    if (meal.fixed) meal.fixed.forEach(item => contentHtml += `<div class="fixed-item">• ${item.t} <span class="kcal-badge">${item.k} kcal</span></div>`);
+    if (meal.fixed) meal.fixed.forEach(item => contentHtml += `<div class="fixed-item">• ${item.t} <br><span class="kcal-badge">${item.k} kcal</span></div>`);
     if (meal.options) {
       if (meal.optionsIntro) contentHtml += `<div class="options-title">${meal.optionsIntro}</div>`;
       meal.options.forEach((opt, i) => {
         let isChecked = (plan.selections[mk] || 0) === i;
-        contentHtml += `<label class="radio-option" onclick="selectOption('${key}','${mk}',${i})"><input type="radio" name="meal_${key}_${mk}" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation()"><span>${opt.t} <span class="kcal-badge">${opt.k} kcal</span></span></label>`;
+        contentHtml += `<label class="radio-option" onclick="selectOption('${key}','${mk}',${i})"><input type="radio" name="meal_${key}_${mk}" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation()"><span>${opt.t} <br><span class="kcal-badge">${opt.k} kcal</span></span></label>`;
       });
     }
     html += `<div class="meal-card ${isDone ? 'is-done' : ''}"><div class="meal-header"><h3>${meal.name}</h3></div><div class="meal-body">${contentHtml}</div><div class="meal-footer" onclick="toggleDone('${key}','${mk}')"><div class="btn-done">${isDone ? '✓ Completato' : 'Segna completato'}</div></div></div>`;
@@ -544,30 +600,31 @@ function renderDayEditor(){
   
   // WIDGET MASSA E ALLENAMENTO DINAMICO
   let act = plan.activity || { type:'', mins:'', overrideBurn:'' };
-  let bmr = Math.round(calculateBMR());
-  let calcBurn = calcExerciseKcal(act.type, parseInt(act.mins||0));
+  let currentW = getWeightAtDate(key);
+  let bmr = Math.round(calculateBMR(currentW));
+  let calcBurn = calcExerciseKcal(act.type, parseInt(act.mins||0), currentW);
   let finalBurn = act.overrideBurn ? parseInt(act.overrideBurn) : calcBurn;
-  let tdee = bmr + (finalBurn || 0);
+  let tdee = bmr + (finalBurn || 0); // Bruciate totali
   
-  let surplusPct = state.profile.surplusPercent || 15;
-  let surplusKcal = Math.round(tdee * (surplusPct / 100));
-  let targetMassa = tdee + surplusKcal;
+  let foodKcal = calcDailyFoodKcal(key); // Assunte
+  let netKcal = foodKcal - tdee;
   
-  let foodKcal = calcDailyFoodKcal(key);
-  let latestW = getLatestWeight();
+  let startW = state.profile.startWeight || 72;
   let targetW = state.profile.targetWeight || 80;
 
   html += `
   <div class="obj-card">
-    <div class="obj-title">🎯 Obiettivo Ipertrofia (${latestW} -> ${targetW}kg)</div>
+    <div class="obj-title">🎯 Obiettivo (${startW} -> ${targetW}kg)</div>
     <div class="obj-grid">
-      <div class="obj-stat"><span>Calorie Target (TDEE + ${surplusPct}%)</span><strong>${targetMassa} kcal</strong></div>
-      <div class="obj-stat"><span>Assunte finora (Da Menu)</span><strong>${foodKcal} kcal</strong></div>
+      <div class="obj-stat"><span>Bruciate (BMR + Allenam.)</span><strong>${tdee} kcal</strong></div>
+      <div class="obj-stat"><span>Assunte (Da Menù)</span><strong>${foodKcal} kcal</strong></div>
     </div>
-    <div style="font-size:12px; opacity:0.8; margin-top:8px; text-align:center;">Surplus applicato: +${surplusKcal} kcal</div>
+    <div style="font-size:14px; opacity:0.9; margin-top:16px; text-align:center; font-weight:600;">
+      Bilancio di oggi: <span style="font-size:18px;">${netKcal > 0 ? '+' : ''}${netKcal}</span> kcal
+    </div>
   </div>
 
-  <div class="meal-card" style="margin-top: 16px;">
+  <div class="meal-card" style="margin-top: 24px;">
     <div class="meal-header"><h3>🔥 Allenamento di Oggi</h3></div>
     <div class="meal-body">
       <div class="calorie-form-group">
@@ -580,7 +637,7 @@ function renderDayEditor(){
           <option value="casa" ${act.type==='casa'?'selected':''}>🏠 Allenamento a Casa</option>
         </select>
       </div>
-      <div style="display:flex; gap:12px;">
+      <div style="display:flex; gap:16px;">
         <div class="calorie-form-group" style="flex:1;">
           <label>Minuti Durata</label>
           <input type="number" id="ex-time" value="${act.mins}" placeholder="Es. 60">
@@ -601,9 +658,12 @@ function saveActivity(key) {
     state.byDate[key].activity.type = document.getElementById("ex-type").value;
     state.byDate[key].activity.mins = document.getElementById("ex-time").value;
     state.byDate[key].activity.overrideBurn = document.getElementById("ex-kcal").value;
+    
+    // Aggiorniamo summary in modo che i progressi peschino dati salvati
     let act = state.byDate[key].activity;
-    let bmr = Math.round(calculateBMR());
-    let burned = act.overrideBurn ? parseInt(act.overrideBurn) : calcExerciseKcal(act.type, parseInt(act.mins||0));
+    let w = getWeightAtDate(key);
+    let bmr = Math.round(calculateBMR(w));
+    let burned = act.overrideBurn ? parseInt(act.overrideBurn) : calcExerciseKcal(act.type, parseInt(act.mins||0), w);
     state.byDate[key].summary = { food: calcDailyFoodKcal(key), burned: bmr + burned };
     save(); render();
     alert("Dati salvati! Guarda il resoconto nella scheda Progressi.");
@@ -638,22 +698,46 @@ function renderShopping(){
         html += `<div class="shop-cat"><div class="shop-cat-title">${cat.icon} ${cat.cat}</div><div>`;
         cat.items.forEach((item, iIdx) => {
             let ch = !!state.shopChecks[currentShopWeek][`${cIdx}-${iIdx}`];
-            html += `<label class="shop-item"><input type="checkbox" ${ch?'checked':''} onchange="toggleShopItem(${cIdx}, ${iIdx})"><div style="flex:1;"><span style="font-size:15px; font-weight:500; ${ch?'text-decoration:line-through;color:var(--ink-faint)':''}">${item.n}</span><br><span style="font-size:13px; color:var(--ink-faint);">${item.q}</span></div></label>`;
+            html += `<label class="shop-item"><input type="checkbox" ${ch?'checked':''} onchange="toggleShopItem(${cIdx}, ${iIdx})"><div style="flex:1;"><span style="font-size:15px; font-weight:500; ${ch?'text-decoration:line-through;color:var(--ink-faint)':''}">${item.n}</span><br><span style="font-size:13px; color:var(--ink-faint); margin-top:4px; display:inline-block;">${item.q}</span></div></label>`;
         });
         html += `</div></div>`;
     });
     document.getElementById('shopContent').innerHTML = html;
 }
 
-/* UI STATISTICHE E FOTO */
+/* UI STATISTICHE, PESO & FOTO */
 function renderStats() {
     let days = parseInt(document.getElementById("stats-range").value);
     let totalFood = 0, totalBurned = 0, count = 0;
     
+    let kcalDates = [];
+    let kcalBurnedTarget = [];
+    let kcalFoodBars = [];
+
+    // Calcolo Media Globale
     for(let i=0; i<days; i++) {
         let d = new Date(); d.setDate(d.getDate() - i);
-        let plan = getPlan(toKey(d));
-        if (plan && plan.summary) { totalFood += plan.summary.food; totalBurned += plan.summary.burned; count++; }
+        let key = toKey(d);
+        let plan = getPlan(key);
+        if (plan && plan.summary) { 
+            totalFood += plan.summary.food; 
+            totalBurned += plan.summary.burned; 
+            count++; 
+        }
+    }
+    
+    // Calcolo Dati per Grafico (ultimi 7 giorni)
+    for(let i=6; i>=0; i--) {
+        let d = new Date(); d.setDate(d.getDate() - i);
+        let key = toKey(d);
+        let plan = getPlan(key);
+        kcalDates.push(d.toLocaleDateString("it-IT", {day:"numeric", month:"short"}));
+        
+        let food = (plan && plan.summary) ? plan.summary.food : 0;
+        let tdee = (plan && plan.summary) ? plan.summary.burned : calculateBMR(getWeightAtDate(key));
+        
+        kcalFoodBars.push(food);
+        kcalBurnedTarget.push(tdee);
     }
     
     let avgFood = count ? Math.round(totalFood/count) : 0;
@@ -664,8 +748,34 @@ function renderStats() {
     document.getElementById("stat-burned").innerText = avgBurn;
     let netEl = document.getElementById("stat-net");
     netEl.innerText = (net > 0 ? "+" : "") + net;
-    netEl.style.color = net > 100 ? "var(--train)" : "#EF4444";
-    document.getElementById("stat-surplus-note").innerText = (state.profile.surplusPercent || 15) + "%";
+    netEl.style.color = net > 50 ? "var(--train)" : "#EF4444";
+
+    // Calorie Oggi (Live)
+    let todayKey = toKey(new Date());
+    let tPlan = getPlan(todayKey);
+    let tFood = calcDailyFoodKcal(todayKey);
+    let tTdee = (tPlan && tPlan.summary) ? tPlan.summary.burned : calculateBMR(getLatestWeight());
+    let tNet = tFood - tTdee;
+    
+    document.getElementById("stat-today-food").innerText = tFood;
+    document.getElementById("stat-today-target").innerText = tTdee;
+    document.getElementById("stat-today-net").innerText = (tNet > 0 ? '+' : '') + tNet;
+    document.getElementById("stat-today-net").style.color = tNet > 50 ? "var(--train)" : "var(--warn)";
+
+    // Disegna Grafico Calorie
+    if(kcalChartInstance) kcalChartInstance.destroy();
+    const ctxK = document.getElementById('kcalChart').getContext('2d');
+    kcalChartInstance = new Chart(ctxK, {
+      type: 'bar',
+      data: { 
+          labels: kcalDates, 
+          datasets: [
+              { label: 'Assunte (Menù)', data: kcalFoodBars, backgroundColor: '#3B82F6', borderRadius: 6 },
+              { label: 'Bruciate (TDEE)', data: kcalBurnedTarget, type: 'line', borderColor: '#10B981', borderDash: [5,5], backgroundColor: 'transparent', borderWidth: 2, pointRadius: 0 }
+          ] 
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom' } }, scales: { y: { beginAtZero: true, grid: { color: '#E5E7EB' } }, x: { grid: { display: false } } } }
+    });
 }
 
 function addWeight() {
@@ -687,7 +797,7 @@ function renderWeight() {
   if(weightChartInstance) weightChartInstance.destroy();
   const ctx = document.getElementById('weightChart').getContext('2d');
   weightChartInstance = new Chart(ctx, {
-    type: 'line', data: { labels: weightData.map(w => fromKey(w.date).toLocaleDateString("it-IT", { day:"numeric", month:"short" })), datasets: [{ label: 'Peso', data: weightData.map(w => w.weight), borderColor: '#2563EB', backgroundColor: 'rgba(37,99,235,0.15)', borderWidth: 3, tension: 0.4, fill: true }] },
+    type: 'line', data: { labels: weightData.map(w => fromKey(w.date).toLocaleDateString("it-IT", { day:"numeric", month:"short" })), datasets: [{ label: 'Peso', data: weightData.map(w => w.weight), borderColor: '#2563EB', backgroundColor: 'rgba(37,99,235,0.15)', borderWidth: 3, tension: 0.4, fill: true, pointBackgroundColor: '#FFFFFF', pointBorderColor: '#2563EB', pointBorderWidth: 2 }] },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#E5E7EB' } }, x: { grid: { display: false } } } }
   });
   renderStats();
@@ -751,16 +861,17 @@ function initSettings() {
     document.getElementById('prof-height').value = state.profile.height;
     document.getElementById('prof-age').value = state.profile.age;
     document.getElementById('prof-gender').value = state.profile.gender;
+    document.getElementById('prof-start-weight').value = state.profile.startWeight;
     document.getElementById('prof-target-weight').value = state.profile.targetWeight;
-    document.getElementById('prof-surplus').value = state.profile.surplusPercent;
 }
 function saveProfile() {
     state.profile.height = document.getElementById('prof-height').value || 175;
     state.profile.age = document.getElementById('prof-age').value || 30;
     state.profile.gender = document.getElementById('prof-gender').value || 'M';
+    state.profile.startWeight = document.getElementById('prof-start-weight').value || 72;
     state.profile.targetWeight = document.getElementById('prof-target-weight').value || 80;
-    state.profile.surplusPercent = document.getElementById('prof-surplus').value || 15;
     save();
+    render();
 }
 function resetAppData() { if(confirm("Cancellare tutto il calendario?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); } }
 
@@ -775,6 +886,7 @@ function switchTab(tabId) {
     if (tabId === 'shop') renderShopping();
     if (tabId === 'weight') renderWeight();
     if (tabId === 'settings') initSettings();
+    window.scrollTo(0,0);
 }
 
 function render() { renderCalendar(); renderDayEditor(); }
