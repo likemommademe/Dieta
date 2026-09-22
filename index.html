@@ -56,18 +56,21 @@
   .date-label { font-size: 13px; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.5px;}
   h1.title { font-weight: 700; font-size: 26px; margin: 4px 0; }
 
-  /* CALENDARIO */
+  /* CALENDARIO SETTIMANALE & MENSILE */
   .calendar { background: var(--surface); border-radius: var(--radius-card); padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 24px; }
   .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-  .cal-nav .label { font-size: 15px; font-weight: 600; }
+  .cal-nav .label { font-size: 15px; font-weight: 600; text-transform: capitalize; }
   .cal-nav button {
     width: 36px; height: 36px; border-radius: 12px; border: 1px solid var(--line);
     background: var(--surface); color: var(--ink); font-size: 18px; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
   }
   .cal-today-btn { font-size: 13px !important; width: auto !important; padding: 0 16px; font-weight: 600; }
+  
   .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .cal-grid-month { gap: 8px; }
   .cal-day { border-radius: 12px; background: var(--surface-muted); padding: 10px 4px; text-align: center; cursor: pointer; position: relative; border: 2px solid transparent; transition: all 0.2s; }
+  .cal-day.empty { background: transparent; cursor: default; }
   .cal-day .dow { font-size: 11px; color: var(--ink-faint); font-weight: 600; margin-bottom: 4px; }
   .cal-day .num { font-size: 16px; font-weight: 700; }
   .cal-day .dot { width: 6px; height: 6px; border-radius: 50%; margin: 4px auto 0; background: transparent; }
@@ -75,6 +78,9 @@
   .cal-day.rest .dot { background: var(--rest); }
   .cal-day.selected { border-color: var(--primary); background: var(--primary-soft); }
   .cal-day .check { position: absolute; top: 3px; right: 4px; font-size: 10px; color: var(--train); font-weight: bold; }
+
+  /* MESE VISTA: Intestazione Giorni */
+  .month-dow-row { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 8px; text-align: center; font-size: 11px; font-weight: 600; color: var(--ink-faint); text-transform: uppercase; }
 
   /* GIORNO (SCELTA TIPO) */
   .day-type-selector { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
@@ -90,7 +96,7 @@
   .type-badge.rest { background: var(--rest-soft); color: #3730A3; }
   .btn-reset { background: none; border: none; color: var(--ink-faint); text-decoration: underline; font-size: 13px; cursor: pointer; }
 
-  /* CARDS PASTI */
+  /* CARDS PASTI E CALORIE */
   .meal-list { display: flex; flex-direction: column; gap: 16px; }
   .meal-card { background: var(--surface); border-radius: var(--radius-card); box-shadow: 0 2px 8px rgba(0,0,0,0.04); overflow: hidden; border: 1px solid var(--line); }
   .meal-header { padding: 16px 16px 12px; border-bottom: 1px solid var(--surface-muted); display: flex; justify-content: space-between; align-items: baseline; }
@@ -109,15 +115,21 @@
   .meal-card.is-done .meal-header h3, .meal-card.is-done .fixed-item { opacity: 0.6; text-decoration: line-through; }
   .meal-card.is-done .btn-done { color: var(--train); }
 
+  /* WIDGET CALORIE & ALLENAMENTO */
+  .calorie-form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .calorie-form-group label { font-size: 13px; font-weight: 600; color: var(--ink-soft); }
+  .calorie-form-group select, .calorie-form-group input { width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 15px; color: var(--ink); background: var(--surface-muted); outline: none; }
+  .calorie-form-group input:focus, .calorie-form-group select:focus { border-color: var(--primary); }
+  .cal-result { display: flex; justify-content: space-between; align-items: center; background: var(--primary-soft); padding: 12px; border-radius: 8px; margin-top: 8px; }
+  .cal-result strong { color: var(--primary); font-size: 16px; }
+
   /* SPESA */
   .shop-header { text-align: center; margin-bottom: 24px; padding-top: 10px; }
   .shop-header h1 { font-weight: 700; font-size: 26px; margin: 0 0 8px; }
   .shop-header p { color: var(--ink-soft); font-size: 14px; margin: 0; }
-  
   .week-tabs { display: flex; overflow-x: auto; gap: 8px; margin-bottom: 20px; padding-bottom: 4px; }
   .week-tabs button { flex: 0 0 auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-pill); padding: 10px 20px; font-size: 14px; font-weight: 600; color: var(--ink-soft); cursor: pointer; }
   .week-tabs button.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2); }
-
   .shop-cat { margin-bottom: 24px; background: var(--surface); border-radius: var(--radius-card); box-shadow: 0 2px 8px rgba(0,0,0,0.04); overflow: hidden; border: 1px solid var(--line); }
   .shop-cat-title { background: var(--surface-muted); padding: 14px 16px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 8px; }
   .shop-item { display: flex; align-items: flex-start; gap: 12px; padding: 16px; border-bottom: 1px solid var(--line); }
@@ -132,24 +144,18 @@
   .info-box h4 { margin: 0 0 8px; color: #92400E; font-size: 14px; text-transform: uppercase; }
   .info-box p, .info-box li { font-size: 13px; color: #92400E; line-height: 1.5; margin: 4px 0;}
 
-  /* PESO & GRAFICO MIGLIORATI */
+  /* PESO E GRAFICO */
   .weight-card { background: var(--surface); border-radius: var(--radius-card); padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 24px; border: 1px solid var(--line); }
   .weight-card h3 { margin: 0 0 16px; font-size: 18px; color: var(--ink); }
-  
   .weight-input-container { display: flex; flex-direction: column; gap: 12px; background: var(--surface-muted); padding: 16px; border-radius: 12px; border: 1px solid var(--line); }
   .weight-row { display: flex; gap: 12px; }
-  
   .input-wrapper { position: relative; flex: 1; display: flex; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
   .input-icon { padding: 0 12px; color: var(--ink-faint); font-size: 18px; }
   .input-wrapper input[type="number"] { flex: 1; border: none; padding: 14px 0; font-size: 18px; font-weight: 600; outline: none; color: var(--ink); }
   .input-unit { padding: 0 16px; color: var(--ink-soft); font-weight: 600; font-size: 15px; background: var(--surface-muted); border-left: 1px solid var(--line); height: 100%; display: flex; align-items: center; }
-  
   .weight-input-container input[type="date"] { padding: 14px; border: 1px solid var(--line); border-radius: 8px; font-size: 15px; background: var(--surface); color: var(--ink-soft); outline: none; }
   .btn-primary { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 14px; font-weight: 600; font-size: 16px; cursor: pointer; transition: background 0.2s; }
-  .btn-primary:active { background: #1D4ED8; }
-  
   .chart-container { position: relative; height: 220px; width: 100%; margin-top: 24px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
-  
   .weight-history { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
   .history-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; font-size: 15px; }
   .history-date { color: var(--ink-soft); font-size: 14px; }
@@ -158,16 +164,12 @@
 
   /* IMPOSTAZIONI */
   .settings-card { background: var(--surface); border-radius: var(--radius-card); padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid var(--line); }
-  .settings-card h3 { margin: 0 0 12px; font-size: 17px; display: flex; align-items: center; gap: 8px;}
-  .settings-card p { font-size: 14px; color: var(--ink-soft); line-height: 1.5; margin-bottom: 16px;}
-  .file-input-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
-  .file-input-wrapper input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; height: 100%; }
-  .btn-outline { width: 100%; background: transparent; border: 2px dashed var(--primary); color: var(--primary); border-radius: 8px; padding: 16px; font-weight: 600; text-align: center; font-size: 15px;}
-
+  .settings-card h3 { margin: 0 0 16px; font-size: 17px; display: flex; align-items: center; gap: 8px;}
+  
   /* BOTTOM NAVIGATION */
   .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--surface); border-top: 1px solid var(--line); display: flex; justify-content: space-around; padding: 12px 12px calc(12px + env(safe-area-inset-bottom)); box-shadow: 0 -4px 20px rgba(0,0,0,0.03); z-index: 1000; }
   .nav-btn { background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--ink-faint); font-weight: 600; font-size: 11px; cursor: pointer; flex: 1; }
-  .nav-btn .icon { font-size: 24px; margin-bottom: 2px; transition: transform 0.2s; }
+  .nav-btn .icon { font-size: 22px; margin-bottom: 2px; transition: transform 0.2s; }
   .nav-btn.active { color: var(--primary); }
   .nav-btn.active .icon { transform: scale(1.15); }
 </style>
@@ -176,22 +178,43 @@
 
 <div class="app">
 
-  <!-- VISTA: PIANO ALIMENTARE -->
+  <!-- VISTA: PIANO ALIMENTARE (GIORNO) -->
   <div id="view-plan" class="view active">
     <header class="hero">
       <div class="date-label" id="dateLabel"></div>
-      <h1 class="title">Piano Alimentare</h1>
+      <h1 class="title">Diario Oggi</h1>
     </header>
+    
     <section class="calendar">
       <div class="cal-nav">
-        <button id="prevWeek">‹</button>
+        <button onclick="changeWeek(-1)">‹</button>
         <span class="label" id="weekLabel"></span>
-        <button class="cal-today-btn" id="gotoToday">Oggi</button>
-        <button id="nextWeek">›</button>
+        <button class="cal-today-btn" onclick="goToToday()">Oggi</button>
+        <button onclick="changeWeek(1)">›</button>
       </div>
       <div class="cal-grid" id="calGrid"></div>
     </section>
+    
     <div id="dayEditor"></div>
+  </div>
+
+  <!-- VISTA: CALENDARIO MENSILE -->
+  <div id="view-month" class="view">
+    <div class="shop-header">
+      <h1>Calendario Mensile 📅</h1>
+      <p>Panoramica degli allenamenti</p>
+    </div>
+    <div class="calendar" style="margin-top:20px;">
+      <div class="cal-nav">
+        <button onclick="changeMonth(-1)">‹</button>
+        <span class="label" id="monthViewLabel" style="text-transform: uppercase;"></span>
+        <button onclick="changeMonth(1)">›</button>
+      </div>
+      <div class="month-dow-row">
+        <span>Lun</span><span>Mar</span><span>Mer</span><span>Gio</span><span>Ven</span><span>Sab</span><span>Dom</span>
+      </div>
+      <div class="cal-grid cal-grid-month" id="monthGrid"></div>
+    </div>
   </div>
 
   <!-- VISTA: SPESA SETTIMANALE -->
@@ -200,14 +223,13 @@
       <h1>Lista della Spesa 🛒</h1>
       <p>Con grammature per porzione</p>
     </div>
-    
     <div class="week-tabs" id="shopWeekTabs">
       <button class="active" onclick="changeShopWeek(1)">Settimana 1</button>
       <button onclick="changeShopWeek(2)">Settimana 2</button>
       <button onclick="changeShopWeek(3)">Settimana 3</button>
       <button onclick="changeShopWeek(4)">Settimana 4</button>
     </div>
-
+    
     <div class="info-box">
       <h4>Raccomandazioni Fisse ⚠️</h4>
       <ul>
@@ -218,12 +240,10 @@
         <li>Pasta: Utilizzare Senatore Cappelli integrale.</li>
       </ul>
     </div>
-    
     <div class="info-box" style="background: #FEE2E2; border-color: #FCA5A5;">
       <h4 style="color: #991B1B;">Alimenti da Evitare 🚫</h4>
-      <p style="color: #991B1B;">Cachi, fichi, uva, kiwi, mango, cocco, frutta molto matura, succhi, melograno, anguria, melone, patate, zucca gialla, rape rosse, carote cotte, mais, gallette (riso/mais), farina 0/00, zucchero, riso bianco, dolci, marmellate, alcool, bibite gassate.</p>
+      <p style="color: #991B1B;">Cachi, fichi, ecc. Gallette, farina bianca, dolci, alcol e bibite gassate.</p>
     </div>
-
     <div id="shopContent"></div>
   </div>
 
@@ -231,11 +251,9 @@
   <div id="view-weight" class="view">
     <div class="shop-header">
       <h1>Andamento Peso ⚖️</h1>
-      <p>Monitora i tuoi progressi</p>
     </div>
-    
     <div class="weight-card">
-      <h3>Inserisci nuova misurazione</h3>
+      <h3>Inserisci misurazione</h3>
       <div class="weight-input-container">
         <div class="weight-row">
           <div class="input-wrapper">
@@ -244,16 +262,10 @@
             <span class="input-unit">kg</span>
           </div>
         </div>
-        <div class="weight-row">
-          <input type="date" id="weightDate" style="flex:1">
-        </div>
+        <div class="weight-row"><input type="date" id="weightDate" style="flex:1"></div>
         <button class="btn-primary" onclick="addWeight()">Salva Misurazione</button>
       </div>
-
-      <div class="chart-container">
-        <canvas id="weightChart"></canvas>
-      </div>
-      
+      <div class="chart-container"><canvas id="weightChart"></canvas></div>
       <h3 style="margin: 24px 0 8px; font-size: 16px;">Storico Misurazioni</h3>
       <div class="weight-history" id="weightHistory"></div>
     </div>
@@ -263,21 +275,38 @@
   <div id="view-settings" class="view">
     <div class="shop-header">
       <h1>Impostazioni ⚙️</h1>
-      <p>Gestisci l'app e i piani</p>
+    </div>
+
+    <!-- PROFILO PER CALCOLO CALORIE -->
+    <div class="settings-card">
+      <h3>👤 Profilo Base (Calcolo Calorie)</h3>
+      <div class="calorie-form-group">
+        <label>Altezza (cm)</label>
+        <input type="number" id="prof-height" placeholder="es. 175" onchange="saveProfile()">
+      </div>
+      <div class="calorie-form-group">
+        <label>Età</label>
+        <input type="number" id="prof-age" placeholder="es. 30" onchange="saveProfile()">
+      </div>
+      <div class="calorie-form-group">
+        <label>Sesso</label>
+        <select id="prof-gender" onchange="saveProfile()">
+          <option value="M">Uomo</option>
+          <option value="F">Donna</option>
+        </select>
+      </div>
     </div>
     
     <div class="settings-card">
-      <h3>🔄 Aggiorna Piano Alimentare</h3>
-      <p>Hai un nuovo PDF della nutrizionista? Chiedi all'IA di "convertire il PDF in file JSON per l'app" e caricalo qui.</p>
+      <h3>🔄 Aggiorna Piano JSON</h3>
       <div class="file-input-wrapper">
         <div class="btn-outline">Carica File .json</div>
-        <input type="file" accept=".json" id="fileUpload" onchange="handleFileUpload(event)">
+        <input type="file" accept=".json" onchange="handleFileUpload(event)">
       </div>
     </div>
 
     <div class="settings-card">
-      <h3>🗑️ Cancella Dati</h3>
-      <p>Ripristina l'app azzerando le spunte e il calendario (il peso non verrà cancellato).</p>
+      <h3>🗑️ Ripristina App</h3>
       <button class="btn-primary" style="background:#EF4444; width:100%" onclick="resetAppData()">Azzera Dati Calendario</button>
     </div>
   </div>
@@ -287,7 +316,10 @@
 <!-- BOTTOM NAVIGATION -->
 <nav class="bottom-nav">
   <button class="nav-btn active" id="tab-plan" onclick="switchTab('plan')">
-    <span class="icon">📅</span><span>Piano</span>
+    <span class="icon">📝</span><span>Oggi</span>
+  </button>
+  <button class="nav-btn" id="tab-month" onclick="switchTab('month')">
+    <span class="icon">📅</span><span>Mese</span>
   </button>
   <button class="nav-btn" id="tab-shop" onclick="switchTab('shop')">
     <span class="icon">🛒</span><span>Spesa</span>
@@ -301,192 +333,80 @@
 </nav>
 
 <script>
-/* ---------- DATI ALIMENTARI (STRETTAMENTE SEPARATI COME DA PDF) ---------- */
+/* ---------- DATI ALIMENTARI (STRETTAMENTE SEPARATI) ---------- */
 let PLAN_DATA = {
   train: {
     label: "Allenamento",
     meals: {
       colazione: { 
         name: "Colazione", time: "7:00 – 8:30",
-        fixed: ["🍊 Spremuta d'arancia o estratto (o 2 cucch. Vibracell)", "☕ Caffè o orzo (facoltativo)", "🍞 70g pane segale integrale tostato"],
-        optionsIntro: "Scegli l'accompagnamento al pane:",
-        options: [
-          "🦃 60g fesa tacchino / cotto / crudo + 2 fette formaggio", 
-          "🍳 2 uova strapazzate bio", 
-          "🐟 50g salmone affumicato + formaggio spalmabile light", 
-          "🫒 2 cucchiaini d'olio e sale", 
-          "🧀 50g di ricotta vaccina"
-        ]
+        fixed: ["🍊 Spremuta d'arancia o estratto", "☕ Caffè o orzo", "🍞 70g pane segale integrale tostato"],
+        optionsIntro: "Accompagna con:",
+        options: ["🦃 60g fesa tacchino/cotto/crudo + 2 fette formaggio", "🍳 2 uova strapazzate bio", "🐟 50g salmone affumicato + formaggio light", "🫒 2 cucchiaini d'olio e sale", "🧀 50g di ricotta vaccina"]
       },
       spuntinoMattina: { 
-        name: "Spuntino Mattina", time: "10:30",
-        optionsIntro: "Scegli un'opzione:",
-        options: [
-          "🥜 40g frutta oleosa + 1 frutto", 
-          "🥣 170g yogurt greco con cereali integrali", 
-          "🍎 1 frutto + 1 barretta proteica (15-20g pro)", 
-          "🥤 30g proteine vegane in acqua"
-        ]
+        name: "Spuntino Mattina", time: "10:30", optionsIntro: "Scegli un'opzione:",
+        options: ["🥜 40g frutta oleosa + 1 frutto", "🥣 170g yogurt greco con cereali integrali", "🍎 1 frutto + 1 barretta proteica", "🥤 30g proteine vegane"]
       },
       pranzo: { 
-        name: "Pranzo (Solo opzioni Allenamento)", time: "13:00 – 14:00",
-        optionsIntro: "Scegli un'opzione prevista:",
-        options: [
-          "🍝 100g pasta integrale, pomodoro pachino, 20g parmigiano, 100-120g fesa tacchino, verdura cotta",
-          "🥒 100g Riso Basmati integrale, zucchine e 150g gamberi",
-          "🐙 100g Riso Basmati integrale, misto mare pescatora (150-200g pesce)",
-          "🐟 100g Riso Basmati integrale, 80g salmone affumicato e zucchine",
-          "🐟 100g Riso Basmati integrale, 250g salmone fresco lessato con zucchine",
-          "🍅 100g Pasta integrale, sugo di pomodoro, 300g pesce azzurro (merluzzo/nasello/ecc.), verdura a piacere",
-          "🥒 100g Pasta integrale, zucchine e parmigiano, 300g pesce azzurro (merluzzo/nasello/ecc.), verdura a piacere"
-        ]
+        name: "Pranzo (Allenamento)", time: "13:00 – 14:00", optionsIntro: "Scegli un'opzione:",
+        options: ["🍝 100g pasta integrale, pomodoro e 20g parmigiano, 100-120g fesa tacchino, verdura cotta", "🥒 100g Riso Basmati, zucchine e 150g gamberi", "🐙 100g Riso Basmati, misto mare pescatora (150-200g)", "🐟 100g Riso Basmati, 80g salmone affumicato e zucchine", "🐟 100g Riso Basmati, 250g salmone fresco lessato", "🍅 100g Pasta integrale, pomodoro, 300g pesce azzurro, verdura", "🥒 100g Pasta integrale, zucchine e parmigiano, 300g pesce azzurro, verdura"]
       },
       spuntinoPomeriggio: { 
-        name: "Spuntino Pomeriggio", time: "16:30",
-        optionsIntro: "Scegli un'opzione:",
-        options: [
-          "🍅 1 frisella integrale con pomodoro", 
-          "🍘 2 fettine Wasa + yocca o 1 scatoletta tonno media", 
-          "🍘 2 fettine Wasa + 60-80g bresaola", 
-          "🥤 30g proteine vegane in acqua/latte avena"
-        ]
+        name: "Spuntino Pomeriggio", time: "16:30", optionsIntro: "Scegli un'opzione:",
+        options: ["🍅 1 frisella integrale con pomodoro", "🍘 2 fettine Wasa + yocca o 1 scatoletta tonno", "🍘 2 fettine Wasa + 60-80g bresaola", "🥤 30g proteine vegane"]
       },
       cena: { 
-        name: "Cena (Solo opzioni Allenamento)", time: "20:00 – 21:00",
-        optionsIntro: "Scegli un'opzione prevista:",
-        options: [
-          "🍗 300g carne bianca ai ferri (pollo/tacchino/vitella), olio a crudo, insalata mista, 1 frutto",
-          "🥩 300g carne magra ai ferri (manzo, bovino, ecc.), verdura a piacere, 1 frutto"
-        ]
+        name: "Cena (Allenamento)", time: "20:00 – 21:00", optionsIntro: "Scegli un'opzione:",
+        options: ["🍗 300g carne bianca ai ferri, olio a crudo, insalata mista, 1 frutto", "🥩 300g carne magra ai ferri (manzo/bovino), verdura a piacere, 1 frutto"]
       }
     }
   },
   rest: {
     label: "Riposo",
     meals: {
-      colazione: { 
-        name: "Colazione", time: "7:00 – 9:00", 
-        fixed: ["🥣 170-200g yogurt greco 0%", "🌾 Manciata di fiocchi d'avena integrali", "🍓 Frutti rossi", "🌰 3-4 noci"] 
-      },
-      spuntinoMattina: { 
-        name: "Spuntino Mattina", time: "10:30", 
-        fixed: ["🥜 30g frutta oleosa", "🍎 1 frutto"] 
-      },
+      colazione: { name: "Colazione", time: "7:00 – 9:00", fixed: ["🥣 170-200g yogurt greco 0%", "🌾 Manciata di fiocchi d'avena", "🍓 Frutti rossi", "🌰 3-4 noci"] },
+      spuntinoMattina: { name: "Spuntino Mattina", time: "10:30", fixed: ["🥜 30g frutta oleosa", "🍎 1 frutto"] },
       pranzo: { 
-        name: "Pranzo (Solo opzioni Riposo)", time: "13:00 – 14:00",
-        optionsIntro: "Scegli un'opzione prevista:",
-        options: [
-          "🍲 Minestrone verdure e legumi, 50g riso integrale + 2 cucchiaini parmigiano",
-          "🌾 80g farro (o riso basmati) integrale, barattolino ceci, verdurine, insalata mista",
-          "🥗 Insalata Greca: Pomodoro, 150g feta, olive, cetrioli, 100g pane di segale, 1 frutto",
-          "🍅 80g pasta integrale fredda, pachino, mozzarella, olive, verdura cotta, 1 frutto"
-        ]
+        name: "Pranzo (Riposo)", time: "13:00 – 14:00", optionsIntro: "Scegli un'opzione:",
+        options: ["🍲 Minestrone verdure e legumi, 50g riso integrale + 2 cucchiaini parmigiano", "🌾 80g farro/riso integrale, barattolino ceci, verdurine, insalata", "🥗 Insalata Greca: Pomodoro, 150g feta, olive, cetrioli, 100g pane di segale, 1 frutto", "🍅 80g pasta integrale fredda, pachino, mozzarella, olive, verdura cotta, 1 frutto"]
       },
-      spuntinoPomeriggio: { 
-        name: "Spuntino Pomeriggio", time: "16:30", 
-        optionsIntro: "Scegli un'opzione:", 
-        options: ["🍎 1 frutto", "🥣 170g yogurt greco 0%", "🥕 Finocchi e carote"] 
-      },
+      spuntinoPomeriggio: { name: "Spuntino Pomeriggio", time: "16:30", optionsIntro: "Scegli un'opzione:", options: ["🍎 1 frutto", "🥣 170g yogurt greco 0%", "🥕 Finocchi e carote"] },
       cena: { 
-        name: "Cena (Solo opzioni Riposo)", time: "20:00 – 21:00",
-        optionsIntro: "Scegli un'opzione prevista:",
-        options: [
-          "🎉 CENA LIBERA !!! Goditela!",
-          "🐟 300g pesce (merluzzo, persico, cernia, orata, nasello), verdura cotta, 1 frutto",
-          "🍲 Minestra: 1 barattolo fagioli o ceci con 60-70g pasta/riso integrale, verdura a piacere",
-          "🐟 300g pesce (spada, aringa, tonno fresco, salmone), insalata, 1 frutto"
-        ]
+        name: "Cena (Riposo)", time: "20:00 – 21:00", optionsIntro: "Scegli un'opzione:",
+        options: ["🎉 CENA LIBERA !!! Goditela!", "🐟 300g pesce (merluzzo, persico, orata, ecc.), verdura cotta, 1 frutto", "🍲 Minestra: 1 barattolo fagioli o ceci con 60-70g pasta/riso integrale, verdura", "🐟 300g pesce (spada, aringa, tonno, salmone), insalata, 1 frutto"]
       }
     }
   }
 };
 
-/* SPESA CON GRAMMATURE DEL PDF */
 const SHOPPING_DATA = [
-  { icon: "🍎", cat: "Frutta e Verdura", items: [
-    {n: "Arance / Frutta per estratto", q: "q.b. per colazione"}, 
-    {n: "Frutti rossi", q: "q.b. per colazione"}, 
-    {n: "Banane (Post-workout)", q: "1 a fine allenamento"}, 
-    {n: "Frutta fresca mista", q: "1-2 frutti al giorno"}, 
-    {n: "Insalata mista", q: "q.b. (piatto abbondante)"}, 
-    {n: "Zucchine e verdure miste", q: "q.b."}, 
-    {n: "Pomodori e Pachino", q: "q.b."}, 
-    {n: "Verdure per minestrone", q: "q.b. per un pasto"}, 
-    {n: "Finocchi e carote", q: "q.b. per spuntino"}, 
-    {n: "Cetrioli", q: "q.b. per insalata greca"}
-  ]},
-  { icon: "🍞", cat: "Carboidrati", items: [
-    {n: "Pane segale integrale", q: "70g - 100g a porzione"}, 
-    {n: "Fiocchi avena integrali", q: "una manciata"}, 
-    {n: "Pasta integrale (Senatore Cappelli)", q: "60g - 100g a porzione"}, 
-    {n: "Riso Basmati integrale", q: "100g a porzione"}, 
-    {n: "Riso / Farro integrale", q: "50g - 80g a porzione"}, 
-    {n: "Friselle integrali", q: "1 a spuntino"}, 
-    {n: "Wasa (cracker segale)", q: "2 fette a spuntino"}
-  ]},
-  { icon: "🥩", cat: "Proteine (Carni e Uova)", items: [
-    {n: "Uova bio", q: "2 a porzione"}, 
-    {n: "Fesa tacchino / Prosciutto", q: "60g - 120g a porzione"}, 
-    {n: "Carne bianca (Pollo, Tacchino, Vitella)", q: "300g a porzione"}, 
-    {n: "Carne magra (Manzo, Bovino)", q: "300g a porzione"}, 
-    {n: "Bresaola", q: "60g - 80g a porzione"}
-  ]},
-  { icon: "🐟", cat: "Pesce", items: [
-    {n: "Salmone affumicato", q: "50g - 80g a porzione"}, 
-    {n: "Salmone fresco", q: "250g a porzione"}, 
-    {n: "Pesce azzurro/bianco (Merluzzo, Nasello, ecc)", q: "300g a porzione"}, 
-    {n: "Pesce grasso (Spada, Tonno fresco, ecc)", q: "300g a porzione"}, 
-    {n: "Gamberi", q: "150g a porzione"},
-    {n: "Misto mare pescatora", q: "150-200g a porzione"}, 
-    {n: "Tonno in scatola", q: "1 scatoletta media"}
-  ]},
-  { icon: "🧀", cat: "Latticini", items: [
-    {n: "Yogurt greco 0%", q: "170g - 200g a porzione"}, 
-    {n: "Parmigiano", q: "20g o 2 cucchiaini"}, 
-    {n: "Formaggio a fette (Galbanino, Bel Paese)", q: "2 fettine a porzione"}, 
-    {n: "Formaggio spalmabile light", q: "q.b. per 50g salmone"}, 
-    {n: "Ricotta vaccina", q: "50g a porzione"}, 
-    {n: "Yocca", q: "1 confezione"}, 
-    {n: "Feta", q: "150g a porzione"},
-    {n: "Mozzarella", q: "q.b. per pasta fredda"}
-  ]},
-  { icon: "🫘", cat: "Legumi e Dispensa", items: [
-    {n: "Frutta oleosa (noci, mandorle, nocciole)", q: "30g - 40g a porzione"}, 
-    {n: "Ceci (barattolo)", q: "1 barattolo a porzione"}, 
-    {n: "Fagioli (barattolo)", q: "1 barattolo a porzione"}, 
-    {n: "Olive", q: "q.b."}, 
-    {n: "Olio EVO", q: "8 cucchiaini al giorno"}, 
-    {n: "Caffè / Orzo", q: "q.b."}, 
-    {n: "Stevia / Sciroppo d'acero", q: "q.b."}
-  ]},
-  { icon: "💊", cat: "Integrazione", items: [
-    {n: "Creatina", q: "3g al giorno"}, 
-    {n: "BCAA 2.1.1", q: "5 pasticche al giorno (solo allenamento)"}, 
-    {n: "Proteine vegane", q: "30g a porzione"}, 
-    {n: "Barrette proteiche", q: "1 da 15-20g a porzione"},
-    {n: "Sciroppo Vibracell (Named)", q: "2 cucchiaini a colazione"}
-  ]}
+  { icon: "🍎", cat: "Frutta e Verdura", items: [{n: "Frutta fresca mista e banane", q: "q.b."}, {n: "Insalata, Zucchine, Pomodori, Carote", q: "q.b."}] },
+  { icon: "🍞", cat: "Carboidrati", items: [{n: "Pane segale integrale", q: "70g-100g/pasto"}, {n: "Pasta / Riso / Farro integrale", q: "q.b."}, {n: "Wasa / Friselle / Avena", q: "q.b."}] },
+  { icon: "🥩", cat: "Proteine", items: [{n: "Uova bio", q: "2/pasto"}, {n: "Fesa tacchino / Bresaola", q: "60-120g/pasto"}, {n: "Carne bianca / magra", q: "300g/pasto"}] },
+  { icon: "🐟", cat: "Pesce", items: [{n: "Salmone / Pesce bianco / Spada", q: "300g/pasto"}, {n: "Gamberi / Misto mare", q: "150-200g/pasto"}] },
+  { icon: "🧀", cat: "Latticini", items: [{n: "Yogurt greco 0%", q: "170-200g/pasto"}, {n: "Feta", q: "150g/pasto"}, {n: "Parmigiano / Formaggio a fette", q: "q.b."}] },
+  { icon: "🫘", cat: "Legumi e Varie", items: [{n: "Frutta oleosa", q: "30-40g/pasto"}, {n: "Ceci / Fagioli (barattolo)", q: "1/pasto"}, {n: "Olio EVO", q: "8 cucchiaini/giorno"}] },
+  { icon: "💊", cat: "Integrazione", items: [{n: "Creatina, BCAA, Pro vegane", q: "q.b."}] }
 ];
 
 /* ---------- STATO E STORAGE ---------- */
-const STORAGE_KEY = "menu-oggi-state-v7";
+const STORAGE_KEY = "menu-oggi-state-v8";
 const WEIGHT_KEY = "menu-oggi-weight";
-const PLAN_KEY = "menu-oggi-custom-plan";
 const DOW = ["Lun","Mar","Mer","Gio","Ven","Sab","Dom"];
 
-const savedPlan = localStorage.getItem(PLAN_KEY);
-if(savedPlan) { try { PLAN_DATA = JSON.parse(savedPlan); } catch(e){} }
-
-let state = null;
-try { state = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch(e){}
-if(!state) { state = { byDate:{}, weekStart: toKey(mondayOf(new Date())), selectedDate: toKey(new Date()), shopChecks: { 1:{}, 2:{}, 3:{}, 4:{} } }; }
-if(!state.shopChecks) state.shopChecks = { 1:{}, 2:{}, 3:{}, 4:{} };
-
-let weightData = [];
-try { weightData = JSON.parse(localStorage.getItem(WEIGHT_KEY)) || []; } catch(e){}
-
+let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || { 
+  byDate: {}, weekStart: toKey(mondayOf(new Date())), selectedDate: toKey(new Date()), 
+  shopChecks: { 1:{}, 2:{}, 3:{}, 4:{} }, 
+  profile: { height: 175, age: 30, gender: 'M' } 
+};
+let weightData = JSON.parse(localStorage.getItem(WEIGHT_KEY)) || [];
 let currentShopWeek = 1;
 let weightChartInstance = null;
+
+// Gestione Calendario Mensile
+let currentMonthDate = new Date(); 
+currentMonthDate.setDate(1);
 
 function pad(n){ return n<10 ? "0"+n : ""+n; }
 function toKey(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
@@ -497,12 +417,64 @@ function mondayOf(d){ const r=new Date(d); const day=(r.getDay()+6)%7; return ad
 function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 function getPlan(key) { return state.byDate[key] || null; }
 
-/* ---------- UI ALIMENTAZIONE ---------- */
-function setPlanType(key, type) {
-    state.byDate[key] = { type, selections: {}, completed: {} };
-    save(); render();
+/* ---------- FUNZIONI CALORIE & ALLENAMENTO ---------- */
+function getLatestWeight() { return weightData.length ? weightData[weightData.length-1].weight : 70; }
+
+function calculateBMR() {
+    let p = state.profile; let w = getLatestWeight();
+    if (p.gender === 'M') return (10 * w) + (6.25 * p.height) - (5 * p.age) + 5;
+    else return (10 * w) + (6.25 * p.height) - (5 * p.age) - 161;
 }
 
+function calcExerciseKcal(type, mins) {
+    const met = { corsa: 8, pesi: 4, piscina: 6, casa: 4.5 }[type] || 0;
+    return Math.round(met * getLatestWeight() * (mins / 60));
+}
+
+function updateCalorieWidget(key) {
+    let plan = state.byDate[key];
+    if (!plan.activity) plan.activity = { type: '', mins: '', manualKcal: '', foodKcal: '' };
+    
+    let type = document.getElementById("ex-type").value;
+    let mins = document.getElementById("ex-time").value;
+    let manual = document.getElementById("ex-kcal").value;
+    let food = document.getElementById("food-kcal").value;
+
+    plan.activity.type = type;
+    plan.activity.mins = mins;
+    
+    // Se cambia tipo/minuti, cancella il manuale per ricalcolare
+    if (document.activeElement.id === 'ex-type' || document.activeElement.id === 'ex-time') {
+        manual = '';
+        plan.activity.manualKcal = '';
+    } else {
+        plan.activity.manualKcal = manual;
+    }
+    
+    plan.activity.foodKcal = food;
+
+    let burned = manual ? parseInt(manual) : calcExerciseKcal(type, parseInt(mins||0));
+    if(!manual && document.activeElement.id !== 'ex-kcal') document.getElementById("ex-kcal").value = burned || '';
+
+    let bmr = Math.round(calculateBMR());
+    let tdee = bmr + (burned || 0);
+    document.getElementById("tdee-display").innerText = tdee + " Kcal";
+    
+    save();
+}
+
+function saveProfile() {
+    state.profile.height = document.getElementById('prof-height').value || 175;
+    state.profile.age = document.getElementById('prof-age').value || 30;
+    state.profile.gender = document.getElementById('prof-gender').value || 'M';
+    save();
+}
+
+/* ---------- UI ALIMENTAZIONE E DIARIO ---------- */
+function setPlanType(key, type) {
+    state.byDate[key] = { type, selections: {}, completed: {}, activity: { type:'', mins:'', manualKcal:'', foodKcal:'' } };
+    save(); render();
+}
 function clearPlan(key) { delete state.byDate[key]; save(); render(); }
 function selectOption(key, mealKey, idx) { getPlan(key).selections[mealKey] = idx; save(); render(); }
 function toggleDone(key, mealKey) { getPlan(key).completed[mealKey] = !getPlan(key).completed[mealKey]; save(); render(); }
@@ -536,6 +508,7 @@ function renderDayEditor(){
   
   let html = `<div class="active-day-header"><div class="type-badge ${plan.type}">${isTrain ? '🏋️ Allenamento' : '🛌 Riposo'}</div><button class="btn-reset" onclick="clearPlan('${key}')">Cambia tipo</button></div><div class="meal-list">`;
 
+  // RENDER PASTI
   Object.keys(cfg.meals).forEach(mk => {
     const meal = cfg.meals[mk]; 
     const isDone = !!plan.completed[mk]; 
@@ -550,37 +523,133 @@ function renderDayEditor(){
     }
     html += `<div class="meal-card ${isDone ? 'is-done' : ''}"><div class="meal-header"><h3>${meal.name}</h3><span class="time">${meal.time}</span></div><div class="meal-body">${contentHtml}</div><div class="meal-footer" onclick="toggleDone('${key}','${mk}')"><div class="btn-done">${isDone ? '✓ Completato' : 'Segna completato'}</div></div></div>`;
   });
-  el.innerHTML = html + `</div>`;
+  
+  // WIDGET CALORIE E ALLENAMENTO
+  let act = plan.activity || { type:'', mins:'', manualKcal:'', foodKcal:'' };
+  let bmr = Math.round(calculateBMR());
+  let calcBurn = calcExerciseKcal(act.type, parseInt(act.mins||0));
+  let finalBurn = act.manualKcal ? parseInt(act.manualKcal) : calcBurn;
+  let tdee = bmr + (finalBurn || 0);
+
+  html += `
+  <div class="meal-card" style="border: 2px solid var(--primary); margin-top: 10px;">
+    <div class="meal-header" style="background:var(--primary-soft);">
+      <h3 style="color:var(--primary);">🔥 Allenamento & Calorie</h3>
+    </div>
+    <div class="meal-body">
+      <div class="calorie-form-group">
+        <label>Tipo di Allenamento</label>
+        <select id="ex-type" onchange="updateCalorieWidget('${key}')">
+          <option value="">Nessuno / Riposo</option>
+          <option value="corsa" ${act.type==='corsa'?'selected':''}>🏃 Corsa</option>
+          <option value="pesi" ${act.type==='pesi'?'selected':''}>🏋️ Sala Pesi</option>
+          <option value="piscina" ${act.type==='piscina'?'selected':''}>🏊 Piscina</option>
+          <option value="casa" ${act.type==='casa'?'selected':''}>🏠 Allenamento a Casa</option>
+        </select>
+      </div>
+      <div style="display:flex; gap:12px;">
+        <div class="calorie-form-group" style="flex:1;">
+          <label>Minuti (Durata)</label>
+          <input type="number" id="ex-time" value="${act.mins}" oninput="updateCalorieWidget('${key}')" placeholder="es. 60">
+        </div>
+        <div class="calorie-form-group" style="flex:1;">
+          <label>Kcal Bruciate (Attive)</label>
+          <input type="number" id="ex-kcal" value="${act.manualKcal || finalBurn || ''}" oninput="updateCalorieWidget('${key}')">
+        </div>
+      </div>
+      
+      <div class="cal-result">
+        <span>Fabbisogno Totale (BMR + Attività)</span>
+        <strong id="tdee-display">${tdee} Kcal</strong>
+      </div>
+      <p style="font-size:12px; color:var(--ink-faint); margin-top:4px; text-align:center;">BMR (Metabolismo Basale) stimato: ${bmr} kcal</p>
+      
+      <hr style="border:0; border-top:1px solid var(--line); margin:16px 0;">
+      
+      <div class="calorie-form-group">
+        <label>Kcal Assunte (Cibo Mangiato)</label>
+        <input type="number" id="food-kcal" value="${act.foodKcal}" oninput="updateCalorieWidget('${key}')" placeholder="es. 2000">
+      </div>
+    </div>
+  </div>
+  </div>`;
+  
+  el.innerHTML = html;
 }
 
-/* ---------- UI SPESA ---------- */
+/* ---------- UI CALENDARIO MENSILE ---------- */
+function renderMonthCalendar() {
+  const grid = document.getElementById("monthGrid");
+  grid.innerHTML = "";
+  
+  let month = currentMonthDate.getMonth();
+  let year = currentMonthDate.getFullYear();
+  
+  const monthNames = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
+  document.getElementById("monthViewLabel").textContent = `${monthNames[month]} ${year}`;
+  
+  let firstDay = new Date(year, month, 1);
+  let lastDay = new Date(year, month + 1, 0);
+  
+  // Giorno settimana primo giorno (0=Dom, 1=Lun... convertiamo per far partire da Lun)
+  let startDow = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1; 
+  
+  // Celle vuote prima
+  for(let i=0; i<startDow; i++) grid.innerHTML += `<div class="cal-day empty"></div>`;
+  
+  // Giorni del mese
+  for(let i=1; i<=lastDay.getDate(); i++) {
+    let d = new Date(year, month, i);
+    let key = toKey(d);
+    let plan = getPlan(key);
+    
+    let cls = "cal-day" + (plan ? " " + plan.type : "");
+    if(key === toKey(new Date())) cls += " selected";
+    
+    grid.innerHTML += `<div class="${cls}" onclick="goToDay('${key}')"><div class="num">${i}</div><div class="dot"></div></div>`;
+  }
+}
+
+function changeMonth(offset) {
+    currentMonthDate.setMonth(currentMonthDate.getMonth() + offset);
+    renderMonthCalendar();
+}
+
+function goToDay(key) {
+    state.selectedDate = key;
+    // Imposta la settimana di quel giorno
+    state.weekStart = toKey(mondayOf(fromKey(key)));
+    save();
+    switchTab('plan');
+}
+
+function changeWeek(offset) { state.weekStart = toKey(addDays(fromKey(state.weekStart), offset*7)); save(); render(); }
+function goToToday() { state.weekStart = toKey(mondayOf(new Date())); state.selectedDate = toKey(new Date()); save(); render(); }
+
+/* ---------- UI SPESA E PESO (INVARIATI) ---------- */
 function changeShopWeek(num) {
   currentShopWeek = num;
-  document.querySelectorAll('.week-tabs button').forEach((b, i) => { b.classList.toggle('active', i === num-1); });
+  document.querySelectorAll('.week-tabs button').forEach((b, i) => b.classList.toggle('active', i === num-1));
   renderShopping();
 }
-
 function toggleShopItem(catIdx, itemIdx) {
   const code = `${catIdx}-${itemIdx}`;
   state.shopChecks[currentShopWeek][code] = !state.shopChecks[currentShopWeek][code];
   save(); renderShopping();
 }
-
 function renderShopping(){
     let html = '';
     SHOPPING_DATA.forEach((cat, cIdx) => {
         html += `<div class="shop-cat"><div class="shop-cat-title">${cat.icon} ${cat.cat}</div><div>`;
         cat.items.forEach((item, iIdx) => {
             const isChecked = !!state.shopChecks[currentShopWeek][`${cIdx}-${iIdx}`];
-            let cls = isChecked ? 'shop-item checked' : 'shop-item';
-            html += `<label class="${cls}"><input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleShopItem(${cIdx}, ${iIdx})"><div class="shop-item-text"><span class="shop-item-name">${item.n}</span><span class="shop-item-qty">${item.q}</span></div></label>`;
+            html += `<label class="shop-item ${isChecked?'checked':''}"><input type="checkbox" ${isChecked?'checked':''} onchange="toggleShopItem(${cIdx}, ${iIdx})"><div class="shop-item-text"><span class="shop-item-name">${item.n}</span><span class="shop-item-qty">${item.q}</span></div></label>`;
         });
         html += `</div></div>`;
     });
     document.getElementById('shopContent').innerHTML = html;
 }
 
-/* ---------- UI PESO ---------- */
 function addWeight() {
   const w = parseFloat(document.getElementById('weightInput').value);
   const d = document.getElementById('weightDate').value;
@@ -591,109 +660,62 @@ function addWeight() {
   document.getElementById('weightInput').value = '';
   renderWeight();
 }
-
 function deleteWeight(idx) {
   weightData.splice(idx, 1);
   localStorage.setItem(WEIGHT_KEY, JSON.stringify(weightData));
   renderWeight();
 }
-
 function renderWeight() {
   document.getElementById('weightDate').value = new Date().toISOString().split('T')[0];
-  
   let histHtml = '';
   [...weightData].reverse().forEach((wd, i) => {
     const realIdx = weightData.length - 1 - i;
     const dStr = fromKey(wd.date).toLocaleDateString("it-IT", { day:"numeric", month:"short", year:"numeric" });
     histHtml += `<div class="history-item"><span class="history-date">${dStr}</span><span class="history-val">${wd.weight} kg <span class="del" onclick="deleteWeight(${realIdx})">✕</span></span></div>`;
   });
-  
-  if (weightData.length === 0) {
-      histHtml = `<p style="text-align:center; color:var(--ink-faint); margin: 20px 0;">Nessuna misurazione salvata.</p>`;
-  }
-  
-  document.getElementById('weightHistory').innerHTML = histHtml;
+  document.getElementById('weightHistory').innerHTML = histHtml || `<p style="text-align:center; color:var(--ink-faint); margin:20px 0;">Nessuna misurazione salvata.</p>`;
 
   if(weightChartInstance) weightChartInstance.destroy();
   const ctx = document.getElementById('weightChart').getContext('2d');
-  
-  const labels = weightData.map(w => fromKey(w.date).toLocaleDateString("it-IT", { day:"numeric", month:"short" }));
-  const data = weightData.map(w => w.weight);
-
   weightChartInstance = new Chart(ctx, {
     type: 'line',
     data: { 
-        labels: labels, 
-        datasets: [{ 
-            label: 'Peso (kg)', 
-            data: data, 
-            borderColor: '#2563EB', 
-            backgroundColor: 'rgba(37, 99, 235, 0.15)', 
-            borderWidth: 3,
-            tension: 0.4, 
-            fill: true, 
-            pointBackgroundColor: '#FFFFFF',
-            pointBorderColor: '#2563EB',
-            pointBorderWidth: 2,
-            pointRadius: 4
-        }] 
+        labels: weightData.map(w => fromKey(w.date).toLocaleDateString("it-IT", { day:"numeric", month:"short" })), 
+        datasets: [{ label: 'Peso (kg)', data: weightData.map(w => w.weight), borderColor: '#2563EB', backgroundColor: 'rgba(37,99,235,0.15)', borderWidth: 3, tension: 0.4, fill: true }] 
     },
-    options: { 
-        responsive: true, 
-        maintainAspectRatio: false, 
-        plugins: { legend: { display: false } }, 
-        scales: { 
-            y: { beginAtZero: false, grid: { color: '#E5E7EB' } },
-            x: { grid: { display: false } }
-        } 
-    }
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false, grid: { color: '#E5E7EB' } }, x: { grid: { display: false } } } }
   });
 }
 
-/* ---------- IMPOSTAZIONI E UPLOAD ---------- */
-function handleFileUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const json = JSON.parse(e.target.result);
-      if(json.train && json.rest) {
-        localStorage.setItem(PLAN_KEY, JSON.stringify(json));
-        PLAN_DATA = json;
-        alert("Piano aggiornato con successo!");
-        render();
-      } else { alert("Formato file non valido."); }
-    } catch(err) { alert("Errore lettura file JSON."); }
-  };
-  reader.readAsText(file);
+/* ---------- CORE ---------- */
+function initSettings() {
+    document.getElementById('prof-height').value = state.profile.height;
+    document.getElementById('prof-age').value = state.profile.age;
+    document.getElementById('prof-gender').value = state.profile.gender;
 }
 
 function resetAppData() {
-  if(confirm("Vuoi cancellare tutto il calendario e la spesa? Il peso verrà mantenuto.")) {
-    localStorage.removeItem(STORAGE_KEY);
-    location.reload();
+  if(confirm("Cancellare tutto il calendario? Il peso rimarrà.")) {
+    localStorage.removeItem(STORAGE_KEY); location.reload();
   }
 }
 
-/* ---------- CORE ---------- */
 function switchTab(tabId) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(`view-${tabId}`).classList.add('active');
     document.getElementById(`tab-${tabId}`).classList.add('active');
     
+    if (tabId === 'plan') render();
+    if (tabId === 'month') renderMonthCalendar();
     if (tabId === 'shop') renderShopping();
     if (tabId === 'weight') renderWeight();
+    if (tabId === 'settings') initSettings();
 }
 
 function render() { renderCalendar(); renderDayEditor(); }
-
-document.getElementById("prevWeek").addEventListener("click", () => { state.weekStart = toKey(addDays(fromKey(state.weekStart), -7)); save(); render(); });
-document.getElementById("nextWeek").addEventListener("click", () => { state.weekStart = toKey(addDays(fromKey(state.weekStart), 7)); save(); render(); });
-document.getElementById("gotoToday").addEventListener("click", () => { state.weekStart = toKey(mondayOf(new Date())); state.selectedDate = toKey(new Date()); save(); render(); });
-
 render();
+initSettings();
 </script>
 </body>
 </html>
