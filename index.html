@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
   :root {
     --bg: #F5F6F8;
@@ -17,13 +19,13 @@
     --ink-faint: #9CA3AF;
     --line: #E5E7EB;
     
-    --primary: #2563EB; /* Blu Yazio style */
+    --primary: #2563EB; 
     --primary-soft: #EFF6FF;
     
-    --train: #10B981; /* Verde */
+    --train: #10B981; 
     --train-soft: #D1FAE5;
     
-    --rest: #6366F1; /* Indaco */
+    --rest: #6366F1; 
     --rest-soft: #E0E7FF;
     
     --radius-card: 16px;
@@ -37,17 +39,14 @@
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   
   body {
-    margin: 0; 
-    background: var(--bg); 
-    color: var(--ink);
-    font-family: 'Work Sans', sans-serif; 
-    -webkit-font-smoothing: antialiased;
-    padding-bottom: 90px; /* Spazio per bottom nav */
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: 'Work Sans', sans-serif; -webkit-font-smoothing: antialiased;
+    padding-bottom: 90px; 
   }
 
   .app { max-width: 600px; margin: 0 auto; }
 
-  /* VISTE (TABS) */
+  /* VISTE */
   .view { display: none; padding: 16px; animation: fadeIn 0.3s ease; }
   .view.active { display: block; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -67,138 +66,88 @@
     display: flex; align-items: center; justify-content: center;
   }
   .cal-today-btn { font-size: 13px !important; width: auto !important; padding: 0 16px; font-weight: 600; }
-  
   .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-  .cal-day {
-    border-radius: 12px; background: var(--bg);
-    padding: 10px 4px; text-align: center; cursor: pointer; position: relative;
-    border: 2px solid transparent; transition: all 0.2s;
-  }
+  .cal-day { border-radius: 12px; background: var(--bg); padding: 10px 4px; text-align: center; cursor: pointer; position: relative; border: 2px solid transparent; transition: all 0.2s; }
   .cal-day .dow { font-size: 11px; color: var(--ink-faint); font-weight: 600; margin-bottom: 4px; }
   .cal-day .num { font-size: 16px; font-weight: 700; }
   .cal-day .dot { width: 6px; height: 6px; border-radius: 50%; margin: 4px auto 0; background: transparent; }
-  
   .cal-day.train .dot { background: var(--train); }
   .cal-day.rest .dot { background: var(--rest); }
   .cal-day.selected { border-color: var(--primary); background: var(--primary-soft); }
   .cal-day .check { position: absolute; top: 3px; right: 4px; font-size: 10px; color: var(--train); font-weight: bold; }
 
-  /* SELEZIONE TIPO GIORNO */
+  /* GIORNO */
   .day-type-selector { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
-  .btn-big {
-    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-card);
-    padding: 24px; font-size: 18px; font-weight: 600; text-align: left; cursor: pointer;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 16px;
-    transition: transform 0.1s;
-  }
+  .btn-big { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-card); padding: 24px; font-size: 18px; font-weight: 600; text-align: left; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 16px; transition: transform 0.1s; }
   .btn-big:active { transform: scale(0.98); }
   .btn-big .icon { font-size: 28px; }
   .btn-big.train { border-left: 6px solid var(--train); }
   .btn-big.rest { border-left: 6px solid var(--rest); }
-
-  /* HEADER GIORNATA PIANIFICATA */
-  .active-day-header {
-    display: flex; justify-content: space-between; align-items: center; 
-    margin-bottom: 20px; padding: 0 4px;
-  }
-  .type-badge {
-    display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px;
-    padding: 8px 16px; border-radius: var(--radius-pill);
-  }
+  .active-day-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 4px; }
+  .type-badge { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; padding: 8px 16px; border-radius: var(--radius-pill); }
   .type-badge.train { background: var(--train-soft); color: #065F46; }
   .type-badge.rest { background: var(--rest-soft); color: #3730A3; }
   .btn-reset { background: none; border: none; color: var(--ink-faint); text-decoration: underline; font-size: 13px; cursor: pointer; }
 
-  /* VARIANTI TABS */
-  .variant-tabs {
-    display: flex; gap: 8px; margin-bottom: 20px;
-    background: var(--line); padding: 4px; border-radius: 12px;
-  }
-  .variant-tabs button {
-    flex: 1; border: none; background: transparent; color: var(--ink-soft);
-    font-weight: 600; font-size: 14px; padding: 10px 0; border-radius: 8px; cursor: pointer;
-    transition: all 0.2s; display: flex; justify-content: center; align-items: center; gap: 6px;
-  }
-  .variant-tabs button.active { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-  .variant-tabs button:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  /* PASTI (CARDS) */
+  /* PASTI */
   .meal-list { display: flex; flex-direction: column; gap: 16px; }
-  .meal-card {
-    background: var(--surface); border-radius: var(--radius-card); 
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden;
-    border: 1px solid var(--line);
-  }
-  .meal-header {
-    padding: 16px 16px 12px; border-bottom: 1px solid var(--surface-muted);
-    display: flex; justify-content: space-between; align-items: baseline;
-  }
+  .meal-card { background: var(--surface); border-radius: var(--radius-card); box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid var(--line); }
+  .meal-header { padding: 16px 16px 12px; border-bottom: 1px solid var(--surface-muted); display: flex; justify-content: space-between; align-items: baseline; }
   .meal-header h3 { margin: 0; font-size: 17px; font-weight: 700; color: var(--ink); }
   .meal-header .time { font-size: 12px; color: var(--ink-faint); font-weight: 500;}
-  
   .meal-body { padding: 12px 16px; }
   .fixed-item { font-size: 15px; line-height: 1.5; color: var(--ink); padding: 8px 0; }
-  
   .options-title { font-size: 13px; color: var(--ink-soft); font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;}
-  
-  .radio-option {
-    display: flex; align-items: flex-start; gap: 12px; padding: 12px 0;
-    border-bottom: 1px solid var(--line); cursor: pointer;
-  }
+  .radio-option { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
   .radio-option:last-child { border-bottom: none; }
-  .radio-option input[type="radio"] { 
-    margin-top: 3px; width: 20px; height: 20px; accent-color: var(--primary);
-  }
+  .radio-option input[type="radio"] { margin-top: 3px; width: 20px; height: 20px; accent-color: var(--primary); }
   .radio-option span { font-size: 15px; line-height: 1.4; color: var(--ink); flex: 1; }
   .radio-option input[type="radio"]:checked + span { font-weight: 600; }
-
-  .meal-footer {
-    padding: 12px 16px; background: var(--surface-muted); border-top: 1px solid var(--line);
-    display: flex; justify-content: center; cursor: pointer;
-  }
-  .btn-done {
-    display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px;
-    color: var(--ink-soft); transition: color 0.2s;
-  }
+  .meal-footer { padding: 12px 16px; background: var(--surface-muted); border-top: 1px solid var(--line); display: flex; justify-content: center; cursor: pointer; }
+  .btn-done { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; color: var(--ink-soft); transition: color 0.2s; }
   .meal-card.is-done .meal-header h3, .meal-card.is-done .fixed-item { opacity: 0.6; text-decoration: line-through; }
   .meal-card.is-done .btn-done { color: var(--train); }
 
-  /* SEZIONE SPESA GENERICA */
+  /* SPESA */
   .shop-header { text-align: center; margin-bottom: 24px; padding-top: 10px; }
   .shop-header h1 { font-weight: 700; font-size: 26px; margin: 0 0 8px; }
   .shop-header p { color: var(--ink-soft); font-size: 14px; margin: 0; }
   
+  .week-tabs { display: flex; overflow-x: auto; gap: 8px; margin-bottom: 20px; padding-bottom: 4px; }
+  .week-tabs button { flex: 0 0 auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-pill); padding: 10px 20px; font-size: 14px; font-weight: 600; color: var(--ink-soft); cursor: pointer; }
+  .week-tabs button.active { background: var(--primary); color: white; border-color: var(--primary); }
+
   .shop-cat { margin-bottom: 24px; background: var(--surface); border-radius: var(--radius-card); box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; }
-  .shop-cat-title { 
-    background: var(--surface-muted); padding: 12px 16px; font-size: 13px; 
-    font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--primary);
-    border-bottom: 1px solid var(--line);
-  }
-  .shop-item {
-    display: flex; align-items: center; gap: 12px; padding: 16px;
-    border-bottom: 1px solid var(--line);
-  }
+  .shop-cat-title { background: var(--surface-muted); padding: 12px 16px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 8px; }
+  .shop-item { display: flex; align-items: center; gap: 12px; padding: 16px; border-bottom: 1px solid var(--line); }
   .shop-item:last-child { border-bottom: none; }
   .shop-item input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--primary); }
   .shop-item span { font-size: 15px; color: var(--ink); }
 
+  /* PESO & GRAFICO */
+  .weight-card { background: var(--surface); border-radius: var(--radius-card); padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 24px; }
+  .weight-input-group { display: flex; gap: 10px; margin-top: 16px; }
+  .weight-input-group input { flex: 1; padding: 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 16px; }
+  .btn-primary { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 12px 20px; font-weight: 600; font-size: 15px; cursor: pointer; }
+  .chart-container { position: relative; height: 250px; width: 100%; margin-top: 20px; }
+  .weight-history { margin-top: 20px; border-top: 1px solid var(--line); padding-top: 16px; }
+  .history-item { display: flex; justify-content: space-between; padding: 8px 0; font-size: 15px; border-bottom: 1px solid var(--surface-muted); }
+  .history-item .del { color: #EF4444; cursor: pointer; font-size: 12px; font-weight: bold; }
+
+  /* IMPOSTAZIONI */
+  .settings-card { background: var(--surface); border-radius: var(--radius-card); padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  .settings-card h3 { margin: 0 0 12px; font-size: 18px; display: flex; align-items: center; gap: 8px;}
+  .settings-card p { font-size: 14px; color: var(--ink-soft); line-height: 1.5; margin-bottom: 16px;}
+  .file-input-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
+  .file-input-wrapper input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; height: 100%; }
+  .btn-outline { width: 100%; background: transparent; border: 2px dashed var(--primary); color: var(--primary); border-radius: 8px; padding: 16px; font-weight: 600; text-align: center; font-size: 15px;}
+
   /* BOTTOM NAVIGATION */
-  .bottom-nav {
-    position: fixed; bottom: 0; left: 0; width: 100%;
-    background: var(--surface); border-top: 1px solid var(--line);
-    display: flex; justify-content: space-around; padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.03); z-index: 1000;
-  }
-  .nav-btn {
-    background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px;
-    color: var(--ink-faint); font-weight: 600; font-size: 12px; cursor: pointer; flex: 1;
-  }
+  .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--surface); border-top: 1px solid var(--line); display: flex; justify-content: space-around; padding: 12px 12px calc(12px + env(safe-area-inset-bottom)); box-shadow: 0 -4px 20px rgba(0,0,0,0.03); z-index: 1000; }
+  .nav-btn { background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--ink-faint); font-weight: 600; font-size: 11px; cursor: pointer; flex: 1; }
   .nav-btn .icon { font-size: 22px; margin-bottom: 2px; transition: transform 0.2s; }
   .nav-btn.active { color: var(--primary); }
   .nav-btn.active .icon { transform: scale(1.1); }
-
-  /* UTILS */
-  .empty-state { text-align: center; color: var(--ink-soft); font-size: 15px; margin-top: 40px; }
 </style>
 </head>
 <body>
@@ -211,7 +160,6 @@
       <div class="date-label" id="dateLabel"></div>
       <h1 class="title">Piano Alimentare</h1>
     </header>
-
     <section class="calendar">
       <div class="cal-nav">
         <button id="prevWeek">‹</button>
@@ -221,17 +169,69 @@
       </div>
       <div class="cal-grid" id="calGrid"></div>
     </section>
-
     <div id="dayEditor"></div>
   </div>
 
-  <!-- VISTA: LISTA DELLA SPESA (GENERICA) -->
+  <!-- VISTA: SPESA SETTIMANALE -->
   <div id="view-shop" class="view">
     <div class="shop-header">
-      <h1>Lista della Spesa</h1>
-      <p>Tutti gli alimenti previsti dal tuo piano</p>
+      <h1>Lista della Spesa 🛒</h1>
+      <p>Organizzata per settimane</p>
     </div>
+    
+    <div class="week-tabs" id="shopWeekTabs">
+      <button class="active" onclick="changeShopWeek(1)">Settimana 1</button>
+      <button onclick="changeShopWeek(2)">Settimana 2</button>
+      <button onclick="changeShopWeek(3)">Settimana 3</button>
+      <button onclick="changeShopWeek(4)">Settimana 4</button>
+    </div>
+
     <div id="shopContent"></div>
+  </div>
+
+  <!-- VISTA: PESO -->
+  <div id="view-weight" class="view">
+    <div class="shop-header">
+      <h1>Andamento Peso ⚖️</h1>
+      <p>Monitora i tuoi progressi</p>
+    </div>
+    <div class="weight-card">
+      <h3 style="margin-top:0">Inserisci Peso</h3>
+      <div class="weight-input-group">
+        <input type="number" id="weightInput" placeholder="es. 75.5" step="0.1">
+        <input type="date" id="weightDate">
+        <button class="btn-primary" onclick="addWeight()">Salva</button>
+      </div>
+      <div class="chart-container">
+        <canvas id="weightChart"></canvas>
+      </div>
+      <div class="weight-history" id="weightHistory"></div>
+    </div>
+  </div>
+
+  <!-- VISTA: IMPOSTAZIONI -->
+  <div id="view-settings" class="view">
+    <div class="shop-header">
+      <h1>Impostazioni ⚙️</h1>
+      <p>Gestisci l'app e i piani</p>
+    </div>
+    
+    <div class="settings-card">
+      <h3>🔄 Aggiorna Piano Alimentare</h3>
+      <p>Hai ricevuto un nuovo PDF? Non puoi caricarlo direttamente qui perché i PDF sono testi complessi.<br><br>
+      <b>Come fare:</b> Chiedi a Gemini o ChatGPT di "convertire il PDF in file JSON per l'app". Poi carica il file `.json` qui sotto!</p>
+      
+      <div class="file-input-wrapper">
+        <div class="btn-outline">Carica File .json</div>
+        <input type="file" accept=".json" id="fileUpload" onchange="handleFileUpload(event)">
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <h3>🗑️ Cancella Dati</h3>
+      <p>Ripristina l'app azzerando le spunte, la spesa e il calendario (il peso non verrà cancellato).</p>
+      <button class="btn-primary" style="background:#EF4444; width:100%" onclick="resetAppData()">Azzera Dati</button>
+    </div>
   </div>
 
 </div>
@@ -239,369 +239,308 @@
 <!-- BOTTOM NAVIGATION -->
 <nav class="bottom-nav">
   <button class="nav-btn active" id="tab-plan" onclick="switchTab('plan')">
-    <span class="icon">📅</span>
-    <span>Piano</span>
+    <span class="icon">📅</span><span>Piano</span>
   </button>
   <button class="nav-btn" id="tab-shop" onclick="switchTab('shop')">
-    <span class="icon">🛒</span>
-    <span>Spesa</span>
+    <span class="icon">🛒</span><span>Spesa</span>
+  </button>
+  <button class="nav-btn" id="tab-weight" onclick="switchTab('weight')">
+    <span class="icon">⚖️</span><span>Peso</span>
+  </button>
+  <button class="nav-btn" id="tab-settings" onclick="switchTab('settings')">
+    <span class="icon">⚙️</span><span>Impost.</span>
   </button>
 </nav>
 
 <script>
-/* ---------- DATA (Strutturato a 3 varianti per tipo) ---------- */
-const DATA = {
+/* ---------- DEFAULT DATA ALIMENTARE SENZA VARIANTI ---------- */
+let PLAN_DATA = {
   train: {
-    label: "Giorno di Allenamento", days: 3,
+    label: "Allenamento",
     meals: {
-      colazione: { name: "Colazione", time: "7:00 – 8:30",
-        fixed: [
-          "Spremuta d'arancia o estratto di frutta (o sciroppo Vibracell)",
-          "Caffè o caffè d'orzo (facoltativo)",
-          "70g di pane di segale integrale tostato"
-        ],
+      colazione: { 
+        name: "Colazione", time: "7:00 – 8:30",
+        fixed: ["🍊 Spremuta d'arancia o estratto", "☕ Caffè o orzo", "🍞 70g pane segale integrale tostato"],
         optionsIntro: "Accompagna con:",
-        options: [
-          "60g fesa tacchino/prosciutto + 2 fette formaggio",
-          "2 uova strapazzate bio",
-          "50g salmone affumicato + formaggio light",
-          "2 cucchiaini d'olio e sale",
-          "50g di ricotta vaccina"
-        ]
+        options: ["🦃 60g fesa tacchino + 2 fette formaggio", "🍳 2 uova strapazzate bio", "🐟 50g salmone affumicato + formaggio light", "🫒 2 cucchiaini d'olio e sale", "🧀 50g di ricotta vaccina"]
       },
-      spuntinoMattina: { name: "Spuntino", time: "10:30",
+      spuntinoMattina: { 
+        name: "Spuntino Mattina", time: "10:30",
+        optionsIntro: "Scegli un'opzione:",
+        options: ["🥜 40g frutta oleosa + 1 frutto", "🥣 170g yogurt greco con cereali integrali", "🍎 1 frutto + 1 barretta proteica", "🥤 30g proteine vegane"]
+      },
+      pranzo: { 
+        name: "Pranzo", time: "13:00 – 14:00",
         optionsIntro: "Scegli un'opzione:",
         options: [
-          "40g di frutta oleosa + 1 frutto",
-          "170g di yogurt greco con cereali integrali",
-          "1 frutto + 1 barretta proteica",
-          "30g di proteine vegane in acqua"
+          "🍝 100g pasta integrale pomodoro e parmigiano, 100-120g fesa tacchino, Verdura cotta",
+          "🥒 100g Riso Basmati, Zucchine e 150g gamberi",
+          "🐙 100g Riso Basmati, Misto mare pescatora",
+          "🐟 100g Riso Basmati, 80g salmone affumicato e zucchine",
+          "🐟 100g Riso Basmati, 250g salmone fresco lessato",
+          "🍅 100g Pasta integrale, Sugo di pomodoro semplice, 300g pesce azzurro",
+          "🥒 100g Pasta integrale, Zucchine e parmigiano, 300g pesce azzurro"
         ]
       },
-      pranzo: { name: "Pranzo", time: "13:00 – 14:00", perDay: true },
-      spuntinoPomeriggio: { name: "Spuntino", time: "16:30",
+      spuntinoPomeriggio: { 
+        name: "Spuntino Pomeriggio", time: "16:30",
+        optionsIntro: "Scegli un'opzione:",
+        options: ["🍅 1 frisella integrale con pomodoro", "🍘 2 fettine Wasa + yocca o tonno", "🍘 2 fettine Wasa + 70g bresaola", "🥤 30g proteine vegane"]
+      },
+      cena: { 
+        name: "Cena", time: "20:00 – 21:00",
         optionsIntro: "Scegli un'opzione:",
         options: [
-          "1 frisella integrale con pomodoro",
-          "2 fettine Wasa + yocca o tonno piccolo",
-          "2 fettine Wasa + 70g bresaola",
-          "30g di proteine vegane"
+          "🍗 300g carne bianca ai ferri, Insalata mista, 1 frutto",
+          "🥩 300g carne magra (manzo), Verdura a piacere, 1 frutto"
         ]
-      },
-      cena: { name: "Cena", time: "20:00 – 21:00", perDay: true }
-    },
-    dayPlans: [
-      { // Variante 1
-        pranzo: { fixed: ["100g pasta integrale pomodoro e parmigiano", "100-120g fesa di tacchino", "Verdura cotta a piacere"] },
-        cena: { fixed: ["300g carne bianca ai ferri", "Insalata mista", "1 frutto"] }
-      },
-      { // Variante 2
-        pranzo: { 
-          optionsIntro: "Condimento Riso Basmati (100g):",
-          options: ["Zucchine e 150g gamberi", "Misto mare pescatora", "80g salmone affumicato e zucchine", "250g salmone fresco lessato"] 
-        },
-        cena: { fixed: ["300g carne bianca ai ferri", "Insalata mista", "1 frutto"] }
-      },
-      { // Variante 3
-        pranzo: { 
-          optionsIntro: "Condimento Pasta integrale (100g) + 300g pesce azzurro:",
-          options: ["Sugo di pomodoro semplice", "Zucchine e parmigiano"] 
-        },
-        cena: { fixed: ["300g carne magra (manzo/bovino)", "Verdura a piacere", "1 frutto"] }
       }
-    ]
+    }
   },
   rest: {
-    label: "Giorno di Riposo", days: 3,
+    label: "Riposo",
     meals: {
-      colazione: { name: "Colazione", time: "7:00 – 9:00",
-        fixed: ["170-200g yogurt greco 0%", "Manciata di fiocchi d'avena", "Frutti rossi", "3-4 noci"]
+      colazione: { 
+        name: "Colazione", time: "7:00 – 9:00", 
+        fixed: ["🥣 170-200g yogurt greco 0%", "🌾 Fiocchi d'avena", "🍓 Frutti rossi", "🌰 3-4 noci"] 
       },
-      spuntinoMattina: { name: "Spuntino", time: "10:30",
-        fixed: ["30g di frutta oleosa", "1 frutto"]
+      spuntinoMattina: { 
+        name: "Spuntino Mattina", time: "10:30", 
+        fixed: ["🥜 30g frutta oleosa", "🍎 1 frutto"] 
       },
-      pranzo: { name: "Pranzo", time: "13:00 – 14:00", perDay: true },
-      spuntinoPomeriggio: { name: "Spuntino", time: "16:30",
+      pranzo: { 
+        name: "Pranzo", time: "13:00 – 14:00",
         optionsIntro: "Scegli un'opzione:",
-        options: ["1 frutto", "170g yogurt greco 0%", "Finocchi e carote"]
+        options: [
+          "🍲 Minestrone verdure e legumi, 50g riso integrale + parmigiano",
+          "🌾 80g farro/riso integrale, Barattolino di ceci, Insalata mista",
+          "🥗 Insalata Greca (Pomodoro, 150g feta, olive, cetrioli), 100g pane segale, 1 frutto"
+        ]
       },
-      cena: { name: "Cena", time: "20:00 – 21:00", perDay: true }
-    },
-    dayPlans: [
-      { // Variante 1
-        pranzo: { fixed: ["Minestrone verdure e legumi", "50g riso integrale + parmigiano"] },
-        cena: { fixed: ["Pasto Libero! 🎉"] }
+      spuntinoPomeriggio: { 
+        name: "Spuntino Pomeriggio", time: "16:30", 
+        optionsIntro: "Scegli un'opzione:", 
+        options: ["🍎 1 frutto", "🥣 170g yogurt greco 0%", "🥕 Finocchi e carote"] 
       },
-      { // Variante 2
-        pranzo: { fixed: ["80g farro/riso integrale", "Barattolino di ceci", "Insalata mista"] },
-        cena: { fixed: ["300g pesce (merluzzo, persico, ecc)", "Verdura cotta", "1 frutto"] }
-      },
-      { // Variante 3
-        pranzo: { fixed: ["Insalata Greca: Pomodoro, 150g feta, olive, cetrioli", "100g pane di segale", "1 frutto"] },
-        cena: { fixed: ["Minestra: Fagioli o ceci con 65g pasta/riso integrale", "Verdura a piacere"] }
+      cena: { 
+        name: "Cena", time: "20:00 – 21:00",
+        optionsIntro: "Scegli un'opzione:",
+        options: [
+          "🎉 Pasto Libero! Goditelo!",
+          "🐟 300g pesce (merluzzo, persico, ecc), Verdura cotta, 1 frutto",
+          "🍲 Minestra: Fagioli o ceci con 65g pasta/riso integrale, Verdura a piacere"
+        ]
       }
-    ]
+    }
   }
 };
 
-/* SPESA GENERICA ESTRAZIONE DATI */
 const SHOPPING_DATA = [
-  { cat: "Frutta e Verdura", items: ["Arance per spremuta", "Frutti rossi", "Banane (post-workout)", "Frutta fresca mista", "Insalata mista", "Zucchine", "Pomodori e Pachino", "Verdure per minestrone", "Carote e finocchi", "Cetrioli"] },
-  { cat: "Carboidrati", items: ["Pane di segale integrale", "Fiocchi d'avena integrali", "Pasta integrale (Senatore Cappelli)", "Riso Basmati integrale", "Riso integrale", "Farro integrale", "Friselle integrali", "Wasa (cracker segale)"] },
-  { cat: "Proteine e Carne", items: ["Uova bio", "Fesa di tacchino / Prosciutto", "Petto di pollo / tacchino (carne bianca)", "Carne magra (manzo/bovino)", "Bresaola"] },
-  { cat: "Pesce", items: ["Salmone affumicato", "Salmone fresco", "Pesce azzurro (merluzzo, nasello)", "Gamberi", "Misto mare", "Tonno in scatola"] },
-  { cat: "Latticini e Uova", items: ["Yogurt greco 0%", "Parmigiano / Grana", "Formaggio a fette (Galbanino)", "Formaggio spalmabile light", "Ricotta vaccina", "Yocca", "Feta"] },
-  { cat: "Legumi e Dispensa", items: ["Frutta oleosa (noci, mandorle)", "Ceci (barattolo)", "Fagioli (barattolo)", "Olive", "Olio Extravergine d'Oliva", "Caffè / Orzo", "Dolcificante (Stevia)"] },
-  { cat: "Integrazione", items: ["Creatina", "BCAA 2.1.1", "Proteine vegane in polvere", "Barrette proteiche"] }
+  { icon: "🍎", cat: "Frutta e Verdura", items: ["Arance", "Frutti rossi", "Banane", "Frutta fresca mista", "Insalata mista", "Zucchine", "Pomodori e Pachino", "Verdure minestrone", "Carote e finocchi", "Cetrioli"] },
+  { icon: "🍞", cat: "Carboidrati", items: ["Pane segale integrale", "Fiocchi avena", "Pasta integrale", "Riso Basmati integrale", "Riso integrale", "Farro integrale", "Friselle", "Wasa"] },
+  { icon: "🥩", cat: "Proteine", items: ["Uova bio", "Fesa tacchino / Prosciutto", "Petto pollo / tacchino", "Carne magra (manzo)", "Bresaola"] },
+  { icon: "🐟", cat: "Pesce", items: ["Salmone affumicato", "Salmone fresco", "Merluzzo / Nasello", "Gamberi", "Misto mare", "Tonno in scatola"] },
+  { icon: "🧀", cat: "Latticini", items: ["Yogurt greco 0%", "Parmigiano", "Galbanino", "Formaggio spalmabile light", "Ricotta", "Yocca", "Feta"] },
+  { icon: "🫘", cat: "Legumi e Dispensa", items: ["Frutta oleosa (noci, mandorle)", "Ceci (barattolo)", "Fagioli (barattolo)", "Olive", "Olio EVO", "Caffè / Orzo", "Stevia"] },
+  { icon: "💊", cat: "Integrazione", items: ["Creatina", "BCAA 2.1.1", "Proteine vegane", "Barrette proteiche"] }
 ];
 
-/* ---------- STATO DELL'APP ---------- */
-const STORAGE_KEY = "menu-oggi-state-v4";
+/* ---------- STATO E STORAGE ---------- */
+const STORAGE_KEY = "menu-oggi-state-v6";
+const WEIGHT_KEY = "menu-oggi-weight";
+const PLAN_KEY = "menu-oggi-custom-plan";
 const DOW = ["Lun","Mar","Mer","Gio","Ven","Sab","Dom"];
+
+const savedPlan = localStorage.getItem(PLAN_KEY);
+if(savedPlan) { try { PLAN_DATA = JSON.parse(savedPlan); } catch(e){} }
+
+let state = null;
+try { state = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch(e){}
+if(!state) { state = { byDate:{}, weekStart: toKey(mondayOf(new Date())), selectedDate: toKey(new Date()), shopChecks: { 1:{}, 2:{}, 3:{}, 4:{} } }; }
+if(!state.shopChecks) state.shopChecks = { 1:{}, 2:{}, 3:{}, 4:{} };
+
+let weightData = [];
+try { weightData = JSON.parse(localStorage.getItem(WEIGHT_KEY)) || []; } catch(e){}
+
+let currentShopWeek = 1;
+let weightChartInstance = null;
 
 function pad(n){ return n<10 ? "0"+n : ""+n; }
 function toKey(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
 function fromKey(k){ const [y,m,d]=k.split("-").map(Number); return new Date(y,m-1,d); }
 function addDays(d,n){ const r=new Date(d); r.setDate(r.getDate()+n); return r; }
 function mondayOf(d){ const r=new Date(d); const day=(r.getDay()+6)%7; return addDays(r,-day); }
-function sameDay(a,b){ return toKey(a)===toKey(b); }
 
-let state = null;
-try { state = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch(e){}
-if(!state) { state = { byDate:{}, weekStart: toKey(mondayOf(new Date())), selectedDate: toKey(new Date()) }; }
-
-function save() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e){} }
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 function getPlan(key) { return state.byDate[key] || null; }
 
-/* ---------- LOGICA OBBLIGATORIA VARIANTI ---------- */
-function getLastUsedVariant(currentKey, type) {
-    const currentMs = fromKey(currentKey).getTime();
-    let closestMs = 0;
-    let lastVariant = -1;
-
-    for (const key in state.byDate) {
-        const ms = fromKey(key).getTime();
-        if (ms < currentMs && state.byDate[key].type === type) {
-            if (ms > closestMs) {
-                closestMs = ms;
-                lastVariant = state.byDate[key].dayIndex;
-            }
-        }
-    }
-    return lastVariant;
-}
-
+/* ---------- UI ALIMENTAZIONE ---------- */
 function setPlanType(key, type) {
-    const disabledIndex = getLastUsedVariant(key, type);
-    let defaultIndex = 0;
-    if (disabledIndex === 0) defaultIndex = 1;
-
-    state.byDate[key] = { type, dayIndex: defaultIndex, selections: {}, completed: {} };
+    state.byDate[key] = { type, selections: {}, completed: {} };
     save(); render();
 }
 
-function clearPlan(key) {
-    delete state.byDate[key];
-    save(); render();
-}
-
-function setDayIndex(key, i) {
-    const p = getPlan(key); if(!p) return;
-    p.dayIndex = i; p.selections = {}; p.completed = {};
-    save(); render();
-}
-
-function selectOption(key, mealKey, idx) {
-    const p = getPlan(key); if(!p) return;
-    p.selections[mealKey] = idx;
-    save(); render();
-}
-
-function toggleDone(key, mealKey) {
-    const p = getPlan(key); if(!p) return;
-    p.completed[mealKey] = !p.completed[mealKey];
-    save(); render();
-}
-
-/* ---------- NAVIGAZIONE ---------- */
-function switchTab(tabId) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    
-    document.getElementById(`view-${tabId}`).classList.add('active');
-    document.getElementById(`tab-${tabId}`).classList.add('active');
-    
-    if (tabId === 'shop') renderShopping();
-}
-
-/* ---------- RENDER UI ---------- */
-function fmtRange(monday){
-  const end = addDays(monday,6);
-  const opts1 = { day:"numeric", month: monday.getMonth()===end.getMonth() ? undefined : "short" };
-  const s1 = monday.toLocaleDateString("it-IT", opts1);
-  const s2 = end.toLocaleDateString("it-IT", { day:"numeric", month:"short" });
-  return s1 + " – " + s2;
-}
+function clearPlan(key) { delete state.byDate[key]; save(); render(); }
+function selectOption(key, mealKey, idx) { getPlan(key).selections[mealKey] = idx; save(); render(); }
+function toggleDone(key, mealKey) { getPlan(key).completed[mealKey] = !getPlan(key).completed[mealKey]; save(); render(); }
 
 function renderCalendar(){
   const monday = fromKey(state.weekStart);
-  document.getElementById("weekLabel").textContent = fmtRange(monday);
-  
-  const dObj = fromKey(state.selectedDate);
-  document.getElementById("dateLabel").textContent = dObj.toLocaleDateString("it-IT", { weekday:"long", day:"numeric", month:"long" });
+  document.getElementById("weekLabel").textContent = monday.toLocaleDateString("it-IT", {day:"numeric", month:"short"}) + " – " + addDays(monday,6).toLocaleDateString("it-IT", {day:"numeric", month:"short"});
+  document.getElementById("dateLabel").textContent = fromKey(state.selectedDate).toLocaleDateString("it-IT", { weekday:"long", day:"numeric", month:"long" });
 
   const grid = document.getElementById("calGrid");
   grid.innerHTML = "";
-  
   for(let i=0; i<7; i++){
-    const d = addDays(monday, i);
-    const key = toKey(d);
-    const plan = getPlan(key);
-    
-    let cls = "cal-day";
-    if (plan) cls += " " + plan.type;
-    if (key === state.selectedDate) cls += " selected";
-    
+    const d = addDays(monday, i); const key = toKey(d); const plan = getPlan(key);
+    let cls = "cal-day" + (plan ? " " + plan.type : "") + (key === state.selectedDate ? " selected" : "");
     let doneMark = "";
-    if(plan){
-      const total = Object.keys(DATA[plan.type].meals).length;
-      const done = Object.values(plan.completed).filter(Boolean).length;
-      if(done >= total) doneMark = '<span class="check">✓</span>';
-    }
-    
-    const cell = document.createElement("div");
-    cell.className = cls;
-    cell.onclick = () => { state.selectedDate = key; save(); render(); };
-    cell.innerHTML = `${doneMark}<div class="dow">${DOW[i]}</div><div class="num">${d.getDate()}</div><div class="dot"></div>`;
-    grid.appendChild(cell);
+    if(plan && Object.values(plan.completed).filter(Boolean).length >= Object.keys(PLAN_DATA[plan.type].meals).length) doneMark = '<span class="check">✓</span>';
+    grid.innerHTML += `<div class="${cls}" onclick="state.selectedDate='${key}'; save(); render();">${doneMark}<div class="dow">${DOW[i]}</div><div class="num">${d.getDate()}</div><div class="dot"></div></div>`;
   }
 }
 
 function renderDayEditor(){
-  const key = state.selectedDate;
-  const plan = getPlan(key);
-  const el = document.getElementById("dayEditor");
-
+  const key = state.selectedDate; const plan = getPlan(key); const el = document.getElementById("dayEditor");
+  
   if(!plan){
-    el.innerHTML = `
-      <div class="day-type-selector">
-        <button class="btn-big train" onclick="setPlanType('${key}','train')">
-          <span class="icon">🏋️</span>
-          <span>Giorno di Allenamento</span>
-        </button>
-        <button class="btn-big rest" onclick="setPlanType('${key}','rest')">
-          <span class="icon">🛌</span>
-          <span>Giorno di Riposo</span>
-        </button>
-      </div>`;
+    el.innerHTML = `<div class="day-type-selector"><button class="btn-big train" onclick="setPlanType('${key}','train')"><span class="icon">🏋️</span><span>Allenamento</span></button><button class="btn-big rest" onclick="setPlanType('${key}','rest')"><span class="icon">🛌</span><span>Riposo</span></button></div>`;
     return;
   }
-
-  const cfg = DATA[plan.type];
-  const isTrain = plan.type === 'train';
-  const disabledVariant = getLastUsedVariant(key, plan.type);
   
-  let html = `
-    <div class="active-day-header">
-      <div class="type-badge ${plan.type}">${isTrain ? '🏋️ Allenamento' : '🛌 Riposo'}</div>
-      <button class="btn-reset" onclick="clearPlan('${key}')">Cambia tipo giornata</button>
-    </div>
-    
-    <div class="variant-tabs">`;
-    
-  for (let i = 0; i < cfg.days; i++) {
-      const isDisabled = (i === disabledVariant);
-      const isActive = (plan.dayIndex === i);
-      const attr = isDisabled ? 'disabled' : '';
-      const icon = isDisabled ? '🔒' : '';
-      const click = isDisabled ? '' : `onclick="setDayIndex('${key}',${i})"`;
-      
-      html += `<button class="${isActive ? 'active' : ''}" ${attr} ${click}>Variante ${i+1} ${icon}</button>`;
-  }
-  html += `</div><div class="meal-list">`;
+  const cfg = PLAN_DATA[plan.type]; 
+  const isTrain = plan.type === 'train';
+  
+  let html = `<div class="active-day-header"><div class="type-badge ${plan.type}">${isTrain ? '🏋️ Allenamento' : '🛌 Riposo'}</div><button class="btn-reset" onclick="clearPlan('${key}')">Cambia tipo</button></div><div class="meal-list">`;
 
   Object.keys(cfg.meals).forEach(mk => {
-    const meal = cfg.meals[mk];
-    const isDone = !!plan.completed[mk];
-    let slotDef = meal.perDay ? cfg.dayPlans[plan.dayIndex][mk] : meal;
-    
-    if(!slotDef) return;
-
+    const meal = cfg.meals[mk]; 
+    const isDone = !!plan.completed[mk]; 
     let contentHtml = "";
-    if (slotDef.fixed) {
-      slotDef.fixed.forEach(item => {
-        contentHtml += `<div class="fixed-item">• ${item}</div>`;
-      });
-    }
     
-    if (slotDef.options) {
-      if (slotDef.optionsIntro) contentHtml += `<div class="options-title">${slotDef.optionsIntro}</div>`;
-      slotDef.options.forEach((opt, i) => {
-        const isChecked = (plan.selections[mk] || 0) === i;
-        contentHtml += `
-          <label class="radio-option" onclick="selectOption('${key}','${mk}',${i})">
-            <input type="radio" name="opt_${key}_${mk}" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation()">
-            <span>${opt}</span>
-          </label>`;
+    if (meal.fixed) meal.fixed.forEach(item => contentHtml += `<div class="fixed-item">• ${item}</div>`);
+    if (meal.options) {
+      if (meal.optionsIntro) contentHtml += `<div class="options-title">${meal.optionsIntro}</div>`;
+      meal.options.forEach((opt, i) => {
+        contentHtml += `<label class="radio-option" onclick="selectOption('${key}','${mk}',${i})"><input type="radio" ${ (plan.selections[mk] || 0) === i ? 'checked' : '' } onclick="event.stopPropagation()"><span>${opt}</span></label>`;
       });
     }
-
-    html += `
-      <div class="meal-card ${isDone ? 'is-done' : ''}">
-        <div class="meal-header">
-          <h3>${meal.name}</h3>
-          <span class="time">${meal.time}</span>
-        </div>
-        <div class="meal-body">${contentHtml}</div>
-        <div class="meal-footer" onclick="toggleDone('${key}','${mk}')">
-          <div class="btn-done">${isDone ? '✓ Completato' : 'Segna come completato'}</div>
-        </div>
-      </div>`;
+    html += `<div class="meal-card ${isDone ? 'is-done' : ''}"><div class="meal-header"><h3>${meal.name}</h3><span class="time">${meal.time}</span></div><div class="meal-body">${contentHtml}</div><div class="meal-footer" onclick="toggleDone('${key}','${mk}')"><div class="btn-done">${isDone ? '✓ Completato' : 'Segna completato'}</div></div></div>`;
   });
+  el.innerHTML = html + `</div>`;
+}
 
-  html += `</div>`;
-  el.innerHTML = html;
+/* ---------- UI SPESA ---------- */
+function changeShopWeek(num) {
+  currentShopWeek = num;
+  document.querySelectorAll('.week-tabs button').forEach((b, i) => { b.classList.toggle('active', i === num-1); });
+  renderShopping();
+}
+
+function toggleShopItem(catIdx, itemIdx) {
+  const code = `${catIdx}-${itemIdx}`;
+  state.shopChecks[currentShopWeek][code] = !state.shopChecks[currentShopWeek][code];
+  save(); renderShopping();
 }
 
 function renderShopping(){
-    const el = document.getElementById('shopContent');
     let html = '';
-    
-    SHOPPING_DATA.forEach(cat => {
-        html += `
-        <div class="shop-cat">
-            <div class="shop-cat-title">${cat.cat}</div>
-            <div>
-                ${cat.items.map(item => `
-                    <label class="shop-item">
-                        <input type="checkbox">
-                        <span>${item}</span>
-                    </label>
-                `).join('')}
-            </div>
-        </div>`;
+    SHOPPING_DATA.forEach((cat, cIdx) => {
+        html += `<div class="shop-cat"><div class="shop-cat-title">${cat.icon} ${cat.cat}</div><div>`;
+        cat.items.forEach((item, iIdx) => {
+            const isChecked = !!state.shopChecks[currentShopWeek][`${cIdx}-${iIdx}`];
+            html += `<label class="shop-item"><input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleShopItem(${cIdx}, ${iIdx})"><span style="${isChecked ? 'text-decoration:line-through; color:var(--ink-faint)' : ''}">${item}</span></label>`;
+        });
+        html += `</div></div>`;
     });
+    document.getElementById('shopContent').innerHTML = html;
+}
+
+/* ---------- UI PESO ---------- */
+function addWeight() {
+  const w = parseFloat(document.getElementById('weightInput').value);
+  const d = document.getElementById('weightDate').value;
+  if(!w || !d) return alert("Inserisci peso e data");
+  weightData.push({ date: d, weight: w });
+  weightData.sort((a,b) => new Date(a.date) - new Date(b.date));
+  localStorage.setItem(WEIGHT_KEY, JSON.stringify(weightData));
+  document.getElementById('weightInput').value = '';
+  renderWeight();
+}
+
+function deleteWeight(idx) {
+  weightData.splice(idx, 1);
+  localStorage.setItem(WEIGHT_KEY, JSON.stringify(weightData));
+  renderWeight();
+}
+
+function renderWeight() {
+  document.getElementById('weightDate').value = new Date().toISOString().split('T')[0];
+  
+  let histHtml = '';
+  [...weightData].reverse().forEach((wd, i) => {
+    const realIdx = weightData.length - 1 - i;
+    const dStr = fromKey(wd.date).toLocaleDateString("it-IT", { day:"numeric", month:"short", year:"numeric" });
+    histHtml += `<div class="history-item"><span>${dStr}</span><span><b>${wd.weight} kg</b> <span class="del" onclick="deleteWeight(${realIdx})">✕</span></span></div>`;
+  });
+  document.getElementById('weightHistory').innerHTML = histHtml;
+
+  if(weightChartInstance) weightChartInstance.destroy();
+  const ctx = document.getElementById('weightChart').getContext('2d');
+  
+  const labels = weightData.map(w => fromKey(w.date).toLocaleDateString("it-IT", { day:"numeric", month:"short" }));
+  const data = weightData.map(w => w.weight);
+
+  weightChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: { labels: labels, datasets: [{ label: 'Peso (kg)', data: data, borderColor: '#2563EB', backgroundColor: 'rgba(37, 99, 235, 0.1)', tension: 0.3, fill: true, pointBackgroundColor: '#2563EB' }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false } } }
+  });
+}
+
+/* ---------- IMPOSTAZIONI E UPLOAD ---------- */
+function handleFileUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const json = JSON.parse(e.target.result);
+      if(json.train && json.rest) {
+        localStorage.setItem(PLAN_KEY, JSON.stringify(json));
+        PLAN_DATA = json;
+        alert("Piano aggiornato con successo!");
+        render();
+      } else { alert("Formato file non valido."); }
+    } catch(err) { alert("Errore lettura file JSON."); }
+  };
+  reader.readAsText(file);
+}
+
+function resetAppData() {
+  if(confirm("Vuoi cancellare tutto il calendario e la spesa? Il peso verrà mantenuto.")) {
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+  }
+}
+
+/* ---------- CORE ---------- */
+function switchTab(tabId) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`view-${tabId}`).classList.add('active');
+    document.getElementById(`tab-${tabId}`).classList.add('active');
     
-    el.innerHTML = html;
+    if (tabId === 'shop') renderShopping();
+    if (tabId === 'weight') renderWeight();
 }
 
-function render(){
-  renderCalendar();
-  renderDayEditor();
-}
+function render() { renderCalendar(); renderDayEditor(); }
 
-// Event Listeners Calendario
-document.getElementById("prevWeek").addEventListener("click", () => {
-  state.weekStart = toKey(addDays(fromKey(state.weekStart), -7)); save(); render();
-});
-document.getElementById("nextWeek").addEventListener("click", () => {
-  state.weekStart = toKey(addDays(fromKey(state.weekStart), 7)); save(); render();
-});
-document.getElementById("gotoToday").addEventListener("click", () => {
-  state.weekStart = toKey(mondayOf(new Date())); state.selectedDate = toKey(new Date()); save(); render();
-});
+document.getElementById("prevWeek").addEventListener("click", () => { state.weekStart = toKey(addDays(fromKey(state.weekStart), -7)); save(); render(); });
+document.getElementById("nextWeek").addEventListener("click", () => { state.weekStart = toKey(addDays(fromKey(state.weekStart), 7)); save(); render(); });
+document.getElementById("gotoToday").addEventListener("click", () => { state.weekStart = toKey(mondayOf(new Date())); state.selectedDate = toKey(new Date()); save(); render(); });
 
-// Avvio
 render();
 </script>
 </body>
