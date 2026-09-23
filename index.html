@@ -51,10 +51,10 @@
   /* SCHERMATA LOGIN */
   #login-view {
     display: none; flex-direction: column; align-items: center; justify-content: center; 
-    height: 100vh; padding: 20px; background: var(--bg);
+    min-height: 100vh; padding: 20px; background: var(--bg);
   }
   .login-card {
-    background: var(--surface); padding: 32px 24px; border-radius: 24px; 
+    background: var(--surface); padding: 40px 24px; border-radius: 24px; 
     box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 360px; border: 1px solid var(--line);
   }
 
@@ -123,13 +123,12 @@
   
   .calorie-form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
   .calorie-form-group label { font-size: 14px; font-weight: 600; color: var(--ink-soft); }
-  .calorie-form-group select, .calorie-form-group input { width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 16px; background: var(--surface-muted); outline: none;}
+  .calorie-form-group select, .calorie-form-group input { width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 16px; background: var(--surface-muted); outline: none; }
   .calorie-form-group input:focus { border-color: var(--primary); }
-  
   .btn-save { width: 100%; background: var(--train); color: white; border: none; border-radius: 10px; padding: 16px; font-weight: 700; font-size: 16px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(16,185,129,0.3); transition: background 0.2s;}
   .btn-save:active { background: #059669; }
 
-  /* SPESA E ALTRE SEZIONI */
+  /* SPESA */
   .shop-header { text-align: center; margin-bottom: 24px; padding-top: 10px; }
   .shop-header h1 { font-weight: 700; font-size: 26px; margin: 0 0 8px; }
   .week-tabs { display: flex; overflow-x: auto; gap: 12px; margin-bottom: 24px; padding-bottom: 8px; }
@@ -198,7 +197,7 @@
       <input type="password" id="login-password" placeholder="••••">
     </div>
     
-    <button class="btn-save" onclick="performLogin()" style="background:var(--primary); box-shadow: 0 4px 12px rgba(37,99,235,0.3);">Accedi</button>
+    <button class="btn-save" onclick="performLogin()" style="background:var(--primary); box-shadow: 0 4px 12px rgba(37,99,235,0.3);">Accedi / Sblocca</button>
   </div>
 </div>
 
@@ -259,9 +258,7 @@
 
     <div class="info-box">
       <h4>Raccomandazioni Fisse ⚠️</h4>
-      <ul id="raccomandazioni-text">
-        <!-- Generato dinamicamente -->
-      </ul>
+      <ul id="raccomandazioni-text"></ul>
     </div>
     
     <div id="shopContent"></div>
@@ -364,7 +361,7 @@
       <h3 style="color: var(--primary);">👤 Profilo: <span id="display-active-profile"></span></h3>
       <div style="display:flex; gap:10px; margin-top:16px;">
         <button class="btn-outline" style="padding: 12px; flex:1; background:var(--surface);" onclick="logout()">🚪 Esci / Cambia</button>
-        <button class="btn-outline" style="padding: 12px; flex:1; background:var(--surface); border-color:#10B981; color:#10B981;" onclick="setPassword()">🔐 Cambia Password</button>
+        <button class="btn-outline" style="padding: 12px; flex:1; background:var(--surface); border-color:#10B981; color:#10B981;" onclick="setPassword()">🔐 Crea/Cambia Password</button>
       </div>
     </div>
 
@@ -413,7 +410,7 @@
 </div>
 
 <!-- BOTTOM NAVIGATION -->
-<nav class="bottom-nav">
+<nav class="bottom-nav" id="bottomNav" style="display:none;">
   <button class="nav-btn active" id="tab-plan" onclick="switchTab('plan')">
     <span class="icon">📝</span><span>Oggi</span>
   </button>
@@ -432,33 +429,22 @@
 </nav>
 
 <script>
-/* ----------------------------------------------------- */
-/* LOGICA LOGIN & AUTENTICAZIONE                         */
-/* ----------------------------------------------------- */
-// Inizializzazione account di default
+/* --- AUTENTICAZIONE E PROFILI --- */
+const DEFAULT_PROFILES = ['Emanuele', 'Andrea'];
 if (!localStorage.getItem('menu-oggi-pwd-Emanuele')) localStorage.setItem('menu-oggi-pwd-Emanuele', '1900');
 if (!localStorage.getItem('menu-oggi-pwd-Andrea')) localStorage.setItem('menu-oggi-pwd-Andrea', '1900');
-if (!localStorage.getItem('menu-oggi-profiles')) localStorage.setItem('menu-oggi-profiles', JSON.stringify(['Emanuele', 'Andrea']));
+if (!localStorage.getItem('menu-oggi-profiles')) localStorage.setItem('menu-oggi-profiles', JSON.stringify(DEFAULT_PROFILES));
 
 let activeProfile = sessionStorage.getItem('logged-in-profile');
 
-// Variabili Globali
-let STORAGE_KEY, WEIGHT_KEY, PHOTOS_KEY, PLAN_KEY;
-let state, weightData, photosData, PLAN_DATA;
-let currentShopWeek = 1; 
-let weightChartInstance = null; 
-let kcalChartInstance = null;
-let currentMonthDate = new Date(); currentMonthDate.setDate(1);
-
-const DOW = ["Lun","Mar","Mer","Gio","Ven","Sab","Dom"];
-
 if (!activeProfile) {
-    // Utente NON loggato -> Mostro il Login
     document.getElementById('login-view').style.display = 'flex';
+    document.getElementById('bottomNav').style.display = 'none';
+    document.getElementById('main-app').style.display = 'none';
 } else {
-    // Utente LOGGATO -> Avvio l'App
+    document.getElementById('login-view').style.display = 'none';
     document.getElementById('main-app').style.display = 'block';
-    initApp(); 
+    document.getElementById('bottomNav').style.display = 'flex';
 }
 
 function performLogin() {
@@ -468,9 +454,7 @@ function performLogin() {
     if (!u) return alert("Inserisci il nome del profilo.");
     if (!p) return alert("Inserisci la password.");
     
-    // Capitalize per matchare esattamente "Emanuele" o "Andrea"
     u = u.charAt(0).toUpperCase() + u.slice(1).toLowerCase();
-
     let savedPwd = localStorage.getItem('menu-oggi-pwd-' + u);
     
     if (savedPwd) {
@@ -478,12 +462,11 @@ function performLogin() {
             sessionStorage.setItem('logged-in-profile', u);
             location.reload();
         } else {
-            alert("Password errata per il profilo " + u + "!");
+            alert("Password errata!");
         }
     } else {
-        // Se il profilo non esiste (es: un amico nuovo) lo creiamo
         if (confirm("Il profilo '" + u + "' non esiste. Vuoi creare un nuovo utente con questa password?")) {
-            let profilesList = JSON.parse(localStorage.getItem('menu-oggi-profiles')) || ['Emanuele', 'Andrea'];
+            let profilesList = JSON.parse(localStorage.getItem('menu-oggi-profiles')) || DEFAULT_PROFILES;
             if(!profilesList.includes(u)) {
                 profilesList.push(u);
                 localStorage.setItem('menu-oggi-profiles', JSON.stringify(profilesList));
@@ -502,244 +485,341 @@ function logout() {
 
 function setPassword() {
     let pwd = localStorage.getItem('menu-oggi-pwd-' + activeProfile);
-    let check = prompt("Inserisci la password ATTUALE per confermare l'identità:");
-    if (check !== pwd) {
-        alert("Password errata!");
-        return;
+    if (pwd) {
+        let check = prompt("Inserisci la password ATTUALE per confermare:");
+        if (check !== pwd) {
+            alert("Password errata!");
+            return;
+        }
     }
-    
-    let newPwd = prompt("Inserisci la NUOVA password per " + activeProfile + ":");
+    let newPwd = prompt("Inserisci la NUOVA password per " + activeProfile + " (lascia vuoto per rimuoverla):");
     if (newPwd === null) return;
-    if (newPwd.trim() === "") return alert("La password non può essere vuota.");
-    
-    localStorage.setItem('menu-oggi-pwd-' + activeProfile, newPwd.trim());
-    alert("Password aggiornata con successo!");
+    if (newPwd.trim() === "") {
+        localStorage.removeItem('menu-oggi-pwd-' + activeProfile);
+        alert("Password rimossa con successo.");
+    } else {
+        localStorage.setItem('menu-oggi-pwd-' + activeProfile, newPwd.trim());
+        alert("Password salvata con successo!");
+    }
 }
 
 
-/* ----------------------------------------------------- */
-/* FUNZIONE PRINCIPALE DELL'APP (Eseguita solo se loggato)*/
-/* ----------------------------------------------------- */
-function initApp() {
-    // CHIAVI DI SALVATAGGIO
-    STORAGE_KEY = "menu-oggi-state-v18-" + activeProfile;
-    WEIGHT_KEY  = "menu-oggi-weight-v18-" + activeProfile;
-    PHOTOS_KEY  = "menu-oggi-photos-v18-" + activeProfile;
-    PLAN_KEY    = "menu-oggi-custom-plan-" + activeProfile;
+/* --- VARIABILI GLOBALI APP --- */
+let STORAGE_KEY = activeProfile ? "menu-oggi-state-v19-" + activeProfile : "dummy";
+let WEIGHT_KEY  = activeProfile ? "menu-oggi-weight-v19-" + activeProfile : "dummy";
+let PHOTOS_KEY  = activeProfile ? "menu-oggi-photos-v19-" + activeProfile : "dummy";
+let PLAN_KEY    = activeProfile ? "menu-oggi-custom-plan-" + activeProfile : "dummy";
 
-    /* DATI ALIMENTARI (EMANUELE) */
-    let EMANUELE_PLAN_DATA = {
-      train: {
-        label: "Allenamento",
-        meals: {
-          colazione: { 
-            name: "Colazione", time: "7:00 – 8:30",
-            fixed: [
-              {t: "💊 1 Pasticca di Creatina da 3g", k: 0},
-              {t: "🍊 Spremuta / 2 cucch. Vibracell", k: 90}, 
-              {t: "☕ Caffè/orzo", k: 0}, 
-              {t: "🍞 70g pane segale tostato", k: 170}
-            ],
-            optionsIntro: "Accompagna con:",
-            options: [{t: "🦃 60g fesa tacchino + 2 fette formaggio", k: 150}, {t: "🍳 2 uova strapazzate bio", k: 160}, {t: "🐟 50g salmone affumicato + form. light", k: 160}, {t: "🫒 2 cucch. olio e sale", k: 90}, {t: "🧀 50g ricotta vaccina", k: 80}]
-          },
-          spuntinoMattina: { 
-            name: "Spuntino Mattina", time: "10:30", optionsIntro: "Scegli un'opzione:",
-            options: [{t: "🥜 40g frutta oleosa + 1 frutto", k: 340}, {t: "🥣 170g yogurt greco con cereali", k: 250}, {t: "🍎 1 frutto + 1 barretta proteica", k: 260}, {t: "🥤 30g proteine vegane", k: 120}]
-          },
-          pranzo: { 
-            name: "Pranzo", time: "13:00 – 14:00", optionsIntro: "Scegli un'opzione:",
-            options: [
-              {t: "🍝 100g pasta integrale, pomodoro, 20g parmigiano, 120g fesa tacchino, verdura", k: 620}, 
-              {t: "🥒 100g Riso Basmati, zucchine e 150g gamberi", k: 510}, 
-              {t: "🐙 100g Riso Basmati, misto mare pescatora", k: 550}, 
-              {t: "🐟 100g Riso Basmati, 80g salmone affumicato e zucchine", k: 520}, 
-              {t: "🐟 100g Riso Basmati, 250g salmone fresco lessato", k: 680}, 
-              {t: "🍅 100g Pasta integrale, pomodoro, 300g pesce azzurro, verdura", k: 600}, 
-              {t: "🥒 100g Pasta integrale, zucchine e parmigiano, 300g pesce", k: 640}
-            ]
-          },
-          spuntinoPomeriggio: { 
-            name: "Spuntino Pomeriggio", time: "16:30", optionsIntro: "Scegli un'opzione:",
-            options: [{t: "🍅 1 frisella integrale con pomodoro", k: 180}, {t: "🍘 2 fettine Wasa + yocca o 1 scatoletta tonno", k: 220}, {t: "🍘 2 fettine Wasa + 70g bresaola", k: 190}, {t: "🥤 30g proteine vegane", k: 120}]
-          },
-          cena: { 
-            name: "Cena", time: "20:00 – 21:00", optionsIntro: "Scegli un'opzione:",
-            options: [{t: "🍗 300g carne bianca ai ferri, insalata mista, 1 frutto", k: 550}, {t: "🥩 300g carne magra (manzo), verdura a piacere, 1 frutto", k: 600}]
-          },
-          condimenti: {
-            name: "Condimenti & Integrazione", time: "Durante la giornata",
-            fixed: [
-              {t: "🫒 Olio Extravergine d'Oliva (8 cucchiaini totali)", k: 360},
-              {t: "💊 BCAA 2.1.1 (3 pasticche prima, 2 dopo)", k: 0},
-              {t: "🍌 1 Banana (Entro 30 min da fine allenamento)", k: 100}
-            ]
-          }
-        }
+let EMANUELE_PLAN_DATA = {
+  train: {
+    label: "Allenamento",
+    meals: {
+      colazione: { 
+        name: "Colazione", time: "7:00 – 8:30",
+        fixed: [
+          {t: "💊 1 Pasticca di Creatina da 3g", k: 0},
+          {t: "🍊 Spremuta / 2 cucch. Vibracell", k: 90}, 
+          {t: "☕ Caffè/orzo", k: 0}, 
+          {t: "🍞 70g pane segale tostato", k: 170}
+        ],
+        optionsIntro: "Accompagna con:",
+        options: [{t: "🦃 60g fesa tacchino + 2 fette form.", k: 150}, {t: "🍳 2 uova strapazzate bio", k: 160}, {t: "🐟 50g salmone affumicato + form. light", k: 160}, {t: "🫒 2 cucch. olio e sale", k: 90}, {t: "🧀 50g ricotta vaccina", k: 80}]
       },
-      rest: {
-        label: "Riposo",
-        meals: {
-          colazione: { 
-            name: "Colazione", time: "7:00 – 9:00", 
-            fixed: [
-              {t: "💊 1 Pasticca di Creatina da 3g", k: 0},
-              {t:"🥣 170-200g yogurt greco 0%", k: 110}, 
-              {t:"🌾 Fiocchi d'avena", k: 150}, 
-              {t:"🍓 Frutti rossi", k: 40}, 
-              {t:"🌰 3-4 noci", k: 100}
-            ] 
-          },
-          spuntinoMattina: { name: "Spuntino Mattina", time: "10:30", fixed: [{t:"🥜 30g frutta oleosa", k: 200}, {t:"🍎 1 frutto", k: 80}] },
-          pranzo: { 
-            name: "Pranzo", time: "13:00 – 14:00", optionsIntro: "Scegli un'opzione:",
-            options: [{t: "🍲 Minestrone verdure/legumi, 50g riso integrale + parmigiano", k: 450}, {t: "🌾 80g farro/riso integrale, ceci, insalata", k: 520}, {t: "🥗 Insalata Greca: Pomodoro, 150g feta, olive, cetrioli, 100g pane segale, 1 frutto", k: 600}, {t: "🍅 80g pasta fredda, pachino, mozzarella, olive, verdura, 1 frutto", k: 580}]
-          },
-          spuntinoPomeriggio: { name: "Spuntino Pomeriggio", time: "16:30", optionsIntro: "Scegli un'opzione:", options: [{t: "🍎 1 frutto", k: 80}, {t: "🥣 170g yogurt greco 0%", k: 100}, {t: "🥕 Finocchi e carote", k: 40}] },
-          cena: { 
-            name: "Cena", time: "20:00 – 21:00", optionsIntro: "Scegli un'opzione:",
-            options: [{t: "🎉 CENA LIBERA !!!", k: 1000}, {t: "🐟 300g pesce (merluzzo/orata), verdura cotta, 1 frutto", k: 450}, {t: "🍲 Minestra: 1 barattolo fagioli/ceci con 65g pasta/riso, verdura", k: 550}, {t: "🐟 300g pesce (spada, salmone), insalata, 1 frutto", k: 650}]
-          },
-          condimenti: {
-            name: "Condimenti", time: "Durante la giornata",
-            fixed: [
-              {t: "🫒 Olio Extravergine d'Oliva (8 cucchiaini totali)", k: 360}
-            ]
-          }
-        }
-      }
-    };
-
-    /* DATI ALIMENTARI (ANDREA) PRECARICATI */
-    let ANDREA_PLAN_DATA = {
-      train: {
-        label: "Allenamento",
-        meals: {
-          colazione: {
-            name: "Colazione", time: "7:00 – 8:30",
-            fixed: [
-              {t: "🍊 Spremuta o estratto / 2 cucch. Vibracell", k: 90},
-              {t: "☕ Caffè o orzo (facoltativo)", k: 0},
-              {t: "🍞 100g pane di segale integrale tostato", k: 240}
-            ],
-            optionsIntro: "Accompagna il pane con:",
-            options: [
-              {t: "🦃 100g fesa tacchino/bresaola o 60-70g prosciutto + 2 fette form.", k: 200},
-              {t: "🍳 2 uova strapazzate bio + 100ml albume", k: 200},
-              {t: "🐟 80g salmone affumicato", k: 140},
-              {t: "🧀 100g di ricotta vaccina", k: 150}
-            ]
-          },
-          spuntinoMattina: {
-            name: "Spuntino Mattina", time: "10:30", optionsIntro: "Scegli un'opzione:",
-            options: [
-              {t: "🥜 40g frutta oleosa (noci/mandorle) + 1 frutto", k: 340},
-              {t: "🥣 170g yogurt greco + manciata cereali integrali", k: 250},
-              {t: "🍎 1 frutto + 1 barretta proteica (25g pro)", k: 280},
-              {t: "🥤 30g proteine vegane sciolte in acqua", k: 120}
-            ]
-          },
-          pranzo: {
-            name: "Pranzo", time: "13:00 – 14:00", optionsIntro: "Scegli un'opzione (Base: 120g Riso Basmati):",
-            options: [
-              {t: "🍚 120g Riso, Zucchine lesse, 120-150g tonno naturale", k: 600},
-              {t: "🍤 120g Riso, Zucchine e gamberetti (150-200g)", k: 580},
-              {t: "🐙 120g Riso, Misto mare pescatora (150-200g)", k: 620},
-              {t: "🐟 120g Riso, 80g salmone affumicato con zucchine", k: 580},
-              {t: "🐟 120g Riso, 250g salmone fresco lessato con zucchine", k: 780}
-            ]
-          },
-          spuntinoPomeriggio: {
-            name: "Spuntino Pomeriggio", time: "16:30", optionsIntro: "Scegli un'opzione:",
-            options: [
-              {t: "🍅 1 frisella integrale con pomodoro, tonno e olio", k: 350},
-              {t: "🍘 2 fettine Wasa + yocca o 1 scatoletta tonno media", k: 220},
-              {t: "🍘 2 fettine Wasa + 60-80g bresaola", k: 190},
-              {t: "🥤 30g proteine vegane in acqua/latte d'avena", k: 140}
-            ]
-          },
-          cena: {
-            name: "Cena", time: "20:00 – 21:00", optionsIntro: "Opzione fissa:",
-            options: [
-              {t: "🍗 300-320g carne bianca ai ferri, insalata mista, 1 frutto", k: 580}
-            ]
-          },
-          condimenti: {
-            name: "Condimenti & Integrazione", time: "Durante la giornata",
-            fixed: [
-              {t: "🫒 Olio Extravergine d'Oliva (8 cucchiaini totali)", k: 360},
-              {t: "💊 BCAA 2.1.1 (8-10g sciolti in 500ml d'acqua)", k: 0},
-              {t: "🍌 1 Banana (Entro 30 min da fine allenamento)", k: 100}
-            ]
-          }
-        }
+      spuntinoMattina: { 
+        name: "Spuntino Mattina", time: "10:30", optionsIntro: "Scegli un'opzione:",
+        options: [{t: "🥜 40g frutta oleosa + 1 frutto", k: 340}, {t: "🥣 170g yogurt greco con cereali", k: 250}, {t: "🍎 1 frutto + 1 barretta proteica", k: 260}, {t: "🥤 30g proteine vegane", k: 120}]
       },
-      rest: {
-        label: "Riposo",
-        meals: {
-          colazione: {
-            name: "Colazione", time: "7:00 – 9:00", optionsIntro: "Scegli la base lattiero-casearia:",
-            options: [
-              {t: "🥛 1 Tazza latte parz. screm. + 60g avena + 20-30g noci + Caffè", k: 530},
-              {t: "🥣 200g yogurt 0% + 60g avena + 20-30g noci + Caffè", k: 510}
-            ]
-          },
-          spuntinoMattina: {
-            name: "Spuntino Mattina", time: "10:30", optionsIntro: "Scegli un'opzione:",
-            options: [
-              {t: "🥜 30g frutta oleosa", k: 200},
-              {t: "🥣 170g yogurt greco 0%", k: 100},
-              {t: "🍎 1 frutto", k: 80}
-            ]
-          },
-          pranzo: {
-            name: "Pranzo", time: "13:00 – 14:00", optionsIntro: "Scegli un'opzione:",
-            options: [
-              {t: "🧀 150g formaggio, insalatona mista, 150-170g pane di segale", k: 780},
-              {t: "🍳 3 uova BIO (frittata verdure), insalata, 150-170g pane segale", k: 680},
-              {t: "🍝 130g pasta int. pomodoro + 3 cucch. parmigiano, verdura, frutto", k: 650},
-              {t: "🐟 350g pesce azzurro/bianco, insalatona, 150-170g pane segale", k: 850}
-            ]
-          },
-          spuntinoPomeriggio: {
-            name: "Spuntino Pomeriggio", time: "16:30", optionsIntro: "Scegli un'opzione:",
-            options: [
-              {t: "🍎 1 frutto", k: 80},
-              {t: "🥣 170g yogurt greco 0%", k: 100},
-              {t: "🥕 Finocchi e carote", k: 40},
-              {t: "🥤 30g proteine sciolte in acqua", k: 120}
-            ]
-          },
-          cena: {
-            name: "Cena", time: "20:00 – 21:00", optionsIntro: "Scegli un'opzione:",
-            options: [
-              {t: "🍲 Finocchi + Minestra fagioli/ceci (1 barattolo) + 70g pasta/riso, frutto", k: 650},
-              {t: "🍲 Finocchi + Minestra lenticchie (1 barattolo) + 70g pasta/riso, frutto", k: 650},
-              {t: "🍲 Minestrone verdure/legumi + 60g pasta/riso + 3 cucch. parmigiano, frutto", k: 500},
-              {t: "🐟 350g merluzzo/nasello, verdura foglia verde, insalata, frutto", k: 450},
-              {t: "🎉 CENA LIBERA !!!", k: 1000}
-            ]
-          },
-          condimenti: {
-            name: "Condimenti", time: "Durante la giornata",
-            fixed: [
-              {t: "🫒 Olio Extravergine d'Oliva (8 cucchiaini totali)", k: 360}
-            ]
-          }
-        }
+      pranzo: { 
+        name: "Pranzo", time: "13:00 – 14:00", optionsIntro: "Scegli un'opzione:",
+        options: [
+          {t: "🍝 100g pasta integrale, pomodoro, 20g parmigiano, 120g fesa tacchino, verdura", k: 620}, 
+          {t: "🥒 100g Riso Basmati, zucchine e 150g gamberi", k: 510}, 
+          {t: "🐙 100g Riso Basmati, misto mare pescatora", k: 550}, 
+          {t: "🐟 100g Riso Basmati, 80g salmone affumicato e zucchine", k: 520}, 
+          {t: "🐟 100g Riso Basmati, 250g salmone fresco lessato", k: 680}, 
+          {t: "🍅 100g Pasta integrale, pomodoro, 300g pesce azzurro, verdura", k: 600}, 
+          {t: "🥒 100g Pasta integrale, zucchine e parmigiano, 300g pesce", k: 640}
+        ]
+      },
+      spuntinoPomeriggio: { 
+        name: "Spuntino Pomeriggio", time: "16:30", optionsIntro: "Scegli un'opzione:",
+        options: [{t: "🍅 1 frisella integrale con pomodoro", k: 180}, {t: "🍘 2 fettine Wasa + yocca o tonno", k: 220}, {t: "🍘 2 fettine Wasa + 70g bresaola", k: 190}, {t: "🥤 30g proteine vegane", k: 120}]
+      },
+      cena: { 
+        name: "Cena", time: "20:00 – 21:00", optionsIntro: "Scegli un'opzione:",
+        options: [{t: "🍗 300g carne bianca ai ferri, insalata mista, 1 frutto", k: 550}, {t: "🥩 300g carne magra (manzo), verdura a piacere, 1 frutto", k: 600}]
+      },
+      condimenti: {
+        name: "Condimenti & Integrazione", time: "Durante la giornata",
+        fixed: [
+          {t: "🫒 Olio Extravergine d'Oliva (8 cucchiaini totali)", k: 360},
+          {t: "💊 BCAA 2.1.1 (3 pasticche prima, 2 dopo)", k: 0},
+          {t: "🍌 1 Banana (Entro 30 min da fine allenamento)", k: 100}
+        ]
       }
-    };
-
-    if (activeProfile === 'Andrea') {
-        PLAN_DATA = ANDREA_PLAN_DATA;
-    } else {
-        PLAN_DATA = EMANUELE_PLAN_DATA;
     }
+  },
+  rest: {
+    label: "Riposo",
+    meals: {
+      colazione: { 
+        name: "Colazione", time: "7:00 – 9:00", 
+        fixed: [
+          {t: "💊 1 Pasticca di Creatina da 3g", k: 0},
+          {t:"🥣 170-200g yogurt greco 0%", k: 110}, 
+          {t:"🌾 Fiocchi d'avena", k: 150}, 
+          {t:"🍓 Frutti rossi", k: 40}, 
+          {t:"🌰 3-4 noci", k: 100}
+        ] 
+      },
+      spuntinoMattina: { name: "Spuntino Mattina", time: "10:30", fixed: [{t:"🥜 30g frutta oleosa", k: 200}, {t:"🍎 1 frutto", k: 80}] },
+      pranzo: { 
+        name: "Pranzo", time: "13:00 – 14:00", optionsIntro: "Scegli un'opzione:",
+        options: [{t: "🍲 Minestrone verdure/legumi, 50g riso integrale + parmigiano", k: 450}, {t: "🌾 80g farro/riso integrale, ceci, insalata", k: 520}, {t: "🥗 Insalata Greca: Pomodoro, 150g feta, olive, cetrioli, 100g pane segale, 1 frutto", k: 600}, {t: "🍅 80g pasta fredda, pachino, mozzarella, olive, verdura, 1 frutto", k: 580}]
+      },
+      spuntinoPomeriggio: { name: "Spuntino Pomeriggio", time: "16:30", optionsIntro: "Scegli un'opzione:", options: [{t: "🍎 1 frutto", k: 80}, {t: "🥣 170g yogurt greco 0%", k: 100}, {t: "🥕 Finocchi e carote", k: 40}] },
+      cena: { 
+        name: "Cena", time: "20:00 – 21:00", optionsIntro: "Scegli un'opzione:",
+        options: [{t: "🎉 CENA LIBERA !!!", k: 1000}, {t: "🐟 300g pesce (merluzzo/orata), verdura cotta, 1 frutto", k: 450}, {t: "🍲 Minestra: 1 barattolo fagioli/ceci con 65g pasta/riso, verdura", k: 550}, {t: "🐟 300g pesce (spada, salmone), insalata, 1 frutto", k: 650}]
+      },
+      condimenti: {
+        name: "Condimenti", time: "Durante la giornata",
+        fixed: [
+          {t: "🫒 Olio Extravergine d'Oliva (8 cucchiaini totali)", k: 360}
+        ]
+      }
+    }
+  }
+};
 
-    // Se è stato caricato manualmente un JSON, lo usiamo
-    const savedPlan = localStorage.getItem(PLAN_KEY);
+let ANDREA_PLAN_DATA = {
+  train: {
+    label: "Allenamento",
+    meals: {
+      colazione: {
+        name: "Colazione", time: "7:00 – 8:30",
+        fixed: [
+          {t: "🍊 Spremuta o estratto / 2 cucch. Vibracell", k: 90},
+          {t: "☕ Caffè o orzo (facoltativo)", k: 0},
+          {t: "🍞 100g pane di segale integrale tostato", k: 240}
+        ],
+        optionsIntro: "Accompagna il pane con:",
+        options: [
+          {t: "🦃 100g fesa tacchino/bresaola o 60-70g prosciutto + 2 fette form.", k: 200},
+          {t: "🍳 2 uova strapazzate bio + 100ml albume", k: 200},
+          {t: "🐟 80g salmone affumicato", k: 140},
+          {t: "🧀 100g di ricotta vaccina", k: 150}
+        ]
+      },
+      spuntinoMattina: {
+        name: "Spuntino Mattina", time: "10:30", optionsIntro: "Scegli un'opzione:",
+        options: [
+          {t: "🥜 40g frutta oleosa (noci/mandorle) + 1 frutto", k: 340},
+          {t: "🥣 170g yogurt greco + manciata cereali integrali", k: 250},
+          {t: "🍎 1 frutto + 1 barretta proteica (25g pro)", k: 280},
+          {t: "🥤 30g proteine vegane sciolte in acqua", k: 120}
+        ]
+      },
+      pranzo: {
+        name: "Pranzo", time: "13:00 – 14:00", optionsIntro: "Scegli un'opzione (Base: 120g Riso Basmati):",
+        options: [
+          {t: "🍚 120g Riso, Zucchine lesse, 120-150g tonno naturale", k: 600},
+          {t: "🍤 120g Riso, Zucchine e gamberetti (150-200g)", k: 580},
+          {t: "🐙 120g Riso, Misto mare pescatora (150-200g)", k: 620},
+          {t: "🐟 120g Riso, 80g salmone affumicato con zucchine", k: 580},
+          {t: "🐟 120g Riso, 250g salmone fresco lessato con zucchine", k: 780}
+        ]
+      },
+      spuntinoPomeriggio: {
+        name: "Spuntino Pomeriggio", time: "16:30", optionsIntro: "Scegli un'opzione:",
+        options: [
+          {t: "🍅 1 frisella integrale con pomodoro, tonno e olio", k: 350},
+          {t: "🍘 2 fettine Wasa + yocca o 1 scatoletta tonno media", k: 220},
+          {t: "🍘 2 fettine Wasa + 60-80g bresaola", k: 190},
+          {t: "🥤 30g proteine vegane in acqua/latte d'avena", k: 140}
+        ]
+      },
+      cena: {
+        name: "Cena", time: "20:00 – 21:00", optionsIntro: "Opzione fissa:",
+        options: [
+          {t: "🍗 300-320g carne bianca ai ferri, insalata mista, 1 frutto", k: 580}
+        ]
+      },
+      condimenti: {
+        name: "Condimenti & Integrazione", time: "Durante la giornata",
+        fixed: [
+          {t: "🫒 Olio Extravergine d'Oliva (8 cucchiaini totali)", k: 360},
+          {t: "💊 BCAA 2.1.1 (8-10g sciolti in 500ml d'acqua)", k: 0},
+          {t: "🍌 1 Banana (Entro 30 min da fine allenamento)", k: 100}
+        ]
+      }
+    }
+  },
+  rest: {
+    label: "Riposo",
+    meals: {
+      colazione: {
+        name: "Colazione", time: "7:00 – 9:00", optionsIntro: "Scegli la base lattiero-casearia:",
+        options: [
+          {t: "🥛 1 Tazza latte parz. screm. + 60g avena + 20-30g noci + Caffè", k: 530},
+          {t: "🥣 200g yogurt 0% + 60g avena + 20-30g noci + Caffè", k: 510}
+        ]
+      },
+      spuntinoMattina: {
+        name: "Spuntino Mattina", time: "10:30", optionsIntro: "Scegli un'opzione:",
+        options: [
+          {t: "🥜 30g frutta oleosa", k: 200},
+          {t: "🥣 170g yogurt greco 0%", k: 100},
+          {t: "🍎 1 frutto", k: 80}
+        ]
+      },
+      pranzo: {
+        name: "Pranzo", time: "13:00 – 14:00", optionsIntro: "Scegli un'opzione:",
+        options: [
+          {t: "🧀 150g formaggio, insalatona mista, 150-170g pane di segale", k: 780},
+          {t: "🍳 3 uova BIO (frittata verdure), insalata, 150-170g pane segale", k: 680},
+          {t: "🍝 130g pasta int. pomodoro + 3 cucch. parmigiano, verdura, frutto", k: 650},
+          {t: "🐟 350g pesce azzurro/bianco, insalatona, 150-170g pane segale", k: 850}
+        ]
+      },
+      spuntinoPomeriggio: {
+        name: "Spuntino Pomeriggio", time: "16:30", optionsIntro: "Scegli un'opzione:",
+        options: [
+          {t: "🍎 1 frutto", k: 80},
+          {t: "🥣 170g yogurt greco 0%", k: 100},
+          {t: "🥕 Finocchi e carote", k: 40},
+          {t: "🥤 30g proteine sciolte in acqua", k: 120}
+        ]
+      },
+      cena: {
+        name: "Cena", time: "20:00 – 21:00", optionsIntro: "Scegli un'opzione:",
+        options: [
+          {t: "🍲 Finocchi + Minestra fagioli/ceci (1 barattolo) + 70g pasta/riso, frutto", k: 650},
+          {t: "🍲 Finocchi + Minestra lenticchie (1 barattolo) + 70g pasta/riso, frutto", k: 650},
+          {t: "🍲 Minestrone verdure/legumi + 60g pasta/riso + 3 cucch. parmigiano, frutto", k: 500},
+          {t: "🐟 350g merluzzo/nasello, verdura foglia verde, insalata, frutto", k: 450},
+          {t: "🎉 CENA LIBERA !!!", k: 1000}
+        ]
+      },
+      condimenti: {
+        name: "Condimenti", time: "Durante la giornata",
+        fixed: [
+          {t: "🫒 Olio Extravergine d'Oliva (8 cucchiaini totali)", k: 360}
+        ]
+      }
+    }
+  }
+};
+
+let PLAN_DATA = activeProfile === 'Andrea' ? ANDREA_PLAN_DATA : EMANUELE_PLAN_DATA;
+if(activeProfile) {
+    let savedPlan = localStorage.getItem(PLAN_KEY);
     if(savedPlan) { try { PLAN_DATA = JSON.parse(savedPlan); } catch(e){} }
+}
 
+const EMANUELE_SHOP = [
+  { icon: "🍎", cat: "Frutta e Verdura", items: [
+    {n: "Banane (Post-workout)", q: "3-4 pz"}, 
+    {n: "Frutta fresca mista", q: "14 pz (2 al giorno)"}, 
+    {n: "Frutti rossi (Colazione)", q: "2 vaschette"},
+    {n: "Insalata, Zucchine, Pomodori, Carote", q: "q.b. (Circa 2-3 kg)"},
+    {n: "Minestrone surgelato / fresco", q: "1 busta"}
+  ]},
+  { icon: "🍞", cat: "Carboidrati", items: [
+    {n: "Pane di segale integrale", q: "1 pacco (400-500g)"}, 
+    {n: "Pasta integrale", q: "1 pacco (500g)"}, 
+    {n: "Riso Basmati / Farro integrale", q: "1 pacco (500g)"}, 
+    {n: "Wasa e Friselle", q: "1 pacco ciascuno"},
+    {n: "Fiocchi d'avena", q: "1 pacco (250g)"}
+  ]},
+  { icon: "🥩", cat: "Proteine", items: [
+    {n: "Uova bio", q: "1 conf. (6 pz)"}, 
+    {n: "Carne bianca (Pollo/Tacchino)", q: "600g (2 porzioni)"}, 
+    {n: "Carne magra (Manzo/Bovino)", q: "300g"},
+    {n: "Affettati (Fesa/Cotto/Bresaola)", q: "350-400g"}
+  ]},
+  { icon: "🐟", cat: "Pesce", items: [
+    {n: "Pesce bianco/azzurro", q: "900g (3 porzioni)"}, 
+    {n: "Salmone fresco o Misto mare", q: "250g"}, 
+    {n: "Salmone affumicato", q: "100g"},
+    {n: "Tonno in scatola", q: "2 scatolette medie"}
+  ]},
+  { icon: "🧀", cat: "Latticini", items: [
+    {n: "Yogurt greco 0%", q: "1 kg (2 secchielli)"}, 
+    {n: "Feta", q: "150g (1 conf.)"}, 
+    {n: "Parmigiano", q: "1 trancio piccolo"},
+    {n: "Yocca / Formaggio light", q: "1-2 conf."},
+    {n: "Formaggio a fette (Galbanino)", q: "1 busta"},
+    {n: "Mozzarella / Ricotta", q: "1 pz ciascuno"}
+  ]},
+  { icon: "🫘", cat: "Legumi e Grassi", items: [
+    {n: "Frutta oleosa (Noci/Mandorle)", q: "250g"}, 
+    {n: "Ceci / Fagioli", q: "3-4 barattoli"}, 
+    {n: "Olio EVO", q: "1 Bottiglia"}
+  ]},
+  { icon: "💊", cat: "Integrazione", items: [
+    {n: "Creatina", q: "1 Barattolo"},
+    {n: "BCAA 2.1.1", q: "1 Barattolo"},
+    {n: "Proteine vegane & Barrette", q: "q.b."}
+  ]}
+];
+
+const ANDREA_SHOP = [
+  { icon: "🍎", cat: "Frutta e Verdura", items: [
+    {n: "Banane (Post-workout)", q: "3-4 pz"}, 
+    {n: "Frutta fresca mista", q: "14 pz (2 al giorno)"}, 
+    {n: "Insalata, Zucchine, Pomodori, Carote", q: "q.b. (Circa 2-3 kg)"},
+    {n: "Minestrone surgelato / fresco", q: "1 busta"}
+  ]},
+  { icon: "🍞", cat: "Carboidrati", items: [
+    {n: "Pane di segale integrale", q: "1 pacco (400-500g)"}, 
+    {n: "Pasta integrale", q: "1 pacco (500g)"}, 
+    {n: "Riso Basmati / Farro integrale", q: "1 pacco (500g)"}, 
+    {n: "Wasa e Friselle", q: "1 pacco ciascuno"},
+    {n: "Fiocchi d'avena", q: "1 pacco (250g)"}
+  ]},
+  { icon: "🥩", cat: "Proteine", items: [
+    {n: "Uova bio", q: "1 conf. (6 pz)"}, 
+    {n: "Albume liquido", q: "1 Bottiglia piccola"}, 
+    {n: "Carne bianca (Pollo/Tacchino)", q: "600g (2 porzioni)"}, 
+    {n: "Affettati (Fesa/Cotto/Bresaola)", q: "350-400g"}
+  ]},
+  { icon: "🐟", cat: "Pesce", items: [
+    {n: "Pesce bianco/azzurro", q: "900g (3 porzioni)"}, 
+    {n: "Salmone fresco o Misto mare", q: "250g"}, 
+    {n: "Salmone affumicato", q: "100g"},
+    {n: "Tonno in scatola", q: "2 scatolette medie"}
+  ]},
+  { icon: "🧀", cat: "Latticini", items: [
+    {n: "Latte parz. scremato", q: "1 Litro"},
+    {n: "Yogurt greco 0%", q: "1 kg (2 secchielli)"}, 
+    {n: "Feta / Primo Sale", q: "150g (1 conf.)"}, 
+    {n: "Parmigiano", q: "1 trancio piccolo"},
+    {n: "Yocca / Formaggio a fette", q: "1-2 conf."},
+    {n: "Mozzarella / Ricotta vaccina", q: "1 pz ciascuno"}
+  ]},
+  { icon: "🫘", cat: "Legumi e Grassi", items: [
+    {n: "Frutta oleosa (Noci/Mandorle)", q: "250g"}, 
+    {n: "Ceci / Fagioli / Lenticchie", q: "3-4 barattoli"}, 
+    {n: "Olio EVO", q: "1 Bottiglia"}
+  ]},
+  { icon: "💊", cat: "Integrazione", items: [
+    {n: "BCAA 2.1.1", q: "1 Barattolo"},
+    {n: "Proteine vegane & Barrette", q: "q.b."}
+  ]}
+];
+
+let SHOPPING_DATA = activeProfile === 'Andrea' ? ANDREA_SHOP : EMANUELE_SHOP;
+
+let state = null;
+let weightData = [];
+let photosData = [];
+let currentShopWeek = 1; 
+let weightChartInstance = null; 
+let kcalChartInstance = null;
+let currentMonthDate = new Date(); currentMonthDate.setDate(1);
+
+if (activeProfile) {
     state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || { 
       byDate: {}, weekStart: toKey(mondayOf(new Date())), selectedDate: toKey(new Date()), shopChecks: {1:{},2:{},3:{},4:{}}, 
       profile: { height: 175, age: 30, gender: 'M', targetWeight: 80, startWeight: 72 } 
@@ -750,23 +830,20 @@ function initApp() {
 
     weightData = JSON.parse(localStorage.getItem(WEIGHT_KEY)) || [];
     photosData = JSON.parse(localStorage.getItem(PHOTOS_KEY)) || [];
-
-    // Avvio effettivo rendering
-    render(); 
-    initSettings();
 }
 
+/* UTILS E CALCOLI */
 function pad(n){ return n<10 ? "0"+n : ""+n; }
 function toKey(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
 function fromKey(k){ const [y,m,d]=k.split("-").map(Number); return new Date(y,m-1,d); }
 function addDays(d,n){ const r=new Date(d); r.setDate(r.getDate()+n); return r; }
 function mondayOf(d){ const r=new Date(d); const day=(r.getDay()+6)%7; return addDays(r,-day); }
 
-function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-function getPlan(key) { return state.byDate[key] || null; }
+function save() { if(activeProfile) localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function getPlan(key) { return state ? state.byDate[key] || null : null; }
 
-/* CALCOLI CALORIE E PESO */
 function getWeightAtDate(dKey) {
+    if(!state) return 72;
     let dTime = fromKey(dKey).getTime();
     let closestW = state.profile.startWeight || 72;
     let closestTime = 0;
@@ -776,9 +853,10 @@ function getWeightAtDate(dKey) {
     });
     return closestW;
 }
-function getLatestWeight() { return weightData.length ? weightData[weightData.length-1].weight : (state.profile.startWeight || 72); }
+function getLatestWeight() { return weightData.length ? weightData[weightData.length-1].weight : (state ? state.profile.startWeight || 72 : 72); }
 
 function calculateBMR(weight) {
+    if(!state) return 0;
     let p = state.profile; let w = weight || getWeightAtDate(toKey(new Date()));
     return p.gender === 'M' ? (10 * w) + (6.25 * p.height) - (5 * p.age) + 5 : (10 * w) + (6.25 * p.height) - (5 * p.age) - 161;
 }
@@ -850,6 +928,7 @@ function renderDayEditor(){
   const cfg = PLAN_DATA[plan.type]; const isTrain = plan.type === 'train';
   let html = `<div class="active-day-header"><div class="type-badge ${plan.type}">${isTrain ? '🏋️ Allenamento' : '🛌 Riposo'}</div><button class="btn-reset" onclick="clearPlan('${key}')">Cambia tipo</button></div><div class="meal-list">`;
 
+  // PASTI
   Object.keys(cfg.meals).forEach(mk => {
     const meal = cfg.meals[mk]; const isDone = !!plan.completed[mk]; let contentHtml = "";
     if (meal.fixed) meal.fixed.forEach(item => contentHtml += `<div class="fixed-item">• ${item.t} <br><span class="kcal-badge">${item.k} kcal</span></div>`);
@@ -863,6 +942,7 @@ function renderDayEditor(){
     html += `<div class="meal-card ${isDone ? 'is-done' : ''}"><div class="meal-header"><h3>${meal.name}</h3></div><div class="meal-body">${contentHtml}</div><div class="meal-footer" onclick="toggleDone('${key}','${mk}')"><div class="btn-done">${isDone ? '✓ Completato' : 'Segna completato'}</div></div></div>`;
   });
   
+  // WIDGET MASSA E ALLENAMENTO DINAMICO
   let act = plan.activity || { type:'', mins:'', overrideBurn:'' };
   let currentW = getWeightAtDate(key);
   let bmr = Math.round(calculateBMR(currentW));
@@ -927,7 +1007,7 @@ function saveActivity(key) {
     alert("Dati salvati! Guarda il resoconto nella scheda Progressi.");
 }
 
-/* UI MESE */
+/* UI MESE E SETTIMANA */
 function renderMonthCalendar() {
   const grid = document.getElementById("monthGrid"); grid.innerHTML = "";
   let month = currentMonthDate.getMonth(); let year = currentMonthDate.getFullYear();
@@ -948,98 +1028,6 @@ function changeWeek(offset) { state.weekStart = toKey(addDays(fromKey(state.week
 function goToToday() { state.weekStart = toKey(mondayOf(new Date())); state.selectedDate = toKey(new Date()); save(); render(); }
 
 /* UI SPESA */
-const SHOPPING_DATA_EMANUELE = [
-  { icon: "🍎", cat: "Frutta e Verdura", items: [
-    {n: "Banane (Post-workout)", q: "3-4 pz"}, 
-    {n: "Frutta fresca mista", q: "14 pz (2 al giorno)"}, 
-    {n: "Frutti rossi (Colazione)", q: "2 vaschette"},
-    {n: "Insalata, Zucchine, Pomodori, Carote", q: "q.b. (Circa 2-3 kg)"},
-    {n: "Minestrone surgelato / fresco", q: "1 busta"}
-  ]},
-  { icon: "🍞", cat: "Carboidrati", items: [
-    {n: "Pane di segale integrale", q: "1 pacco (400-500g)"}, 
-    {n: "Pasta integrale (Senatore Cappelli)", q: "1 pacco (500g)"}, 
-    {n: "Riso Basmati / Farro integrale", q: "1 pacco (500g)"}, 
-    {n: "Wasa e Friselle", q: "1 pacco ciascuno"},
-    {n: "Fiocchi d'avena", q: "1 pacco (250g)"}
-  ]},
-  { icon: "🥩", cat: "Proteine (Carne e Uova)", items: [
-    {n: "Uova bio", q: "1 confezione (6 pz)"}, 
-    {n: "Carne bianca (Pollo/Tacchino)", q: "600g (2 porzioni da 300g)"}, 
-    {n: "Carne magra (Manzo/Bovino)", q: "300g"},
-    {n: "Affettati (Fesa/Cotto/Bresaola)", q: "350-400g"}
-  ]},
-  { icon: "🐟", cat: "Pesce", items: [
-    {n: "Pesce bianco/azzurro (Merluzzo, Orata)", q: "900g (3 porzioni da 300g)"}, 
-    {n: "Salmone fresco o Misto mare", q: "250g"}, 
-    {n: "Salmone affumicato", q: "100g"},
-    {n: "Tonno in scatola", q: "2 scatolette medie"}
-  ]},
-  { icon: "🧀", cat: "Latticini", items: [
-    {n: "Yogurt greco 0%", q: "1 kg (2 secchielli da 500g)"}, 
-    {n: "Feta", q: "150g (1 conf.)"}, 
-    {n: "Parmigiano", q: "1 trancio piccolo"},
-    {n: "Yocca / Formaggio light", q: "1-2 conf."},
-    {n: "Formaggio a fette (Galbanino)", q: "1 busta"},
-    {n: "Mozzarella / Ricotta", q: "1 pz ciascuno"}
-  ]},
-  { icon: "🫘", cat: "Legumi e Grassi", items: [
-    {n: "Frutta oleosa (Noci/Mandorle)", q: "250g"}, 
-    {n: "Ceci / Fagioli", q: "3-4 barattoli"}, 
-    {n: "Olio EVO", q: "1 Bottiglia (Usare 8 cucchiaini/die)"}
-  ]},
-  { icon: "💊", cat: "Integrazione", items: [
-    {n: "Creatina", q: "1 Barattolo (3g/die)"},
-    {n: "BCAA 2.1.1", q: "1 Barattolo"},
-    {n: "Proteine vegane & Barrette", q: "q.b."}
-  ]}
-];
-
-const SHOPPING_DATA_ANDREA = [
-  { icon: "🍎", cat: "Frutta e Verdura", items: [
-    {n: "Banane (Post-workout)", q: "3-4 pz"}, 
-    {n: "Frutta fresca mista", q: "14 pz (2 al giorno)"}, 
-    {n: "Insalata, Zucchine, Pomodori, Carote", q: "q.b. (Circa 2-3 kg)"},
-    {n: "Minestrone surgelato / fresco", q: "1 busta"}
-  ]},
-  { icon: "🍞", cat: "Carboidrati", items: [
-    {n: "Pane di segale integrale", q: "1 pacco (400-500g)"}, 
-    {n: "Pasta integrale", q: "1 pacco (500g)"}, 
-    {n: "Riso Basmati / Farro integrale", q: "1 pacco (500g)"}, 
-    {n: "Wasa e Friselle", q: "1 pacco ciascuno"},
-    {n: "Fiocchi d'avena", q: "1 pacco (250g)"}
-  ]},
-  { icon: "🥩", cat: "Proteine (Carne e Uova)", items: [
-    {n: "Uova bio", q: "1 confezione (6 pz)"}, 
-    {n: "Albume liquido", q: "1 Bottiglia piccola"}, 
-    {n: "Carne bianca (Pollo/Tacchino)", q: "600g (2 porzioni)"}, 
-    {n: "Affettati (Fesa/Cotto/Bresaola)", q: "350-400g"}
-  ]},
-  { icon: "🐟", cat: "Pesce", items: [
-    {n: "Pesce bianco/azzurro (Merluzzo, Orata)", q: "900g (3 porzioni)"}, 
-    {n: "Salmone fresco o Misto mare", q: "250g"}, 
-    {n: "Salmone affumicato", q: "100g"},
-    {n: "Tonno in scatola", q: "2 scatolette medie"}
-  ]},
-  { icon: "🧀", cat: "Latticini", items: [
-    {n: "Latte parz. scremato", q: "1 Litro"},
-    {n: "Yogurt greco 0%", q: "1 kg (2 secchielli da 500g)"}, 
-    {n: "Feta / Primo Sale", q: "150g (1 conf.)"}, 
-    {n: "Parmigiano", q: "1 trancio piccolo"},
-    {n: "Yocca / Formaggio a fette", q: "1-2 conf."},
-    {n: "Mozzarella / Ricotta vaccina", q: "1 pz ciascuno"}
-  ]},
-  { icon: "🫘", cat: "Legumi e Grassi", items: [
-    {n: "Frutta oleosa (Noci/Mandorle)", q: "250g"}, 
-    {n: "Ceci / Fagioli / Lenticchie", q: "3-4 barattoli"}, 
-    {n: "Olio EVO", q: "1 Bottiglia"}
-  ]},
-  { icon: "💊", cat: "Integrazione", items: [
-    {n: "BCAA 2.1.1", q: "1 Barattolo"},
-    {n: "Proteine vegane & Barrette", q: "q.b."}
-  ]}
-];
-
 function changeShopWeek(num) { currentShopWeek = num; document.querySelectorAll('.week-tabs button').forEach((b, i) => b.classList.toggle('active', i === num-1)); renderShopping(); }
 function toggleShopItem(cIdx, iIdx) { state.shopChecks[currentShopWeek][`${cIdx}-${iIdx}`] = !state.shopChecks[currentShopWeek][`${cIdx}-${iIdx}`]; save(); renderShopping(); }
 function renderShopping(){
@@ -1048,9 +1036,7 @@ function renderShopping(){
     document.getElementById("raccomandazioni-text").innerHTML = 
         PLAN_DATA.train.meals.condimenti.fixed.map(item => `<li style="margin-bottom:6px;">${item.t}</li>`).join("");
 
-    let CURRENT_SHOPPING_DATA = activeProfile === 'Andrea' ? SHOPPING_DATA_ANDREA : SHOPPING_DATA_EMANUELE;
-
-    CURRENT_SHOPPING_DATA.forEach((cat, cIdx) => {
+    SHOPPING_DATA.forEach((cat, cIdx) => {
         html += `<div class="shop-cat"><div class="shop-cat-title">${cat.icon} ${cat.cat}</div><div>`;
         cat.items.forEach((item, iIdx) => {
             let ch = !!state.shopChecks[currentShopWeek][`${cIdx}-${iIdx}`];
@@ -1067,18 +1053,22 @@ function renderStats() {
     let totalFood = 0, totalBurned = 0, count = 0;
     let kcalDates = [], kcalBurnedTarget = [], kcalFoodBars = [];
 
+    // Media Globale
     for(let i=0; i<days; i++) {
         let d = new Date(); d.setDate(d.getDate() - i);
         let key = toKey(d); let plan = getPlan(key);
         if (plan && plan.summary) { totalFood += plan.summary.food; totalBurned += plan.summary.burned; count++; }
     }
     
+    // Grafico 7 giorni
     for(let i=6; i>=0; i--) {
         let d = new Date(); d.setDate(d.getDate() - i);
         let key = toKey(d); let plan = getPlan(key);
         kcalDates.push(d.toLocaleDateString("it-IT", {day:"numeric", month:"short"}));
+        
         let food = (plan && plan.summary) ? plan.summary.food : 0;
         let tdee = (plan && plan.summary) ? plan.summary.burned : calculateBMR(getWeightAtDate(key));
+        
         kcalFoodBars.push(food); kcalBurnedTarget.push(tdee);
     }
     
@@ -1092,6 +1082,7 @@ function renderStats() {
     netEl.innerText = (net > 0 ? "+" : "") + net;
     netEl.style.color = net > 50 ? "var(--train)" : "#EF4444";
 
+    // Oggi Live
     let todayKey = toKey(new Date()); let tPlan = getPlan(todayKey);
     let tFood = calcDailyFoodKcal(todayKey); let tTdee = (tPlan && tPlan.summary) ? tPlan.summary.burned : calculateBMR(getLatestWeight());
     let tNet = tFood - tTdee;
@@ -1101,6 +1092,7 @@ function renderStats() {
     document.getElementById("stat-today-net").innerText = (tNet > 0 ? '+' : '') + tNet;
     document.getElementById("stat-today-net").style.color = tNet > 50 ? "var(--train)" : "var(--warn)";
 
+    // Chart
     if(kcalChartInstance) kcalChartInstance.destroy();
     const ctxK = document.getElementById('kcalChart').getContext('2d');
     kcalChartInstance = new Chart(ctxK, {
@@ -1144,10 +1136,8 @@ function handlePhotoUpload(event) {
     const img = new Image();
     img.onload = function() {
       const canvas = document.createElement('canvas');
-      const MAX_WIDTH = 500;
-      const scaleSize = MAX_WIDTH / img.width;
-      canvas.width = MAX_WIDTH;
-      canvas.height = img.height * scaleSize;
+      const MAX_WIDTH = 500; const scaleSize = MAX_WIDTH / img.width;
+      canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
@@ -1171,7 +1161,7 @@ function renderPhotos() {
 }
 function deletePhoto(idx) { if(confirm("Eliminare questa foto?")) { photosData.splice(idx, 1); localStorage.setItem(PHOTOS_KEY, JSON.stringify(photosData)); renderPhotos(); } }
 
-/* IMPOSTAZIONI */
+/* IMPOSTAZIONI E SALVATAGGIO */
 function initSettings() {
     document.getElementById('mainTitle').innerText = "Diario di " + activeProfile;
     document.title = "Diario - " + activeProfile;
@@ -1224,7 +1214,10 @@ function switchTab(tabId) {
     window.scrollTo(0,0);
 }
 
-} // Fine initApp()
+function render() { renderCalendar(); renderDayEditor(); }
+
+// Avvio effettivo se autenticato
+if(activeProfile) { render(); initSettings(); }
 </script>
 </body>
 </html>
