@@ -30,12 +30,7 @@
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   
-  body {
-    margin: 0; background: var(--bg); color: var(--ink);
-    font-family: 'Work Sans', sans-serif;
-    padding-bottom: 90px; 
-  }
-
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'Work Sans', sans-serif; padding-bottom: 90px; }
   .app { max-width: 600px; margin: 0 auto; }
 
   /* VISTE */
@@ -149,7 +144,7 @@
   .photo-card .del-btn { position: absolute; top: 10px; right: 10px; background: rgba(239, 68, 68, 0.9); color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; }
   .file-upload-btn { position: relative; overflow: hidden; display: inline-block; width: 100%; }
   .file-upload-btn input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; height: 100%; }
-  .btn-outline { width: 100%; background: var(--primary-soft); border: 2px dashed var(--primary); color: var(--primary); border-radius: 12px; padding: 20px; font-weight: 600; text-align: center; font-size: 16px; }
+  .btn-outline { width: 100%; background: var(--primary-soft); border: 2px dashed var(--primary); color: var(--primary); border-radius: 12px; padding: 20px; font-weight: 600; text-align: center; font-size: 16px; cursor: pointer;}
 
   /* IMPOSTAZIONI */
   .settings-card { background: var(--surface); border-radius: var(--radius-card); padding: 24px; margin-bottom: 24px; border: 1px solid var(--line); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
@@ -161,11 +156,20 @@
   .nav-btn .icon { font-size: 24px; transition: transform 0.2s; }
   .nav-btn.active { color: var(--primary); }
   .nav-btn.active .icon { transform: scale(1.15); }
+  
+  #access-denied { display:none; text-align:center; margin-top:100px; padding:20px; }
 </style>
 </head>
 <body>
 
-<div class="app">
+<!-- SCHERMATA BLOCCO PASSWORD -->
+<div id="access-denied">
+  <h1 style="font-size:50px;">🔒</h1>
+  <h2>Profilo Protetto</h2>
+  <p style="color:var(--ink-soft);">Questo profilo è protetto da password. Ricarica la pagina per riprovare.</p>
+</div>
+
+<div class="app" id="main-app" style="display:none;">
 
   <!-- VISTA: DIARIO -->
   <div id="view-plan" class="view active">
@@ -218,6 +222,14 @@
       <button onclick="changeShopWeek(3)">Settimana 3</button>
       <button onclick="changeShopWeek(4)">Settimana 4</button>
     </div>
+
+    <div class="info-box">
+      <h4>Raccomandazioni Fisse ⚠️</h4>
+      <ul id="raccomandazioni-text">
+        <!-- Generato dinamicamente -->
+      </ul>
+    </div>
+    
     <div id="shopContent"></div>
   </div>
 
@@ -317,9 +329,12 @@
     <div class="settings-card" style="border: 2px solid var(--primary); background: var(--primary-soft);">
       <h3 style="color: var(--primary);">👥 Profilo Attivo</h3>
       <div class="calorie-form-group">
-        <select id="profile-select" onchange="switchProfile(this.value)" style="font-weight:bold; color:var(--primary);"></select>
+        <select id="profile-select" onchange="attemptSwitchProfile(this.value)" style="font-weight:bold; color:var(--primary); padding:14px;"></select>
       </div>
-      <button class="btn-outline" style="padding: 10px; margin-top:10px; background:var(--surface);" onclick="createNewProfile()">+ Aggiungi Nuova Persona</button>
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <button class="btn-outline" style="padding: 12px; flex:1; background:var(--surface);" onclick="createNewProfile()">+ Nuovo</button>
+        <button class="btn-outline" style="padding: 12px; flex:1; background:var(--surface); border-color:#10B981; color:#10B981;" onclick="setPassword()">🔐 Password</button>
+      </div>
     </div>
 
     <div class="settings-card">
@@ -353,7 +368,7 @@
       <h3>🔄 Aggiorna Piano Alimentare</h3>
       <p style="font-size:14px; color:var(--ink-soft); margin-bottom:16px;">Carica il file .json con il nuovo piano della nutrizionista per questo profilo.</p>
       <div class="file-upload-btn">
-        <div class="btn-outline">Carica File .json</div>
+        <div class="btn-outline" style="padding: 14px;">Carica File .json</div>
         <input type="file" accept=".json" onchange="handleFileUpload(event)">
       </div>
     </div>
@@ -386,14 +401,48 @@
 </nav>
 
 <script>
-/* SISTEMA MULTI-PROFILO */
+/* SISTEMA MULTI-PROFILO E AUTENTICAZIONE */
 let profilesList = JSON.parse(localStorage.getItem('menu-oggi-profiles')) || ['Emanuele', 'Andrea'];
 let activeProfile = localStorage.getItem('menu-oggi-active-profile') || profilesList[0];
+
+// CONTROLLO PASSWORD ALL'AVVIO
+let currentPwd = localStorage.getItem('menu-oggi-pwd-' + activeProfile);
+let isAuthenticated = sessionStorage.getItem('auth-' + activeProfile);
+
+if (currentPwd && !isAuthenticated) {
+    let entered = prompt("🔐 Il profilo di " + activeProfile + " è protetto. Inserisci la password:");
+    if (entered === currentPwd) {
+        sessionStorage.setItem('auth-' + activeProfile, 'true');
+        document.getElementById('main-app').style.display = 'block';
+    } else {
+        document.getElementById('access-denied').style.display = 'block';
+        throw new Error("Access denied"); 
+    }
+} else {
+    document.getElementById('main-app').style.display = 'block';
+}
+
+function attemptSwitchProfile(targetProfile) {
+    if (targetProfile === activeProfile) return;
+    let pwd = localStorage.getItem('menu-oggi-pwd-' + targetProfile);
+    if (pwd && !sessionStorage.getItem('auth-' + targetProfile)) {
+        let entered = prompt("🔐 Inserisci la password per il profilo di " + targetProfile + ":");
+        if (entered !== pwd) {
+            alert("Password errata!");
+            document.getElementById('profile-select').value = activeProfile;
+            return;
+        } else {
+            sessionStorage.setItem('auth-' + targetProfile, 'true');
+        }
+    }
+    switchProfile(targetProfile);
+}
 
 function switchProfile(name) {
     localStorage.setItem('menu-oggi-active-profile', name);
     location.reload();
 }
+
 function createNewProfile() {
     let name = prompt("Inserisci il nome del nuovo profilo (es. Marco):");
     if(name && name.trim() !== "" && !profilesList.includes(name.trim())) {
@@ -403,14 +452,35 @@ function createNewProfile() {
     }
 }
 
+function setPassword() {
+    let pwd = localStorage.getItem('menu-oggi-pwd-' + activeProfile);
+    if (pwd) {
+        let check = prompt("Inserisci la password ATTUALE per confermare:");
+        if (check !== pwd) {
+            alert("Password errata!");
+            return;
+        }
+    }
+    let newPwd = prompt("Inserisci la NUOVA password per " + activeProfile + " (lascia vuoto per rimuoverla):");
+    if (newPwd === null) return;
+    if (newPwd.trim() === "") {
+        localStorage.removeItem('menu-oggi-pwd-' + activeProfile);
+        alert("Password rimossa con successo.");
+    } else {
+        localStorage.setItem('menu-oggi-pwd-' + activeProfile, newPwd.trim());
+        sessionStorage.setItem('auth-' + activeProfile, 'true'); 
+        alert("Password salvata con successo!");
+    }
+}
+
 // CHIAVI DI SALVATAGGIO DINAMICHE PER PROFILO
-const STORAGE_KEY = "menu-oggi-state-v16-" + activeProfile;
-const WEIGHT_KEY  = "menu-oggi-weight-v16-" + activeProfile;
-const PHOTOS_KEY  = "menu-oggi-photos-v16-" + activeProfile;
+const STORAGE_KEY = "menu-oggi-state-v17-" + activeProfile;
+const WEIGHT_KEY  = "menu-oggi-weight-v17-" + activeProfile;
+const PHOTOS_KEY  = "menu-oggi-photos-v17-" + activeProfile;
 const PLAN_KEY    = "menu-oggi-custom-plan-" + activeProfile;
 
-/* DATI ALIMENTARI DI DEFAULT (EMANUELE) */
-let DEFAULT_PLAN_DATA = {
+/* DATI ALIMENTARI (EMANUELE) */
+let EMANUELE_PLAN_DATA = {
   train: {
     label: "Allenamento",
     meals: {
@@ -452,7 +522,7 @@ let DEFAULT_PLAN_DATA = {
       condimenti: {
         name: "Condimenti & Integrazione", time: "Durante la giornata",
         fixed: [
-          {t: "🫒 Olio Extravergine d'Oliva (8 cucchiaini)", k: 360},
+          {t: "🫒 Olio Extravergine d'Oliva (8 cucchiaini totali)", k: 360},
           {t: "💊 BCAA 2.1.1 (3 pasticche prima, 2 dopo)", k: 0},
           {t: "🍌 1 Banana (Entro 30 min da fine allenamento)", k: 100}
         ]
@@ -485,20 +555,144 @@ let DEFAULT_PLAN_DATA = {
       condimenti: {
         name: "Condimenti", time: "Durante la giornata",
         fixed: [
-          {t: "🫒 Olio Extravergine d'Oliva (8 cucchiaini)", k: 360}
+          {t: "🫒 Olio Extravergine d'Oliva (8 cucchiaini totali)", k: 360}
         ]
       }
     }
   }
 };
 
-let PLAN_DATA = DEFAULT_PLAN_DATA;
+/* DATI ALIMENTARI (ANDREA) PRECARICATI */
+let ANDREA_PLAN_DATA = {
+  train: {
+    label: "Allenamento",
+    meals: {
+      colazione: {
+        name: "Colazione", time: "7:00 – 8:30",
+        fixed: [
+          {t: "🍊 Spremuta o estratto / 2 cucch. Vibracell", k: 90},
+          {t: "☕ Caffè o orzo (facoltativo)", k: 0},
+          {t: "🍞 100g pane di segale integrale tostato", k: 240}
+        ],
+        optionsIntro: "Accompagna il pane con:",
+        options: [
+          {t: "🦃 100g fesa tacchino/bresaola o 60-70g prosciutto + 2 fette formaggio", k: 200},
+          {t: "🍳 2 uova strapazzate bio + 100ml albume", k: 200},
+          {t: "🐟 80g salmone affumicato", k: 140},
+          {t: "🧀 100g di ricotta vaccina", k: 150}
+        ]
+      },
+      spuntinoMattina: {
+        name: "Spuntino Mattina", time: "10:30", optionsIntro: "Scegli un'opzione:",
+        options: [
+          {t: "🥜 40g frutta oleosa (noci/mandorle) + 1 frutto", k: 340},
+          {t: "🥣 170g yogurt greco + manciata cereali integrali", k: 250},
+          {t: "🍎 1 frutto + 1 barretta proteica (25g pro)", k: 280},
+          {t: "🥤 30g proteine vegane sciolte in acqua", k: 120}
+        ]
+      },
+      pranzo: {
+        name: "Pranzo", time: "13:00 – 14:00", optionsIntro: "Scegli un'opzione (Base: 120g Riso Basmati integrale):",
+        options: [
+          {t: "🍚 120g Riso, Zucchine lesse, 120-150g tonno naturale", k: 600},
+          {t: "🍤 120g Riso, Zucchine e gamberetti (150-200g)", k: 580},
+          {t: "🐙 120g Riso, Misto mare pescatora (150-200g)", k: 620},
+          {t: "🐟 120g Riso, 80g salmone affumicato con zucchine", k: 580},
+          {t: "🐟 120g Riso, 250g salmone fresco lessato con zucchine", k: 780}
+        ]
+      },
+      spuntinoPomeriggio: {
+        name: "Spuntino Pomeriggio", time: "16:30", optionsIntro: "Scegli un'opzione:",
+        options: [
+          {t: "🍅 1 frisella integrale con pomodoro, tonno e olio", k: 350},
+          {t: "🍘 2 fettine Wasa + yocca o 1 scatoletta tonno media", k: 220},
+          {t: "🍘 2 fettine Wasa + 60-80g bresaola", k: 190},
+          {t: "🥤 30g proteine vegane in acqua/latte d'avena", k: 140}
+        ]
+      },
+      cena: {
+        name: "Cena", time: "20:00 – 21:00", optionsIntro: "Opzione fissa:",
+        options: [
+          {t: "🍗 300-320g carne bianca ai ferri, insalata mista, 1 frutto", k: 580}
+        ]
+      },
+      condimenti: {
+        name: "Condimenti & Integrazione", time: "Durante la giornata",
+        fixed: [
+          {t: "🫒 Olio Extravergine d'Oliva (8 cucchiaini totali)", k: 360},
+          {t: "💊 BCAA 2.1.1 (8-10g sciolti in 500ml d'acqua)", k: 0},
+          {t: "🍌 1 Banana (Entro 30 min da fine allenamento)", k: 100}
+        ]
+      }
+    }
+  },
+  rest: {
+    label: "Riposo",
+    meals: {
+      colazione: {
+        name: "Colazione", time: "7:00 – 9:00", optionsIntro: "Scegli la base lattiero-casearia:",
+        options: [
+          {t: "🥛 1 Tazza latte parz. screm. + 60g avena + 20-30g noci + Caffè", k: 530},
+          {t: "🥣 200g yogurt 0% + 60g avena + 20-30g noci + Caffè", k: 510}
+        ]
+      },
+      spuntinoMattina: {
+        name: "Spuntino Mattina", time: "10:30", optionsIntro: "Scegli un'opzione:",
+        options: [
+          {t: "🥜 30g frutta oleosa", k: 200},
+          {t: "🥣 170g yogurt greco 0%", k: 100},
+          {t: "🍎 1 frutto", k: 80}
+        ]
+      },
+      pranzo: {
+        name: "Pranzo", time: "13:00 – 14:00", optionsIntro: "Scegli un'opzione:",
+        options: [
+          {t: "🧀 150g formaggio, insalatona mista, 150-170g pane di segale", k: 780},
+          {t: "🍳 3 uova BIO (frittata verdure), insalata, 150-170g pane segale", k: 680},
+          {t: "🍝 130g pasta int. pomodoro + 3 cucch. parmigiano, verdura, frutto", k: 650},
+          {t: "🐟 350g pesce azzurro/bianco, insalatona, 150-170g pane segale", k: 850}
+        ]
+      },
+      spuntinoPomeriggio: {
+        name: "Spuntino Pomeriggio", time: "16:30", optionsIntro: "Scegli un'opzione:",
+        options: [
+          {t: "🍎 1 frutto", k: 80},
+          {t: "🥣 170g yogurt greco 0%", k: 100},
+          {t: "🥕 Finocchi e carote", k: 40},
+          {t: "🥤 30g proteine sciolte in acqua", k: 120}
+        ]
+      },
+      cena: {
+        name: "Cena", time: "20:00 – 21:00", optionsIntro: "Scegli un'opzione:",
+        options: [
+          {t: "🍲 Finocchi + Minestra fagioli/ceci (1 barattolo/100g secchi) + 70g pasta/riso, frutto", k: 650},
+          {t: "🍲 Finocchi + Minestra lenticchie (1 barattolo/100-120g secchi) + 70g pasta/riso, frutto", k: 650},
+          {t: "🍲 Minestrone verdure/legumi + 60g pasta/riso + 3 cucch. parmigiano, frutto", k: 500},
+          {t: "🐟 350g merluzzo/nasello, verdura foglia verde, insalata, frutto", k: 450},
+          {t: "🎉 CENA LIBERA !!!", k: 1000}
+        ]
+      },
+      condimenti: {
+        name: "Condimenti", time: "Durante la giornata",
+        fixed: [
+          {t: "🫒 Olio Extravergine d'Oliva (8 cucchiaini totali)", k: 360}
+        ]
+      }
+    }
+  }
+};
+
+let PLAN_DATA = {};
+if (activeProfile === 'Andrea') {
+    PLAN_DATA = ANDREA_PLAN_DATA;
+} else {
+    PLAN_DATA = EMANUELE_PLAN_DATA;
+}
+
+// Se è stato caricato manualmente un JSON personalizzato, sovrascrive quello di default
 const savedPlan = localStorage.getItem(PLAN_KEY);
 if(savedPlan) { 
     try { PLAN_DATA = JSON.parse(savedPlan); } catch(e){} 
-} else if (activeProfile !== 'Emanuele') {
-    // Profilo Andrea vuoto: usa Emanuele come base temporanea finché non carica il JSON.
-    PLAN_DATA = DEFAULT_PLAN_DATA;
 }
 
 const SHOPPING_DATA = [
@@ -529,6 +723,7 @@ const SHOPPING_DATA = [
     {n: "Tonno in scatola", q: "2 scatolette medie"}
   ]},
   { icon: "🧀", cat: "Latticini", items: [
+    {n: "Latte parz. scremato", q: "1 Litro"},
     {n: "Yogurt greco 0%", q: "1 kg (2 secchielli da 500g)"}, 
     {n: "Feta", q: "150g (1 conf.)"}, 
     {n: "Parmigiano", q: "1 trancio piccolo"},
@@ -538,7 +733,7 @@ const SHOPPING_DATA = [
   ]},
   { icon: "🫘", cat: "Legumi e Grassi", items: [
     {n: "Frutta oleosa (Noci/Mandorle)", q: "250g"}, 
-    {n: "Ceci / Fagioli", q: "3-4 barattoli"}, 
+    {n: "Ceci / Fagioli / Lenticchie", q: "3-4 barattoli"}, 
     {n: "Olio EVO", q: "1 Bottiglia (Usare 8 cucchiaini/die)"}
   ]},
   { icon: "💊", cat: "Integrazione", items: [
@@ -680,10 +875,10 @@ function renderDayEditor(){
   let bmr = Math.round(calculateBMR(currentW));
   let calcBurn = calcExerciseKcal(act.type, parseInt(act.mins||0), currentW);
   let finalBurn = act.overrideBurn ? parseInt(act.overrideBurn) : calcBurn;
-  let tdee = bmr + (finalBurn || 0); // Bruciate totali
+  let tdee = bmr + (finalBurn || 0); 
   
-  let foodKcal = calcDailyFoodKcal(key); // Assunte calcolate in automatico
-  let netKcal = foodKcal - tdee; // Bilancio netto reale
+  let foodKcal = calcDailyFoodKcal(key); 
+  let netKcal = foodKcal - tdee; 
   
   let startW = state.profile.startWeight || 72;
   let targetW = state.profile.targetWeight || 80;
@@ -765,6 +960,10 @@ function changeShopWeek(num) { currentShopWeek = num; document.querySelectorAll(
 function toggleShopItem(cIdx, iIdx) { state.shopChecks[currentShopWeek][`${cIdx}-${iIdx}`] = !state.shopChecks[currentShopWeek][`${cIdx}-${iIdx}`]; save(); renderShopping(); }
 function renderShopping(){
     let html = '';
+    
+    document.getElementById("raccomandazioni-text").innerHTML = 
+        PLAN_DATA.train.meals.condimenti.fixed.map(item => `<li>${item.t}</li>`).join("");
+
     SHOPPING_DATA.forEach((cat, cIdx) => {
         html += `<div class="shop-cat"><div class="shop-cat-title">${cat.icon} ${cat.cat}</div><div>`;
         cat.items.forEach((item, iIdx) => {
@@ -776,7 +975,7 @@ function renderShopping(){
     document.getElementById('shopContent').innerHTML = html;
 }
 
-/* UI STATISTICHE E FOTO */
+/* UI STATISTICHE, PESO & FOTO */
 function renderStats() {
     let days = parseInt(document.getElementById("stats-range").value);
     let totalFood = 0, totalBurned = 0, count = 0;
@@ -927,9 +1126,10 @@ function deletePhoto(idx) {
     }
 }
 
-/* IMPOSTAZIONI E PROFILI */
+/* IMPOSTAZIONI */
 function initSettings() {
     document.getElementById('mainTitle').innerText = "Diario di " + activeProfile;
+    document.title = "Diario - " + activeProfile;
     
     let profSelect = document.getElementById('profile-select');
     profSelect.innerHTML = "";
@@ -963,15 +1163,6 @@ function handleFileUpload(event) {
   reader.readAsText(file);
 }
 
-function saveProfile() {
-    state.profile.height = document.getElementById('prof-height').value || 175;
-    state.profile.age = document.getElementById('prof-age').value || 30;
-    state.profile.gender = document.getElementById('prof-gender').value || 'M';
-    state.profile.startWeight = document.getElementById('prof-start-weight').value || 72;
-    state.profile.targetWeight = document.getElementById('prof-target-weight').value || 80;
-    save();
-    render();
-}
 function resetAppData() { 
     if(confirm("Cancellare tutto il calendario di " + activeProfile + "?")) { 
         localStorage.removeItem(STORAGE_KEY); 
@@ -994,7 +1185,11 @@ function switchTab(tabId) {
 }
 
 function render() { renderCalendar(); renderDayEditor(); }
-render(); initSettings();
+
+// Inizializza tutto solo se autenticato (password corretta)
+if(document.getElementById('main-app').style.display === 'block') {
+    render(); initSettings();
+}
 </script>
 </body>
 </html>
