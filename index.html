@@ -25,7 +25,6 @@
     
     --rest: #6366F1; 
     --rest-soft: #E0E7FF;
-
     --warn: #F59E0B;
     
     --radius-card: 16px;
@@ -85,7 +84,7 @@
 
   /* SCELTA TIPO */
   .day-type-selector { display: flex; flex-direction: column; gap: 16px; margin-top: 24px; }
-  .btn-big { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-card); padding: 24px; font-size: 18px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: transform 0.1s, box-shadow 0.1s; }
+  .btn-big { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-card); padding: 24px; font-size: 18px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: transform 0.1s; }
   .btn-big:active { transform: translateY(2px); box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
   .btn-big.train { border-left: 6px solid var(--train); }
   .btn-big.rest { border-left: 6px solid var(--rest); }
@@ -151,8 +150,7 @@
   .weight-row { display: flex; gap: 16px; }
   .input-wrapper { display: flex; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; flex: 1; align-items: center; }
   .input-wrapper input { flex: 1; border: none; padding: 16px; font-size: 18px; font-weight: 600; outline: none; background: transparent; }
-  .btn-primary { background: var(--primary); color: white; border: none; border-radius: 10px; padding: 16px; font-weight: 600; font-size: 16px; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,0.2); transition: background 0.2s; }
-  .btn-primary:active { background: #1D4ED8; }
+  .btn-primary { background: var(--primary); color: white; border: none; border-radius: 10px; padding: 16px; font-weight: 600; font-size: 16px; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
   .chart-container { position: relative; height: 250px; width: 100%; margin-top: 24px; margin-bottom: 12px; }
   .history-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--surface-muted); border: 1px solid var(--line); border-radius: 12px; margin-top: 12px; font-size: 16px; }
   .history-item .del { background: #FEE2E2; color: #EF4444; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; }
@@ -181,7 +179,7 @@
 </head>
 <body>
 
-<!-- SCHERMATA LOGIN -->
+<!-- SCHERMATA LOGIN INIZIALE -->
 <div id="login-view">
   <div class="login-card">
     <div style="text-align:center; font-size:50px; margin-bottom:12px;">🥗</div>
@@ -189,7 +187,7 @@
     
     <div class="calorie-form-group">
       <label>Nome Profilo</label>
-      <input type="text" id="login-username" placeholder="Emanuele o Andrea" style="text-transform: capitalize;">
+      <input type="text" id="login-username" placeholder="Es. Emanuele">
     </div>
     
     <div class="calorie-form-group" style="margin-bottom: 24px;">
@@ -197,7 +195,7 @@
       <input type="password" id="login-password" placeholder="••••">
     </div>
     
-    <button class="btn-save" onclick="performLogin()" style="background:var(--primary); box-shadow: 0 4px 12px rgba(37,99,235,0.3);">Accedi</button>
+    <button class="btn-save" onclick="performLogin()">Accedi / Sblocca</button>
   </div>
 </div>
 
@@ -448,7 +446,7 @@ const EMANUELE_PLAN = {
           {t: "🍞 70g pane segale tostato", k: 170}
         ],
         optionsIntro: "Accompagna con:",
-        options: [{t: "🦃 60g fesa tacchino + 2 fette formaggio", k: 150}, {t: "🍳 2 uova strapazzate bio", k: 160}, {t: "🐟 50g salmone affumicato + form. light", k: 160}, {t: "🫒 2 cucch. olio e sale", k: 90}, {t: "🧀 50g ricotta vaccina", k: 80}]
+        options: [{t: "🦃 60g fesa tacchino + 2 fette form.", k: 150}, {t: "🍳 2 uova strapazzate bio", k: 160}, {t: "🐟 50g salmone affumicato + form. light", k: 160}, {t: "🫒 2 cucch. olio e sale", k: 90}, {t: "🧀 50g ricotta vaccina", k: 80}]
       },
       spuntinoMattina: { 
         name: "Spuntino Mattina", time: "10:30", optionsIntro: "Scegli un'opzione:",
@@ -468,7 +466,7 @@ const EMANUELE_PLAN = {
       },
       spuntinoPomeriggio: { 
         name: "Spuntino Pomeriggio", time: "16:30", optionsIntro: "Scegli un'opzione:",
-        options: [{t: "🍅 1 frisella integrale con pomodoro", k: 180}, {t: "🍘 2 fettine Wasa + yocca o 1 scatoletta tonno", k: 220}, {t: "🍘 2 fettine Wasa + 70g bresaola", k: 190}, {t: "🥤 30g proteine vegane", k: 120}]
+        options: [{t: "🍅 1 frisella integrale con pomodoro", k: 180}, {t: "🍘 2 fettine Wasa + yocca o tonno", k: 220}, {t: "🍘 2 fettine Wasa + 70g bresaola", k: 190}, {t: "🥤 30g proteine vegane", k: 120}]
       },
       cena: { 
         name: "Cena", time: "20:00 – 21:00", optionsIntro: "Scegli un'opzione:",
@@ -657,7 +655,7 @@ const ANDREA_SHOP = [
 ];
 
 /* -------------------------------------------------------------------------- */
-/* 2. LOGICA LOGIN                                                            */
+/* 2. LOGICA LOGIN (Senza reload fallato)                                     */
 /* -------------------------------------------------------------------------- */
 const DOW = ["Lun","Mar","Mer","Gio","Ven","Sab","Dom"];
 
@@ -677,22 +675,34 @@ function performLogin() {
     if (!u) return alert("Inserisci il nome.");
     if (!p) return alert("Inserisci la password.");
     
-    u = u.charAt(0).toUpperCase() + u.slice(1).toLowerCase(); // Assicura la maiuscola
+    // Auto capitalize
+    u = u.charAt(0).toUpperCase() + u.slice(1).toLowerCase(); 
 
-    // Controllo Password
-    let valid = false;
-    
     // Hardcoded defaults per evitare blocchi
-    if (u === 'Emanuele' && p === '1900') valid = true;
-    if (u === 'Andrea' && p === '1900') valid = true;
+    if (!localStorage.getItem('menu-oggi-pwd-Emanuele')) localStorage.setItem('menu-oggi-pwd-Emanuele', '1900');
+    if (!localStorage.getItem('menu-oggi-pwd-Andrea')) localStorage.setItem('menu-oggi-pwd-Andrea', '1900');
     
-    // Controllo se password è stata cambiata
     let savedPwd = localStorage.getItem('menu-oggi-pwd-' + u);
-    if (savedPwd && savedPwd === p) valid = true;
+    let valid = false;
+
+    if (savedPwd && savedPwd === p) {
+        valid = true;
+    } else if (!savedPwd) {
+        if (confirm("Il profilo '" + u + "' non esiste. Vuoi creare un nuovo utente con questa password?")) {
+            localStorage.setItem('menu-oggi-pwd-' + u, p);
+            let pList = JSON.parse(localStorage.getItem('menu-oggi-profiles')) || ['Emanuele', 'Andrea'];
+            if(!pList.includes(u)) { pList.push(u); localStorage.setItem('menu-oggi-profiles', JSON.stringify(pList)); }
+            valid = true;
+        }
+    }
 
     if (valid) {
         sessionStorage.setItem('logged-in-profile', u);
-        location.reload(); // Ricarica e sblocca l'app
+        activeProfile = u;
+        // Transizione visuale senza reload della pagina
+        document.getElementById('login-view').style.display = 'none';
+        document.getElementById('main-app').style.display = 'block';
+        initApp();
     } else {
         alert("Nome utente o password errati.");
     }
@@ -700,16 +710,29 @@ function performLogin() {
 
 function logout() {
     sessionStorage.removeItem('logged-in-profile');
-    location.reload();
+    activeProfile = null;
+    document.getElementById('login-view').style.display = 'flex';
+    document.getElementById('main-app').style.display = 'none';
+    document.getElementById('login-username').value = '';
+    document.getElementById('login-password').value = '';
 }
 
 function setPassword() {
-    let newPwd = prompt("Inserisci la NUOVA password per " + activeProfile + ":\n(Questa sostituirà '1900')");
-    if (newPwd === null) return;
-    if (newPwd.trim() === "") return alert("La password non può essere vuota.");
+    let pwd = localStorage.getItem('menu-oggi-pwd-' + activeProfile);
+    if(pwd) {
+        let check = prompt("Inserisci la password ATTUALE per confermare l'identità:");
+        if (check !== pwd) return alert("Password errata!");
+    }
     
-    localStorage.setItem('menu-oggi-pwd-' + activeProfile, newPwd.trim());
-    alert("Password aggiornata con successo! Al prossimo accesso usa la nuova password.");
+    let newPwd = prompt("Inserisci la NUOVA password per " + activeProfile + " (lascia vuoto per rimuoverla):");
+    if (newPwd === null) return;
+    if (newPwd.trim() === "") {
+        localStorage.removeItem('menu-oggi-pwd-' + activeProfile);
+        alert("Password rimossa con successo.");
+    } else {
+        localStorage.setItem('menu-oggi-pwd-' + activeProfile, newPwd.trim());
+        alert("Password salvata con successo!");
+    }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -723,21 +746,21 @@ let kcalChartInstance = null;
 let currentMonthDate = new Date(); currentMonthDate.setDate(1);
 
 function initApp() {
-    // Definizione Chiavi
-    STORAGE_KEY = "menu-oggi-state-v20-" + activeProfile;
-    WEIGHT_KEY  = "menu-oggi-weight-v20-" + activeProfile;
-    PHOTOS_KEY  = "menu-oggi-photos-v20-" + activeProfile;
+    // Inizializza Variabili con il nome del profilo
+    STORAGE_KEY = "menu-oggi-state-v21-" + activeProfile;
+    WEIGHT_KEY  = "menu-oggi-weight-v21-" + activeProfile;
+    PHOTOS_KEY  = "menu-oggi-photos-v21-" + activeProfile;
     PLAN_KEY    = "menu-oggi-custom-plan-" + activeProfile;
 
-    // Assegnazione Dati Base
+    // Assegnazione Piani Base
     PLAN_DATA = activeProfile === 'Andrea' ? ANDREA_PLAN : EMANUELE_PLAN;
     SHOPPING_DATA = activeProfile === 'Andrea' ? ANDREA_SHOP : EMANUELE_SHOP;
 
-    // Controllo se c'è un JSON caricato a mano
+    // Controlla se c'è un JSON caricato a mano
     const savedPlan = localStorage.getItem(PLAN_KEY);
     if(savedPlan) { try { PLAN_DATA = JSON.parse(savedPlan); } catch(e){} }
 
-    // Caricamento Stato
+    // Carica lo stato
     state = JSON.parse(localStorage.getItem(STORAGE_KEY));
     if(!state) {
         state = { 
@@ -745,6 +768,8 @@ function initApp() {
           profile: { height: 175, age: 30, gender: 'M', targetWeight: 80, startWeight: 72 } 
         };
     }
+    // Protezione per vecchi salvataggi
+    if(!state.shopChecks) state.shopChecks = {1:{},2:{},3:{},4:{}};
     if(!state.profile) state.profile = { height: 175, age: 30, gender: 'M', targetWeight: 80, startWeight: 72 };
     if(!state.profile.targetWeight) state.profile.targetWeight = 80;
     if(!state.profile.startWeight) state.profile.startWeight = 72;
@@ -754,15 +779,14 @@ function initApp() {
 
     // Visualizzazione Impostazioni
     document.getElementById('mainTitle').innerText = "Diario di " + activeProfile;
-    document.getElementById('display-active-profile').innerText = activeProfile;
     document.getElementById('prof-height').value = state.profile.height;
     document.getElementById('prof-age').value = state.profile.age;
     document.getElementById('prof-gender').value = state.profile.gender;
     document.getElementById('prof-start-weight').value = state.profile.startWeight;
     document.getElementById('prof-target-weight').value = state.profile.targetWeight;
 
-    // Rendering Iniziale
-    render();
+    // Switcha fisicamente alla prima tab
+    switchTab('plan');
 }
 
 /* --- UTILS E CALCOLI --- */
@@ -775,6 +799,7 @@ function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 function getPlan(key) { return state.byDate[key] || null; }
 
 function getWeightAtDate(dKey) {
+    if(!state) return 72;
     let dTime = fromKey(dKey).getTime();
     let closestW = state.profile.startWeight || 72;
     let closestTime = 0;
@@ -787,6 +812,7 @@ function getWeightAtDate(dKey) {
 function getLatestWeight() { return weightData.length ? weightData[weightData.length-1].weight : (state.profile.startWeight || 72); }
 
 function calculateBMR(weight) {
+    if(!state) return 0;
     let p = state.profile; let w = weight || getWeightAtDate(toKey(new Date()));
     return p.gender === 'M' ? (10 * w) + (6.25 * p.height) - (5 * p.age) + 5 : (10 * w) + (6.25 * p.height) - (5 * p.age) - 161;
 }
@@ -799,6 +825,7 @@ function calcExerciseKcal(type, mins, weight) {
 function calcDailyFoodKcal(key) {
     let plan = getPlan(key); if(!plan) return 0;
     let cfg = PLAN_DATA[plan.type];
+    if(!cfg) return 0;
     let total = 0;
     Object.keys(cfg.meals).forEach(mk => {
         let meal = cfg.meals[mk];
@@ -845,7 +872,10 @@ function renderCalendar(){
   for(let i=0; i<7; i++){
     const d = addDays(monday, i); const key = toKey(d); const plan = getPlan(key);
     let cls = "cal-day" + (plan ? " " + plan.type : "") + (key === state.selectedDate ? " selected" : "");
-    let doneMark = plan && Object.values(plan.completed).filter(Boolean).length >= Object.keys(PLAN_DATA[plan.type].meals).length ? '<span class="check">✓</span>' : '';
+    let doneMark = "";
+    if (plan && PLAN_DATA[plan.type]) {
+       if (Object.values(plan.completed).filter(Boolean).length >= Object.keys(PLAN_DATA[plan.type].meals).length) doneMark = '<span class="check">✓</span>';
+    }
     grid.innerHTML += `<div class="${cls}" onclick="state.selectedDate='${key}'; save(); render();">${doneMark}<div class="dow">${DOW[i]}</div><div class="num">${d.getDate()}</div><div class="dot"></div></div>`;
   }
 }
@@ -857,6 +887,8 @@ function renderDayEditor(){
     return;
   }
   const cfg = PLAN_DATA[plan.type]; const isTrain = plan.type === 'train';
+  if(!cfg) return;
+
   let html = `<div class="active-day-header"><div class="type-badge ${plan.type}">${isTrain ? '🏋️ Allenamento' : '🛌 Riposo'}</div><button class="btn-reset" onclick="clearPlan('${key}')">Cambia tipo</button></div><div class="meal-list">`;
 
   // PASTI
@@ -938,6 +970,7 @@ function saveActivity(key) {
     alert("Dati salvati! Guarda il resoconto nella scheda Progressi.");
 }
 
+/* UI MESE */
 function renderMonthCalendar() {
   const grid = document.getElementById("monthGrid"); grid.innerHTML = "";
   let month = currentMonthDate.getMonth(); let year = currentMonthDate.getFullYear();
@@ -957,14 +990,17 @@ function goToDay(key) { state.selectedDate = key; state.weekStart = toKey(monday
 function changeWeek(offset) { state.weekStart = toKey(addDays(fromKey(state.weekStart), offset*7)); save(); render(); }
 function goToToday() { state.weekStart = toKey(mondayOf(new Date())); state.selectedDate = toKey(new Date()); save(); render(); }
 
-/* --- UI SPESA --- */
+/* UI SPESA */
 function changeShopWeek(num) { currentShopWeek = num; document.querySelectorAll('.week-tabs button').forEach((b, i) => b.classList.toggle('active', i === num-1)); renderShopping(); }
 function toggleShopItem(cIdx, iIdx) { state.shopChecks[currentShopWeek][`${cIdx}-${iIdx}`] = !state.shopChecks[currentShopWeek][`${cIdx}-${iIdx}`]; save(); renderShopping(); }
 function renderShopping(){
     let html = '';
     
-    document.getElementById("raccomandazioni-text").innerHTML = 
-        PLAN_DATA.train.meals.condimenti.fixed.map(item => `<li style="margin-bottom:6px;">${item.t}</li>`).join("");
+    // Aggiorna raccomandazioni fisse dal piano corrente
+    if(PLAN_DATA.train && PLAN_DATA.train.meals.condimenti) {
+        document.getElementById("raccomandazioni-text").innerHTML = 
+            PLAN_DATA.train.meals.condimenti.fixed.map(item => `<li style="margin-bottom:6px;">${item.t}</li>`).join("");
+    }
 
     SHOPPING_DATA.forEach((cat, cIdx) => {
         html += `<div class="shop-cat"><div class="shop-cat-title">${cat.icon} ${cat.cat}</div><div>`;
@@ -977,16 +1013,23 @@ function renderShopping(){
     document.getElementById('shopContent').innerHTML = html;
 }
 
-/* --- UI STATISTICHE, PESO & FOTO --- */
+/* UI STATISTICHE E FOTO */
 function renderStats() {
     let days = parseInt(document.getElementById("stats-range").value);
     let totalFood = 0, totalBurned = 0, count = 0;
-    let kcalDates = [], kcalBurnedTarget = [], kcalFoodBars = [];
+    
+    let kcalDates = [];
+    let kcalBurnedTarget = [];
+    let kcalFoodBars = [];
 
     for(let i=0; i<days; i++) {
         let d = new Date(); d.setDate(d.getDate() - i);
         let key = toKey(d); let plan = getPlan(key);
-        if (plan && plan.summary) { totalFood += plan.summary.food; totalBurned += plan.summary.burned; count++; }
+        if (plan && plan.summary) { 
+            totalFood += plan.summary.food; 
+            totalBurned += plan.summary.burned; 
+            count++; 
+        }
     }
     
     for(let i=6; i>=0; i--) {
@@ -997,7 +1040,8 @@ function renderStats() {
         let food = (plan && plan.summary) ? plan.summary.food : 0;
         let tdee = (plan && plan.summary) ? plan.summary.burned : calculateBMR(getWeightAtDate(key));
         
-        kcalFoodBars.push(food); kcalBurnedTarget.push(tdee);
+        kcalFoodBars.push(food);
+        kcalBurnedTarget.push(tdee);
     }
     
     let avgFood = count ? Math.round(totalFood/count) : 0;
@@ -1023,7 +1067,13 @@ function renderStats() {
     const ctxK = document.getElementById('kcalChart').getContext('2d');
     kcalChartInstance = new Chart(ctxK, {
       type: 'bar',
-      data: { labels: kcalDates, datasets: [{ label: 'Assunte (Menù)', data: kcalFoodBars, backgroundColor: '#3B82F6', borderRadius: 6 }, { label: 'Bruciate (TDEE)', data: kcalBurnedTarget, type: 'line', borderColor: '#10B981', borderDash: [5,5], backgroundColor: 'transparent', borderWidth: 2, pointRadius: 0 }] },
+      data: { 
+          labels: kcalDates, 
+          datasets: [
+              { label: 'Assunte (Menù)', data: kcalFoodBars, backgroundColor: '#3B82F6', borderRadius: 6 },
+              { label: 'Bruciate (TDEE)', data: kcalBurnedTarget, type: 'line', borderColor: '#10B981', borderDash: [5,5], backgroundColor: 'transparent', borderWidth: 2, pointRadius: 0 }
+          ] 
+      },
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom' } }, scales: { y: { beginAtZero: true, grid: { color: '#E5E7EB' } }, x: { grid: { display: false } } } }
     });
 }
@@ -1087,16 +1137,6 @@ function renderPhotos() {
 }
 function deletePhoto(idx) { if(confirm("Eliminare questa foto?")) { photosData.splice(idx, 1); localStorage.setItem(PHOTOS_KEY, JSON.stringify(photosData)); renderPhotos(); } }
 
-/* IMPOSTAZIONI */
-function saveProfile() {
-    state.profile.height = document.getElementById('prof-height').value || 175;
-    state.profile.age = document.getElementById('prof-age').value || 30;
-    state.profile.gender = document.getElementById('prof-gender').value || 'M';
-    state.profile.startWeight = document.getElementById('prof-start-weight').value || 72;
-    state.profile.targetWeight = document.getElementById('prof-target-weight').value || 80;
-    save(); render();
-}
-
 function handleFileUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -1113,9 +1153,17 @@ function handleFileUpload(event) {
   reader.readAsText(file);
 }
 
+function saveProfile() {
+    state.profile.height = document.getElementById('prof-height').value || 175;
+    state.profile.age = document.getElementById('prof-age').value || 30;
+    state.profile.gender = document.getElementById('prof-gender').value || 'M';
+    state.profile.startWeight = document.getElementById('prof-start-weight').value || 72;
+    state.profile.targetWeight = document.getElementById('prof-target-weight').value || 80;
+    save(); render();
+}
+
 function resetAppData() { if(confirm("Cancellare tutto il calendario di " + activeProfile + "?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); } }
 
-/* --- CORE E RENDER --- */
 function switchTab(tabId) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -1129,11 +1177,7 @@ function switchTab(tabId) {
     window.scrollTo(0,0);
 }
 
-function render() { 
-    renderCalendar(); 
-    renderDayEditor(); 
-}
-
+function render() { renderCalendar(); renderDayEditor(); }
 </script>
 </body>
 </html>
