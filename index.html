@@ -16,21 +16,15 @@
     --ink-soft: #4B5563;
     --ink-faint: #9CA3AF;
     --line: #E5E7EB;
-    
     --primary: #2563EB; 
     --primary-soft: #EFF6FF;
-    
     --train: #10B981; 
     --train-soft: #D1FAE5;
-    
     --rest: #6366F1; 
     --rest-soft: #E0E7FF;
-
     --warn: #F59E0B;
-    
     --radius-card: 16px;
     --radius-pill: 999px;
-    
     box-sizing: border-box;
   }
 
@@ -118,7 +112,7 @@
   .btn-save { width: 100%; background: var(--train); color: white; border: none; border-radius: 10px; padding: 16px; font-weight: 700; font-size: 16px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(16,185,129,0.3); transition: background 0.2s;}
   .btn-save:active { background: #059669; }
 
-  /* SPESA E PROGRESSI */
+  /* SPESA */
   .shop-header { text-align: center; margin-bottom: 24px; padding-top: 10px; }
   .shop-header h1 { font-weight: 700; font-size: 26px; margin: 0 0 8px; }
   .week-tabs { display: flex; overflow-x: auto; gap: 12px; margin-bottom: 24px; padding-bottom: 8px; }
@@ -141,7 +135,8 @@
   .weight-row { display: flex; gap: 16px; }
   .input-wrapper { display: flex; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; flex: 1; align-items: center; }
   .input-wrapper input { flex: 1; border: none; padding: 16px; font-size: 18px; font-weight: 600; outline: none; background: transparent; }
-  .btn-primary { background: var(--primary); color: white; border: none; border-radius: 10px; padding: 16px; font-weight: 600; font-size: 16px; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
+  .btn-primary { background: var(--primary); color: white; border: none; border-radius: 10px; padding: 16px; font-weight: 600; font-size: 16px; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,0.2); transition: background 0.2s; }
+  .btn-primary:active { background: #1D4ED8; }
   .chart-container { position: relative; height: 250px; width: 100%; margin-top: 24px; margin-bottom: 12px; }
   .history-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--surface-muted); border: 1px solid var(--line); border-radius: 12px; margin-top: 12px; font-size: 16px; }
   .history-item .del { background: #FEE2E2; color: #EF4444; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; }
@@ -176,7 +171,7 @@
   <div id="view-plan" class="view active">
     <header class="hero">
       <div class="date-label" id="dateLabel"></div>
-      <h1 class="title">Diario Oggi</h1>
+      <h1 class="title" id="mainTitle">Diario Oggi</h1>
     </header>
     
     <section class="calendar">
@@ -280,7 +275,7 @@
         <strong id="stat-net">+0</strong>
       </div>
       <p style="font-size:12px; color:var(--ink-soft); margin-top:12px; text-align:center;">
-        La nutrizionista ha calcolato i tuoi piatti in modo da garantirti questo surplus calorico netto.
+        La dieta è calibrata per farti stare in surplus rispetto a quanto bruci!
       </p>
     </div>
 
@@ -319,6 +314,14 @@
   <div id="view-settings" class="view">
     <div class="shop-header"><h1>Impostazioni ⚙️</h1></div>
     
+    <div class="settings-card" style="border: 2px solid var(--primary); background: var(--primary-soft);">
+      <h3 style="color: var(--primary);">👥 Profilo Attivo</h3>
+      <div class="calorie-form-group">
+        <select id="profile-select" onchange="switchProfile(this.value)" style="font-weight:bold; color:var(--primary);"></select>
+      </div>
+      <button class="btn-outline" style="padding: 10px; margin-top:10px; background:var(--surface);" onclick="createNewProfile()">+ Aggiungi Nuova Persona</button>
+    </div>
+
     <div class="settings-card">
       <h3>🎯 Obiettivi (Massa)</h3>
       <div class="calorie-form-group">
@@ -345,9 +348,19 @@
         <select id="prof-gender" onchange="saveProfile()"><option value="M">Uomo</option><option value="F">Donna</option></select>
       </div>
     </div>
+    
+    <div class="settings-card">
+      <h3>🔄 Aggiorna Piano Alimentare</h3>
+      <p style="font-size:14px; color:var(--ink-soft); margin-bottom:16px;">Carica il file .json con il nuovo piano della nutrizionista per questo profilo.</p>
+      <div class="file-upload-btn">
+        <div class="btn-outline">Carica File .json</div>
+        <input type="file" accept=".json" onchange="handleFileUpload(event)">
+      </div>
+    </div>
+
     <div class="settings-card">
       <h3>🗑️ Cancella Dati App</h3>
-      <button class="btn-primary" style="background:#EF4444; width:100%" onclick="resetAppData()">Azzera Dati App</button>
+      <button class="btn-primary" style="background:#EF4444; width:100%" onclick="resetAppData()">Azzera Dati Questo Profilo</button>
     </div>
   </div>
 
@@ -373,8 +386,31 @@
 </nav>
 
 <script>
-/* DATI ALIMENTARI CON CALORIE STIMATE PER OBIETTIVO MASSA */
-let PLAN_DATA = {
+/* SISTEMA MULTI-PROFILO */
+let profilesList = JSON.parse(localStorage.getItem('menu-oggi-profiles')) || ['Emanuele', 'Andrea'];
+let activeProfile = localStorage.getItem('menu-oggi-active-profile') || profilesList[0];
+
+function switchProfile(name) {
+    localStorage.setItem('menu-oggi-active-profile', name);
+    location.reload();
+}
+function createNewProfile() {
+    let name = prompt("Inserisci il nome del nuovo profilo (es. Marco):");
+    if(name && name.trim() !== "" && !profilesList.includes(name.trim())) {
+        profilesList.push(name.trim());
+        localStorage.setItem('menu-oggi-profiles', JSON.stringify(profilesList));
+        switchProfile(name.trim());
+    }
+}
+
+// CHIAVI DI SALVATAGGIO DINAMICHE PER PROFILO
+const STORAGE_KEY = "menu-oggi-state-v16-" + activeProfile;
+const WEIGHT_KEY  = "menu-oggi-weight-v16-" + activeProfile;
+const PHOTOS_KEY  = "menu-oggi-photos-v16-" + activeProfile;
+const PLAN_KEY    = "menu-oggi-custom-plan-" + activeProfile;
+
+/* DATI ALIMENTARI DI DEFAULT (EMANUELE) */
+let DEFAULT_PLAN_DATA = {
   train: {
     label: "Allenamento",
     meals: {
@@ -414,10 +450,10 @@ let PLAN_DATA = {
         options: [{t: "🍗 300g carne bianca ai ferri, insalata mista, 1 frutto", k: 550}, {t: "🥩 300g carne magra (manzo), verdura a piacere, 1 frutto", k: 600}]
       },
       condimenti: {
-        name: "Condimenti & Integrazione Allenamento", time: "Durante la giornata",
+        name: "Condimenti & Integrazione", time: "Durante la giornata",
         fixed: [
-          {t: "🫒 Olio Extravergine d'Oliva (Da usare a pranzo/cena, 8 cucchiaini totali)", k: 360},
-          {t: "💊 BCAA 2.1.1 (3 pasticche 1h prima, 2 subito dopo allenamento)", k: 0},
+          {t: "🫒 Olio Extravergine d'Oliva (8 cucchiaini)", k: 360},
+          {t: "💊 BCAA 2.1.1 (3 pasticche prima, 2 dopo)", k: 0},
           {t: "🍌 1 Banana (Entro 30 min da fine allenamento)", k: 100}
         ]
       }
@@ -447,16 +483,24 @@ let PLAN_DATA = {
         options: [{t: "🎉 CENA LIBERA !!!", k: 1000}, {t: "🐟 300g pesce (merluzzo/orata), verdura cotta, 1 frutto", k: 450}, {t: "🍲 Minestra: 1 barattolo fagioli/ceci con 65g pasta/riso, verdura", k: 550}, {t: "🐟 300g pesce (spada, salmone), insalata, 1 frutto", k: 650}]
       },
       condimenti: {
-        name: "Condimenti della Giornata", time: "Durante la giornata",
+        name: "Condimenti", time: "Durante la giornata",
         fixed: [
-          {t: "🫒 Olio Extravergine d'Oliva (Da usare a pranzo/cena, 8 cucchiaini totali)", k: 360}
+          {t: "🫒 Olio Extravergine d'Oliva (8 cucchiaini)", k: 360}
         ]
       }
     }
   }
 };
 
-/* SPESA CALCOLATA ESATTAMENTE SUI PASTI SETTIMANALI (3 ALL + 4 RIPOSO) */
+let PLAN_DATA = DEFAULT_PLAN_DATA;
+const savedPlan = localStorage.getItem(PLAN_KEY);
+if(savedPlan) { 
+    try { PLAN_DATA = JSON.parse(savedPlan); } catch(e){} 
+} else if (activeProfile !== 'Emanuele') {
+    // Profilo Andrea vuoto: usa Emanuele come base temporanea finché non carica il JSON.
+    PLAN_DATA = DEFAULT_PLAN_DATA;
+}
+
 const SHOPPING_DATA = [
   { icon: "🍎", cat: "Frutta e Verdura", items: [
     {n: "Banane (Post-workout)", q: "3-4 pz"}, 
@@ -504,9 +548,6 @@ const SHOPPING_DATA = [
   ]}
 ];
 
-const STORAGE_KEY = "menu-oggi-state-v15";
-const WEIGHT_KEY = "menu-oggi-weight";
-const PHOTOS_KEY = "menu-oggi-photos";
 const DOW = ["Lun","Mar","Mer","Gio","Ven","Sab","Dom"];
 
 let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || { 
@@ -735,7 +776,7 @@ function renderShopping(){
     document.getElementById('shopContent').innerHTML = html;
 }
 
-/* UI STATISTICHE, PESO & FOTO */
+/* UI STATISTICHE E FOTO */
 function renderStats() {
     let days = parseInt(document.getElementById("stats-range").value);
     let totalFood = 0, totalBurned = 0, count = 0;
@@ -886,14 +927,42 @@ function deletePhoto(idx) {
     }
 }
 
-/* IMPOSTAZIONI */
+/* IMPOSTAZIONI E PROFILI */
 function initSettings() {
+    document.getElementById('mainTitle').innerText = "Diario di " + activeProfile;
+    
+    let profSelect = document.getElementById('profile-select');
+    profSelect.innerHTML = "";
+    profilesList.forEach(p => {
+        let sel = p === activeProfile ? "selected" : "";
+        profSelect.innerHTML += `<option value="${p}" ${sel}>${p}</option>`;
+    });
+
     document.getElementById('prof-height').value = state.profile.height;
     document.getElementById('prof-age').value = state.profile.age;
     document.getElementById('prof-gender').value = state.profile.gender;
     document.getElementById('prof-start-weight').value = state.profile.startWeight;
     document.getElementById('prof-target-weight').value = state.profile.targetWeight;
 }
+
+function handleFileUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const json = JSON.parse(e.target.result);
+      if(json.train && json.rest) {
+        localStorage.setItem(PLAN_KEY, JSON.stringify(json));
+        PLAN_DATA = json;
+        alert("Piano caricato con successo per " + activeProfile + "!");
+        render();
+      } else { alert("Formato file non valido. Deve contenere 'train' e 'rest'."); }
+    } catch(err) { alert("Errore lettura file JSON."); }
+  };
+  reader.readAsText(file);
+}
+
 function saveProfile() {
     state.profile.height = document.getElementById('prof-height').value || 175;
     state.profile.age = document.getElementById('prof-age').value || 30;
@@ -903,7 +972,12 @@ function saveProfile() {
     save();
     render();
 }
-function resetAppData() { if(confirm("Cancellare tutto il calendario?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); } }
+function resetAppData() { 
+    if(confirm("Cancellare tutto il calendario di " + activeProfile + "?")) { 
+        localStorage.removeItem(STORAGE_KEY); 
+        location.reload(); 
+    } 
+}
 
 function switchTab(tabId) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
