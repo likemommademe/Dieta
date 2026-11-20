@@ -96,6 +96,9 @@
   .items { list-style: none; margin: 4px 0 0; padding: 0; }
   .items li { padding: 6px 0 6px 18px; position: relative; }
   .items li::before { content: ""; position: absolute; left: 3px; top: 14px; width: 6px; height: 6px; border-radius: 50%; background: var(--ink-faint); }
+  .varianti { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 8px; }
+  .var { border: 1.5px solid var(--line); background: transparent; color: inherit; border-radius: 999px; padding: 6px 14px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .var.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
   .intro { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-faint); margin: 10px 0 6px; }
   .opt { display: flex; gap: 10px; align-items: flex-start; width: 100%; text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 14px; padding: 10px 12px; margin-bottom: 6px; cursor: pointer; }
   .opt .radio { flex: none; width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--ink-faint); margin-top: 1px; }
@@ -349,6 +352,18 @@ const COMMON = {
         { t: "50 g di salmone affumicato + formaggio spalmabile light", k: 140 },
         { t: "2 cucchiaini di olio e sale", k: 90 },
         { t: "50 g di ricotta vaccina", k: 75 }
+      ],
+      // alternative scelte da Emanuele, non scritte dalla nutrizionista: porzioni indicative
+      varianti: [
+        { nome: "Pancake", items: [
+          { t: "Pancake: 2 uova + 40 g di fiocchi d'avena frullati, cotti in padella antiaderente", k: 290 },
+          { t: "Frutti rossi sopra", k: 45 },
+          { t: "Caffè o caffè d'orzo (facoltativo)", k: 0 } ] },
+        { nome: "Skyr", items: [
+          { t: "200 g di skyr naturale", k: 130 },
+          { t: "40 g di fiocchi d'avena integrali", k: 150 },
+          { t: "Frutti rossi", k: 45 },
+          { t: "3–4 noci", k: 100 } ] }
       ]
     },
     spuntino: {
@@ -377,6 +392,13 @@ const COMMON = {
         { t: "Una manciata di fiocchi d'avena integrali", k: 110 },
         { t: "Frutti rossi", k: 45 },
         { t: "3–4 noci", k: 100 }
+      ],
+      // alternativa scelta da Emanuele, non scritta dalla nutrizionista: porzioni indicative
+      varianti: [
+        { nome: "Porridge", items: [
+          { t: "Porridge: 40 g di fiocchi d'avena integrali cotti in 200 ml di latte d'avena (o acqua)", k: 230 },
+          { t: "Frutti rossi", k: 45 },
+          { t: "3–4 noci", k: 100 } ] }
       ]
     },
     spuntino: {
@@ -617,6 +639,11 @@ function mealOf(typeId, meal) {
   const t = DAY_TYPES[typeId];
   return (meal === "pranzo" || meal === "cena") ? t[meal] : COMMON[t.kind][meal];
 }
+// colazione: se nel giorno hai scelto un'alternativa (pancake, skyr, porridge), uso quella
+function mealFor(key, typeId, m) {
+  const base = mealOf(typeId, m), d = state.days[key], v = d && d.sel ? d.sel[m + "_v"] : 0;
+  return base.varianti && v ? Object.assign({ variante: true }, base.varianti[v - 1]) : base;
+}
 function dayData(key) {
   if (!state.days[key]) state.days[key] = { sel: {}, done: {}, extras: {} };
   return state.days[key];
@@ -631,7 +658,7 @@ function dayKcal(key, onlyDone) {
   const typeId = typeOf(key), kind = DAY_TYPES[typeId].kind;
   const d = state.days[key] || { sel: {}, done: {}, extras: {} };
   let total = 0;
-  MEALS.forEach(m => { if (!onlyDone || d.done[m]) total += mealKcal(mealOf(typeId, m), d.sel[m]); });
+  MEALS.forEach(m => { if (!onlyDone || d.done[m]) total += mealKcal(mealFor(key, typeId, m), d.sel[m]); });
   EXTRAS.forEach(e => { if (e.when === "all" || e.when === kind) { if (!onlyDone || d.extras[e.id]) total += e.k; } });
   return total;
 }
@@ -683,8 +710,11 @@ function renderDay() {
     <p class="note">Calorie stimate da noi, non indicate dalla nutrizionista.${state.overrides[key] ? ` · Giornata cambiata a mano. <a href="#" onclick="setType('');return false" style="color:inherit">Ripristina</a>` : ""}</p>`;
 
   document.getElementById("day-meals").innerHTML = MEALS.map(m => {
-    const meal = mealOf(typeId, m), sel = dd.sel[m] || 0, done = !!dd.done[m];
+    const base = mealOf(typeId, m), meal = mealFor(key, typeId, m), sel = dd.sel[m] || 0, done = !!dd.done[m], v = dd.sel[m + "_v"] || 0;
     let body = "";
+    if (base.varianti) body += `<div class="varianti">${["Del piano"].concat(base.varianti.map(x => x.nome)).map((n, i) =>
+      `<button class="var ${i === v ? "on" : ""}" onclick="chooseVar('${m}',${i})">${n}</button>`).join("")}</div>` +
+      (v ? `<p class="muted small" style="margin:4px 0 0">Alternativa tua, non del piano: porzioni indicative.</p>` : "");
     if (meal.free) body = `<div class="free">Cena libera!</div><p class="muted small" style="margin:0">Non entra nel conteggio delle calorie.</p>`;
     if (meal.items && meal.items.length) body += `<ul class="items">${meal.items.map(i => `<li>${i.t}</li>`).join("")}</ul>`;
     if (meal.options) body += `<div class="intro">${meal.intro}</div>` + meal.options.map((o, i) =>
@@ -704,6 +734,7 @@ function shiftWeek(n) { selected = toKey(addDays(fromKey(selected), n * 7)); ren
 function goToday() { selected = toKey(new Date()); renderOggi(); }
 function setType(id) { if (id && id !== state.week[fromKey(selected).getDay()]) state.overrides[selected] = id; else delete state.overrides[selected]; save(); renderOggi(); }
 function choose(m, i) { dayData(selected).sel[m] = i; save(); renderDay(); }
+function chooseVar(m, i) { dayData(selected).sel[m + "_v"] = i; save(); renderDay(); }
 function toggleDone(m) { const d = dayData(selected); d.done[m] = !d.done[m]; save(); renderDay(); }
 function toggleExtra(id) { const d = dayData(selected); d.extras[id] = !d.extras[id]; save(); renderDay(); }
 function renderOggi() { renderStrip(); renderDay(); window.scrollTo({ top: 0 }); }
@@ -717,6 +748,7 @@ function describe(meal) {
   let h = (meal.items || []).map(i => `<li>${i.t}</li>`).join("");
   let o = "";
   if (meal.options) o = `<div class="alt small" style="margin-top:6px">${meal.intro}</div><ol class="opts">${meal.options.map(x => `<li>${x.t}</li>`).join("")}</ol>`;
+  if (meal.varianti) o += `<div class="alt small" style="margin-top:6px">Oppure, al posto di tutta la colazione: ${meal.varianti.map(x => x.nome.toLowerCase()).join(" o ")}</div>`;
   return (h ? `<ul>${h}</ul>` : "") + o;
 }
 
