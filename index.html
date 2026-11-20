@@ -9,7 +9,7 @@
 <title>Il Menù di Oggi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     color-scheme: light;
@@ -34,7 +34,7 @@
   html, body { margin: 0; background: var(--bg); color: var(--ink); }
   body { font-family: 'Manrope', system-ui, sans-serif; font-size: 15px; line-height: 1.45; }
   button, input, select { font: inherit; color: inherit; }
-  h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; font-weight: 700; margin: 0; letter-spacing: -.01em; }
+  h1, h2, h3 { font-family: 'Chakra Petch', 'Arial Narrow', sans-serif; font-weight: 700; margin: 0; letter-spacing: .01em; text-transform: uppercase; }
 
   .app { max-width: 560px; margin: 0 auto; padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 96px); }
   .view { display: none; }
@@ -44,7 +44,7 @@
   /* Intestazioni */
   .top { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; margin: 4px 0 16px; }
   .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
-  .top h1 { font-size: 30px; line-height: 1.1; margin-top: 2px; }
+  .top h1 { font-size: 32px; line-height: 1.05; margin-top: 2px; }
   .section-title { font-size: 20px; margin: 26px 0 10px; }
 
   /* Card */
@@ -78,7 +78,7 @@
   .type-select { border: 1px solid var(--line); background: var(--surface-2); border-radius: 12px; padding: 8px 10px; max-width: 190px; }
   .kcal-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 14px; }
   .kcal-box { background: var(--surface-2); border-radius: 14px; padding: 10px 12px; }
-  .kcal-box b { display: block; font-family: 'Fraunces', serif; font-size: 22px; line-height: 1.1; }
+  .kcal-box b { display: block; font-family: 'Chakra Petch', sans-serif; font-size: 22px; line-height: 1.1; }
   .kcal-box span { font-size: 12px; color: var(--ink-soft); }
   .progress { height: 8px; background: var(--surface-2); border-radius: 99px; overflow: hidden; margin-top: 12px; }
   .progress > div { height: 100%; background: var(--train); border-radius: 99px; transition: width .3s; }
@@ -105,7 +105,7 @@
   .done-btn { width: 100%; border: 0; border-top: 1px solid var(--line); background: none; padding: 13px; font-weight: 700; cursor: pointer; color: var(--ink-soft); }
   .meal.done .done-btn { background: var(--train-soft); color: var(--train); }
   .meal.done .meal-head h3::after { content: " ✓"; color: var(--train); }
-  .free { font-family: 'Fraunces', serif; font-size: 22px; padding: 6px 0; }
+  .free { font-family: 'Chakra Petch', sans-serif; font-size: 22px; padding: 6px 0; }
 
   /* Lista con spunte */
   .check { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
@@ -152,6 +152,24 @@
   .tags { display: flex; flex-wrap: wrap; gap: 6px; }
   .tag { background: #FDECEC; color: #C2453D; padding: 5px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; }
   .note { font-size: 12px; color: var(--ink-faint); margin-top: 8px; }
+
+  /* Misure */
+  .m-sum { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 12px; }
+  .m-box { background: var(--surface-2); border-radius: 14px; padding: 10px 12px; }
+  .m-box .lbl { font-size: 12px; color: var(--ink-soft); font-weight: 600; }
+  .m-box .val { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 22px; line-height: 1.1; }
+  .m-box .from { font-size: 12px; color: var(--ink-faint); }
+  .good { color: var(--train); } .bad { color: #C2453D; } .same { color: var(--ink-faint); }
+  .hero-m { background: var(--train-soft); border-radius: 14px; padding: 12px 14px; margin-top: 12px; }
+  .hero-m b { font-family: 'Chakra Petch', sans-serif; font-size: 26px; color: var(--train); }
+  .tbl-wrap { overflow-x: auto; margin-top: 12px; -webkit-overflow-scrolling: touch; }
+  .tbl { border-collapse: collapse; font-size: 13px; min-width: 100%; white-space: nowrap; }
+  .tbl th, .tbl td { padding: 7px 8px; border-bottom: 1px solid var(--line); text-align: right; }
+  .tbl th { font-size: 11px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .04em; }
+  .tbl th:first-child, .tbl td:first-child { text-align: left; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  details.add summary { cursor: pointer; font-weight: 700; padding: 10px 0 4px; list-style: none; color: var(--train); }
+  details.add summary::-webkit-details-marker { display: none; }
 
   /* Menu in basso */
   .nav { position: fixed; left: 0; right: 0; bottom: 0; background: color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); z-index: 10; }
@@ -219,6 +237,19 @@
       </div>
       <button class="btn solid block" onclick="addWeight()">Aggiungi peso</button>
       <div id="weight-hist" style="margin-top:10px"></div>
+    </div>
+
+    <div class="card">
+      <div class="dayhead"><h3><span class="em">📐</span>Misure</h3><span class="muted small" id="m-range"></span></div>
+      <div id="m-summary"></div>
+      <details class="add">
+        <summary>＋ Aggiungi nuove misure</summary>
+        <div class="field" style="margin-top:8px"><label for="m-date">Data</label><input id="m-date" type="date"></div>
+        <div class="grid3" id="m-fields"></div>
+        <button class="btn solid block" style="margin-top:4px" onclick="addMeasure()">Salva misure</button>
+      </details>
+      <div class="tbl-wrap" id="m-table"></div>
+      <p class="note">In verde i cambiamenti nella direzione giusta per la massa: meno centimetri su vita, pancia e fianchi, più centimetri su torace, braccia e cosce.</p>
     </div>
 
     <div class="card">
@@ -532,13 +563,38 @@ if (!state) {
   const old = load("menu-oggi-state-v21-Emanuele", null);
   const p = old && old.profile ? old.profile : {};
   state = { week: { ...DEFAULT_WEEK }, overrides: {}, days: {}, shop: {},
-    profile: { height: p.height || 175, age: p.age || 30, sex: p.gender || "M", start: p.startWeight || 72, target: p.targetWeight || 80 } };
+    profile: { height: p.height || 175, age: p.age || 30, sex: p.gender || "M", start: 72, target: p.targetWeight || 80 } };
 }
 if (!state.week || state.weekVersion !== WEEK_VERSION) { state.week = { ...DEFAULT_WEEK }; state.weekVersion = WEEK_VERSION; }
 state.overrides = state.overrides || {};
 state.days = state.days || {};
 state.shop = state.shop || {};
 let weights = load(WEIGHT_KEY, []);
+const MEASURE_KEY = "dieta-emanuele-misure";
+// down = meglio se scende, up = meglio se sale
+const MEASURES = [
+  { id: "vita", label: "Vita", dir: "down" },
+  { id: "pancia", label: "Pancia", dir: "down" },
+  { id: "fianchi", label: "Fianchi", dir: "down" },
+  { id: "torace", label: "Torace", dir: "up" },
+  { id: "bdx", label: "Braccio dx", dir: "up" },
+  { id: "bsn", label: "Braccio sn", dir: "up" },
+  { id: "cdx", label: "Coscia dx", dir: "up" },
+  { id: "csn", label: "Coscia sn", dir: "up" }
+];
+// Prime misure dalla scheda cartacea
+const FIRST_MEASURES = [
+  { date: "2026-09-15", peso: 72, vita: 84, pancia: 92, torace: 99, bdx: 30, bsn: 30, cdx: 50, csn: 50 },
+  { date: "2026-11-20", peso: 71, vita: 83, pancia: 89, torace: 99, bdx: 32, bsn: 32, cdx: 52, csn: 52 }
+];
+let measures = load(MEASURE_KEY, null);
+if (!measures) {
+  measures = FIRST_MEASURES.map(m => ({ ...m }));
+  store(MEASURE_KEY, measures);
+  FIRST_MEASURES.forEach(m => { if (!weights.some(w => w.date === m.date)) weights.push({ date: m.date, weight: m.peso }); });
+  weights.sort((a, b) => a.date.localeCompare(b.date));
+  store(WEIGHT_KEY, weights);
+}
 let photos = load(PHOTOS_KEY, []);
 const save = () => store(KEY, state);
 
@@ -727,7 +783,7 @@ function lineChart(pts) {
   s += `<path d="${path}" fill="none" stroke="var(--train)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
   pts.forEach((p, i) => s += `<circle cx="${X(i)}" cy="${Y(p.weight)}" r="3.5" fill="var(--surface)" stroke="var(--train)" stroke-width="2"/>`);
   const step = Math.ceil(pts.length / 5);
-  pts.forEach((p, i) => { if (i % step === 0 || i === pts.length - 1) s += `<text x="${X(i)}" y="${H - 6}" text-anchor="middle">${fmt(fromKey(p.date), { day: "numeric", month: "short" })}</text>`; });
+  pts.forEach((p, i) => { if (i % step === 0 || i === pts.length - 1) s += `<text x="${X(i)}" y="${H - 6}" text-anchor="${i === pts.length - 1 ? "end" : i === 0 ? "start" : "middle"}">${fmt(fromKey(p.date), { day: "numeric", month: "short" })}</text>`; });
   return s + "</svg>";
 }
 
@@ -742,16 +798,67 @@ function renderProgress() {
   const pts = weights.slice(-20);
   document.getElementById("weight-chart").innerHTML = lineChart(pts);
   const last = weights.length ? weights[weights.length - 1].weight : null;
-  document.getElementById("weight-delta").textContent = last ? `${last} kg · ${(last - state.profile.start >= 0 ? "+" : "")}${(last - state.profile.start).toFixed(1)} dalla partenza · obiettivo ${state.profile.target} kg` : `obiettivo ${state.profile.target} kg`;
+  document.getElementById("weight-delta").textContent = last ? `${last} kg · ${(last - state.profile.start >= 0 ? "+" : "")}${(last - state.profile.start).toFixed(1).replace(".", ",")} kg dalla partenza · obiettivo ${state.profile.target} kg` : `obiettivo ${state.profile.target} kg`;
   document.getElementById("w-date").value = toKey(new Date());
   document.getElementById("weight-hist").innerHTML = weights.map((w, i) => ({ w, i })).reverse().slice(0, 10).map(({ w, i }) =>
     `<div class="row-hist"><span>${fmt(fromKey(w.date), { day: "numeric", month: "short", year: "numeric" })}</span><span><b>${w.weight} kg</b> <button class="x" onclick="delWeight(${i})" aria-label="Elimina">✕</button></span></div>`).join("");
 
+  renderMeasures();
   document.getElementById("photos").innerHTML = photos.length ? photos.map((p, i) => ({ p, i })).reverse().map(({ p, i }) =>
     `<figure><img src="${p.src}" alt="Foto del ${fmt(new Date(p.date), { day: "numeric", month: "short" })}"><button class="x" onclick="delPhoto(${i})" aria-label="Elimina">✕</button>
       <figcaption>${fmt(new Date(p.date), { day: "numeric", month: "short" })}${p.weight ? " · " + p.weight + " kg" : ""}</figcaption></figure>`).join("")
     : `<p class="muted small" style="grid-column:1/-1;margin:0">Nessuna foto per ora.</p>`;
 }
+
+function delta(m, a, b) {
+  if (a == null || b == null) return null;
+  const d = Math.round((b - a) * 10) / 10;
+  const good = d === 0 ? "same" : ((d < 0) === (m.dir === "down") ? "good" : "bad");
+  return { d, txt: (d > 0 ? "+" : d < 0 ? "−" : "±") + Math.abs(d).toString().replace(".", ",") + " cm", cls: good };
+}
+function renderMeasures() {
+  const list = [...measures].sort((a, b) => a.date.localeCompare(b.date));
+  const first = list[0], last = list[list.length - 1];
+  const sh = k => fmt(fromKey(k), { day: "numeric", month: "short", year: "numeric" });
+  document.getElementById("m-range").textContent = list.length > 1 ? `${sh(first.date).replace(/ \d{4}$/, "")} → ${sh(last.date)}` : "";
+  let html = "";
+  if (list.length > 1) {
+    const lost = ["vita", "pancia", "fianchi"].reduce((s, id) => s + ((first[id] != null && last[id] != null) ? Math.max(0, first[id] - last[id]) : 0), 0);
+    const gained = ["torace", "bdx", "bsn", "cdx", "csn"].reduce((s, id) => s + ((first[id] != null && last[id] != null) ? Math.max(0, last[id] - first[id]) : 0), 0);
+    html += `<div class="hero-m"><b>−${lost} cm</b> <span class="muted">persi tra vita e pancia</span><br><b>+${gained} cm</b> <span class="muted">guadagnati tra torace, braccia e cosce</span></div>`;
+    html += `<div class="m-sum">` + MEASURES.filter(m => first[m.id] != null && last[m.id] != null).map(m => {
+      const d = delta(m, first[m.id], last[m.id]);
+      return `<div class="m-box"><div class="lbl">${m.label}</div><div class="val ${d.cls}">${d.txt}</div><div class="from">${first[m.id]} → ${last[m.id]} cm</div></div>`;
+    }).join("") + `</div>`;
+  } else html = `<p class="muted small">Aggiungi un secondo rilevamento per vedere i centimetri persi e guadagnati.</p>`;
+  document.getElementById("m-summary").innerHTML = html;
+
+  const cols = MEASURES.filter(m => list.some(r => r[m.id] != null));
+  document.getElementById("m-table").innerHTML = `<table class="tbl"><thead><tr><th>Data</th><th>Peso</th>${cols.map(m => `<th>${m.label}</th>`).join("")}<th></th></tr></thead><tbody>` +
+    list.map((r, i) => `<tr><td>${sh(r.date)}</td><td>${r.peso ?? "–"}</td>${cols.map(m => {
+      const prev = i ? list[i - 1][m.id] : null, d = i ? delta(m, prev, r[m.id]) : null;
+      return `<td>${r[m.id] ?? "–"}${d && d.d !== 0 ? ` <span class="${d.cls}" style="font-size:11px">${d.txt.replace(" cm", "")}</span>` : ""}</td>`;
+    }).join("")}<td><button class="x" onclick="delMeasure('${r.date}')" aria-label="Elimina">✕</button></td></tr>`).join("") + `</tbody></table>`;
+
+  document.getElementById("m-date").value = toKey(new Date());
+  if (!document.getElementById("m-fields").children.length)
+    document.getElementById("m-fields").innerHTML = [{ id: "peso", label: "Peso (kg)" }, ...MEASURES.map(m => ({ id: m.id, label: m.label + " (cm)" }))].map(f =>
+      `<div class="field"><label for="mf-${f.id}">${f.label}</label><input id="mf-${f.id}" type="number" step="0.5" inputmode="decimal"></div>`).join("");
+}
+function addMeasure() {
+  const d = document.getElementById("m-date").value; if (!d) return alert("Scegli la data.");
+  const row = { date: d }; let any = false;
+  ["peso", ...MEASURES.map(m => m.id)].forEach(id => {
+    const v = parseFloat(String(document.getElementById("mf-" + id).value).replace(",", "."));
+    if (!isNaN(v)) { row[id] = v; any = true; }
+    document.getElementById("mf-" + id).value = "";
+  });
+  if (!any) return alert("Scrivi almeno una misura.");
+  measures = measures.filter(m => m.date !== d); measures.push(row); store(MEASURE_KEY, measures);
+  if (row.peso) { weights = weights.filter(w => w.date !== d); weights.push({ date: d, weight: row.peso }); weights.sort((a, b) => a.date.localeCompare(b.date)); store(WEIGHT_KEY, weights); }
+  document.querySelector("details.add").open = false; renderProgress();
+}
+function delMeasure(date) { if (confirm("Eliminare le misure di questa data?")) { measures = measures.filter(m => m.date !== date); store(MEASURE_KEY, measures); renderProgress(); } }
 
 function addWeight() {
   const v = parseFloat(String(document.getElementById("w-val").value).replace(",", ".")), d = document.getElementById("w-date").value;
@@ -806,7 +913,7 @@ function saveProfile() {
   p.sex = document.getElementById("p-sex").value; save(); alert("Salvato.");
 }
 function exportBackup() {
-  const data = JSON.stringify({ app: "dieta-emanuele", version: 2, date: new Date().toISOString(), state, weights, photos });
+  const data = JSON.stringify({ app: "dieta-emanuele", version: 2, date: new Date().toISOString(), state, weights, photos, measures });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([data], { type: "application/json" }));
   a.download = `backup-dieta-${toKey(new Date())}.json`; a.click();
@@ -820,7 +927,7 @@ function importBackup(ev) {
       const b = JSON.parse(e.target.result);
       if (b.app !== "dieta-emanuele" || !b.state) throw new Error();
       if (!confirm("Sostituire i dati di questo telefono con quelli del backup?")) return;
-      state = b.state; weights = b.weights || []; photos = b.photos || [];
+      state = b.state; weights = b.weights || []; photos = b.photos || []; if (b.measures) { measures = b.measures; store(MEASURE_KEY, measures); }
       save(); store(WEIGHT_KEY, weights); store(PHOTOS_KEY, photos);
       alert("Backup caricato."); location.reload();
     } catch (err) { alert("Questo file non è un backup valido."); }
