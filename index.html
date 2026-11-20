@@ -258,7 +258,7 @@
 
     <div class="card">
       <h3>La tua settimana</h3>
-      <p class="muted small" style="margin:4px 0 12px">Quale giornata del piano fai in ogni giorno. Il singolo giorno si può cambiare anche dalla schermata Oggi.</p>
+      <p class="muted small" style="margin:4px 0 12px">Quale giornata del piano fai in ogni giorno. Se una settimana ti alleni il sabato invece del venerdì, cambia il singolo giorno dalla schermata Oggi.</p>
       <div id="week-map"></div>
     </div>
 
@@ -526,7 +526,9 @@ const SHOP = [
 const KEY = "dieta-emanuele-v2";
 const WEIGHT_KEY = "menu-oggi-weight-v21-Emanuele";   // stesso salvataggio della vecchia app
 const PHOTOS_KEY = "menu-oggi-photos-v21-Emanuele";   // stesso salvataggio della vecchia app
-const DEFAULT_WEEK = { 1: "A1", 2: "A2", 3: "A3", 4: "R1", 5: "R2", 6: "R3", 0: "R4" }; // 0 = domenica
+// Settimana base: allenamento martedì, giovedì e venerdì (o sabato), riposo gli altri giorni. 0 = domenica
+const DEFAULT_WEEK = { 1: "R2", 2: "A1", 3: "R3", 4: "A2", 5: "A3", 6: "R1", 0: "R4" };
+const WEEK_VERSION = 2;
 
 function load(key, fallback) { try { const v = JSON.parse(localStorage.getItem(key)); return v ?? fallback; } catch (e) { return fallback; } }
 function store(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch (e) { return false; } }
@@ -538,7 +540,7 @@ if (!state) {
   state = { week: { ...DEFAULT_WEEK }, overrides: {}, days: {}, shop: {},
     profile: { height: p.height || 175, age: p.age || 30, sex: p.gender || "M", start: p.startWeight || 72, target: p.targetWeight || 80 } };
 }
-state.week = state.week || { ...DEFAULT_WEEK };
+if (!state.week || state.weekVersion !== WEEK_VERSION) { state.week = { ...DEFAULT_WEEK }; state.weekVersion = WEEK_VERSION; }
 state.overrides = state.overrides || {};
 state.days = state.days || {};
 state.shop = state.shop || {};
@@ -795,7 +797,7 @@ function renderInfo() {
     `<div class="field" style="flex-direction:row;align-items:center;justify-content:space-between;gap:12px">
       <label for="wm-${wd}" style="font-size:15px;color:var(--ink)">${DAY_NAMES[wd]}</label>
       <select id="wm-${wd}" style="max-width:220px" onchange="setWeekday(${wd},this.value)">${TYPE_ORDER.map(id => `<option value="${id}" ${state.week[wd] === id ? "selected" : ""}>${DAY_TYPES[id].label}</option>`).join("")}</select></div>`).join("")
-    + `<button class="btn block" onclick="resetWeek()">Torna all'ordine del documento</button>`;
+    + `<button class="btn block" onclick="resetWeek()">Torna alla settimana base</button>`;
   const p = state.profile;
   document.getElementById("p-height").value = p.height; document.getElementById("p-age").value = p.age;
   document.getElementById("p-start").value = p.start; document.getElementById("p-target").value = p.target;
