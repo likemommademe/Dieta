@@ -465,12 +465,11 @@ const DAY_TYPES = {
   },
   R2: { label: "2° giorno di riposo", short: "Riposo 2", kind: "rest",
     pranzo: { items: [
-      { t: "Insalata di farro: 80 g di farro integrale (o riso basmati integrale), verdurine miste a piacere e un barattolino di ceci", k: 470 },
-      { t: "Un piatto di insalata mista", k: 25 } ] },
+      { t: "Insalata con pomodori e 2 scatolette di tonno", k: 230 },
+      { t: "100 g di pane di segale integrale", k: 250 } ] },
     cena: { items: [
-      { t: "300 g di pesce (merluzzo, persico, filetto di cernia o di orata, nasello)", k: 270 },
-      { t: "Verdura cotta (fagiolini, zucchine, melanzane…)", k: 40 },
-      { t: "Un frutto", k: 70 } ] }
+      { t: "Minestra di lenticchie o di fagioli con 60 g di pasta", k: 450 },
+      { t: "Verdura a piacere", k: 40 } ] }
   },
   R3: { label: "3° giorno di riposo", short: "Riposo 3", kind: "rest",
     pranzo: { items: [
@@ -512,17 +511,17 @@ const SHOP = [
     ["Arance o frutta e verdura per estratti", "3 spremute"],
     ["Frutti rossi", "4 porzioni"],
     ["Pomodori pachino", "2 vaschette"],
-    ["Pomodori e cetrioli", "per l'insalata greca"],
+    ["Pomodori", "per l'insalata con tonno e l'insalata greca"],
+    ["Cetrioli", "per l'insalata greca"],
     ["Zucchine", "circa 1 kg"],
     ["Insalata mista", "5 piatti"],
     ["Verdure da cuocere (fagiolini, melanzane…)", "4–5 porzioni"],
     ["Verdure per il minestrone", "1 porzione"],
     ["Finocchi e carote", "per la merenda"] ] },
   { cat: "Pane, pasta e cereali", i: "🍞", items: [
-    ["Pane di segale integrale", "circa 310 g"],
-    ["Pasta integrale Senatore Cappelli", "circa 350 g"],
+    ["Pane di segale integrale", "circa 410 g"],
+    ["Pasta integrale Senatore Cappelli", "circa 410 g"],
     ["Riso basmati integrale", "circa 200 g"],
-    ["Farro integrale", "80 g"],
     ["Fiocchi d'avena integrali", "1 confezione"],
     ["Cereali integrali", "1 confezione"],
     ["Friselle integrali", "1 confezione"],
@@ -533,11 +532,11 @@ const SHOP = [
     ["Carne bianca (pollo, tacchino, vitella, arista)", "circa 1,2 kg"],
     ["Carne magra di manzo", "300 g"] ] },
   { cat: "Pesce", i: "🐟", items: [
-    ["Pesce bianco (merluzzo, nasello, persico, cernia, orata)", "circa 600 g"],
+    ["Pesce bianco (merluzzo, nasello, persico)", "300 g"],
     ["Pesce spada, aringa, tonno fresco o salmone", "300 g"],
     ["Per il riso: gamberi, misto mare o salmone", "a scelta"],
     ["Salmone affumicato", "1 confezione"],
-    ["Tonno in scatola", "1–2 scatolette"] ] },
+    ["Tonno in scatola", "3–4 scatolette"] ] },
   { cat: "Latticini e uova", i: "🥛", items: [
     ["Yogurt greco 0%", "circa 8 vasetti da 170 g"],
     ["Uova bio", "6"],
@@ -549,8 +548,8 @@ const SHOP = [
     ["Feta", "150 g"],
     ["Mozzarella", "1"] ] },
   { cat: "Legumi, frutta secca e dispensa", i: "🥜", items: [
-    ["Ceci in barattolo", "2"],
-    ["Fagioli o ceci in barattolo", "1 per la minestra"],
+    ["Lenticchie o fagioli in barattolo", "1 per la minestra del giorno di riposo 2"],
+    ["Fagioli o ceci in barattolo", "1 per la minestra del giorno di riposo 3"],
     ["Noci", "1 confezione"],
     ["Frutta secca (nocciole, mandorle, pistacchi)", "circa 200 g"],
     ["Olive", "1 vasetto"],
