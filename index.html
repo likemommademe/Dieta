@@ -637,9 +637,9 @@ const SHOP = [
 const KEY = "dieta-emanuele-v2";
 const WEIGHT_KEY = "menu-oggi-weight-v21-Emanuele";   // stesso salvataggio della vecchia app
 const PHOTOS_KEY = "menu-oggi-photos-v21-Emanuele";   // stesso salvataggio della vecchia app
-// Settimana base: allenamento martedì, giovedì e venerdì (o sabato), riposo gli altri giorni. 0 = domenica
-const DEFAULT_WEEK = { 1: "R2", 2: "A1", 3: "R3", 4: "A2", 5: "A3", 6: "R1", 0: "R4" };
-const WEEK_VERSION = 2;
+// Settimana base, da domenica a sabato: allenamento martedì, giovedì e venerdì, riposo gli altri giorni. 0 = domenica
+const DEFAULT_WEEK = { 0: "R4", 1: "R2", 2: "A1", 3: "R1", 4: "A2", 5: "A3", 6: "R3" };
+const WEEK_VERSION = 3;
 
 function load(key, fallback) { try { const v = JSON.parse(localStorage.getItem(key)); return v ?? fallback; } catch (e) { return fallback; } }
 function store(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch (e) { return false; } }
@@ -694,7 +694,7 @@ const pad = n => String(n).padStart(2, "0");
 const toKey = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const fromKey = k => { const [y, m, d] = k.split("-").map(Number); return new Date(y, m - 1, d); };
 const addDays = (d, n) => { const r = new Date(d); r.setDate(r.getDate() + n); return r; };
-const mondayOf = d => addDays(d, -((d.getDay() + 6) % 7));
+const sundayOf = d => addDays(d, -d.getDay());  // la settimana va da domenica a sabato
 const DAY_NAMES = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"];
 const fmt = (d, o) => d.toLocaleDateString("it-IT", o);
 
@@ -744,7 +744,7 @@ function needKcal(key) {
 /* ========================================================================== */
 
 function renderStrip() {
-  const mon = mondayOf(fromKey(selected)), todayK = toKey(new Date());
+  const mon = sundayOf(fromKey(selected)), todayK = toKey(new Date());
   let h = "";
   for (let i = 0; i < 7; i++) {
     const d = addDays(mon, i), k = toKey(d), kind = DAY_TYPES[typeOf(k)].kind;
@@ -820,7 +820,7 @@ function describe(meal) {
 }
 
 function renderWeek() {
-  const order = [1, 2, 3, 4, 5, 6, 0];
+  const order = [0, 1, 2, 3, 4, 5, 6];
   document.getElementById("week-list").innerHTML = order.map((wd, n) => {
     const id = state.week[wd], t = DAY_TYPES[id];
     return `<div class="card wday" id="wd-${wd}">
@@ -835,8 +835,7 @@ function renderWeek() {
   }).join("");
 }
 function openWeekday(wd) {
-  const mon = mondayOf(new Date());
-  selected = toKey(addDays(mon, (wd + 6) % 7));
+  selected = toKey(addDays(sundayOf(new Date()), wd));
   tab("oggi");
 }
 
@@ -1192,7 +1191,7 @@ function openTraining(typeId) { const cur = trCurrent(); trSel = { w: cur.w, d: 
 
 function renderInfo() {
   document.getElementById("banned").innerHTML = BANNED.map(b => `<span class="tag">${b}</span>`).join("");
-  document.getElementById("week-map").innerHTML = [1, 2, 3, 4, 5, 6, 0].map(wd =>
+  document.getElementById("week-map").innerHTML = [0, 1, 2, 3, 4, 5, 6].map(wd =>
     `<div class="field" style="flex-direction:row;align-items:center;justify-content:space-between;gap:12px">
       <label for="wm-${wd}" style="font-size:15px;color:var(--ink)">${DAY_NAMES[wd]}</label>
       <select id="wm-${wd}" style="max-width:220px" onchange="setWeekday(${wd},this.value)">${TYPE_ORDER.map(id => `<option value="${id}" ${state.week[wd] === id ? "selected" : ""}>${DAY_TYPES[id].label}</option>`).join("")}</select></div>`).join("")
