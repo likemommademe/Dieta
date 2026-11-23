@@ -25,6 +25,8 @@
     --rest: #4A90D9;
     --rest-soft: #E4EFFB;
     --accent: #2FA36B;
+    --hot: #E0452B;
+    --hot-soft: #FDE9E5;
     --on-accent: #FFFFFF;
     --radius: 18px;
     --shadow: 0 1px 2px rgba(36,48,42,.04), 0 8px 22px rgba(36,48,42,.06);
@@ -174,9 +176,48 @@
   details.add summary { cursor: pointer; font-weight: 700; padding: 10px 0 4px; list-style: none; color: var(--train); }
   details.add summary::-webkit-details-marker { display: none; }
 
+
+  /* Allenamento */
+  .maxes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .wk-months { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 4px; }
+  .wk-months span { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-faint); text-align: center; border-bottom: 1px solid var(--line); padding-bottom: 3px; }
+  .wk-strip { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; margin-bottom: 12px; }
+  .wk { border: 1px solid transparent; background: none; border-radius: 12px; padding: 7px 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .wk b { font-family: 'Chakra Petch', sans-serif; font-size: 15px; }
+  .wk .bar { width: 22px; height: 4px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+  .wk .bar i { display: block; height: 100%; background: var(--train); }
+  .wk.sel { background: var(--surface); border-color: var(--line); box-shadow: var(--shadow); }
+  .wk.cur b { text-decoration: underline; text-underline-offset: 3px; }
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; background: var(--surface-2); padding: 4px; border-radius: 14px; margin-bottom: 12px; }
+  .seg button { border: 0; background: none; border-radius: 10px; padding: 8px 4px; font-weight: 700; font-size: 13px; cursor: pointer; color: var(--ink-soft); }
+  .seg button.on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+  .seg button small { display: block; font-weight: 600; font-size: 11px; color: var(--ink-faint); }
+  .ex-head { display: flex; gap: 12px; align-items: flex-start; }
+  .ex-n { flex: none; width: 30px; height: 30px; border-radius: 10px; background: var(--surface-2); display: grid; place-items: center; font-family: 'Chakra Petch', sans-serif; font-weight: 700; }
+  .ex.main .ex-n { background: var(--train); color: #fff; }
+  .ex.done .ex-n { background: var(--train-soft); color: var(--train); }
+  .ex h3 { font-size: 17px; line-height: 1.2; }
+  .ex-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .pill { background: var(--surface-2); border-radius: 999px; padding: 3px 10px; font-size: 13px; font-weight: 700; }
+  .pill.w { background: var(--train-soft); color: var(--train); }
+  .pill.tag { background: #FFF3DC; color: #A86A00; }
+  .sets { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 10px; }
+  .set { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--line); background: var(--surface); font-weight: 700; font-size: 13px; color: var(--ink-faint); cursor: pointer; }
+  .set.on { background: var(--train); border-color: var(--train); color: #fff; }
+  .ex .field { margin-bottom: 0; }
+  .ex .field input { padding: 9px 11px; }
+  .ex .grid2 > * { min-width: 0; }
+  .yt { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 13px; font-weight: 700; color: var(--ink-soft); text-decoration: none; border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; }
+  .yt::before { content: "▶"; color: #fff; background: #FF0033; border-radius: 6px; font-size: 9px; padding: 3px 6px; }
+  .prev { font-size: 12px; color: var(--ink-faint); margin-top: 8px; }
+  .prev.up { color: var(--hot); font-weight: 700; }
+  .pill.w.old { background: var(--surface-2); color: var(--ink-faint); text-decoration: line-through; }
+  .pill.hot { background: var(--hot); color: #fff; }
+  .ex .field input.hot { border-color: var(--hot); background: var(--hot-soft); color: var(--hot); font-weight: 700; }
+
   /* Menu in basso */
   .nav { position: fixed; left: 0; right: 0; bottom: 0; background: color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); z-index: 10; }
-  .nav-in { max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); }
+  .nav-in { max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: repeat(6, 1fr); }
   .nav button { border: 0; background: none; padding: 9px 0 10px; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; font-weight: 700; color: var(--ink-faint); cursor: pointer; }
   .nav button svg { width: 22px; height: 22px; }
   .nav button.active { color: var(--train); }
@@ -263,6 +304,29 @@
     </div>
   </section>
 
+
+  <!-- ============ ALLENAMENTO ============ -->
+  <section class="view" id="view-palestra">
+    <div class="top">
+      <div><div class="eyebrow" id="tr-eyebrow">Scheda di 8 settimane</div><h1>Allenamento</h1></div>
+      <button class="btn" onclick="trGoCurrent()">Adesso</button>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:10px"><span class="em">🏋️</span>Massimali</h3>
+      <div class="maxes">
+        <div class="kcal-box"><b>65 kg</b><span>Panca piana</span></div>
+        <div class="kcal-box"><b>90 kg</b><span>Stacco da terra</span></div>
+        <div class="kcal-box"><b>75 kg</b><span>Squat</span></div>
+      </div>
+    </div>
+    <div class="wk-months"><span>Mese 1</span><span>Mese 2</span></div>
+    <div class="wk-strip" id="wk-strip"></div>
+    <div class="seg" id="tr-days"></div>
+    <div class="card" id="tr-summary"></div>
+    <div id="tr-list"></div>
+    <p class="note">Tocca i cerchi per segnare le serie fatte. Se cambi peso scrivilo in «Peso nuovo»: diventa rosso e la settimana dopo te lo ricordo. Peso e note si salvano da soli.</p>
+  </section>
+
   <!-- ============ INFO ============ -->
   <section class="view" id="view-info">
     <div class="top"><div><div class="eyebrow">Regole e impostazioni</div><h1>Info</h1></div></div>
@@ -320,6 +384,7 @@
   <button data-tab="oggi" class="active" onclick="tab('oggi')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><path d="M12 8v4l2.5 2"/></svg>Oggi</button>
   <button data-tab="settimana" onclick="tab('settimana')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Settimana</button>
   <button data-tab="spesa" onclick="tab('spesa')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 11H6.2z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>Spesa</button>
+  <button data-tab="palestra" onclick="tab('palestra')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6.5 7v10M17.5 7v10M3.5 9.5v5M20.5 9.5v5M6.5 12h11"/></svg>Palestra</button>
   <button data-tab="progressi" onclick="tab('progressi')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18l5-6 4 3 7-8"/><path d="M15 7h5v5"/></svg>Progressi</button>
   <button data-tab="info" onclick="tab('info')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 11v5M12 8h.01"/></svg>Info</button>
 </div></nav>
@@ -706,6 +771,7 @@ function renderDay() {
       <div class="kcal-box"><b>${need}</b><span>🔥 fabbisogno</span></div>
     </div>
     <div class="progress"><div style="width:${Math.min(100, planned ? eaten / planned * 100 : 0)}%"></div></div>
+    ${t.kind === "train" ? `<button class="btn block" style="margin-top:12px" onclick="openTraining('${typeId}')">🏋️ Vedi l'allenamento: giorno ${typeId.slice(1)}</button>` : ""}
     <p class="note">Calorie stimate da noi, non indicate dalla nutrizionista.${state.overrides[key] ? ` · Giornata cambiata a mano. <a href="#" onclick="setType('');return false" style="color:inherit">Ripristina</a>` : ""}</p>`;
 
   document.getElementById("day-meals").innerHTML = MEALS.map(m => {
@@ -920,6 +986,186 @@ function addPhoto(ev) {
 function delPhoto(i) { if (confirm("Eliminare questa foto?")) { photos.splice(i, 1); store(PHOTOS_KEY, photos); renderProgress(); } }
 
 /* ========================================================================== */
+/* 8b. ALLENAMENTO (scheda di 8 settimane)                                    */
+/*     riga: "Nome|schema|carico|etichetta|percentuale"                       */
+/* ========================================================================== */
+
+const TR_WEEKS = [
+  { n: 1, titolo: "Accumulo & 6×4", days: [
+    ["Panca Piana|6x4|53,0 kg|Main|81,5%", "Squat corpo libero|3x10|+20 kg", "Trazioni Assistite|3x10|25 kg", "Spinte panca inclinata manubri (lv 5)|3x10|14 kg", "Alzate Laterali Manubri|3x10|7 kg", "Pushdown sbarra dritta|3x10|18 kg", "Plank|3x45 secondi|"],
+    ["Stacco da terra|6x4|72,5 kg (20 kg per lato + bilanciere)|Main|80,8%", "Lento Avanti Manubri (lv 7)|3x8|16 kg", "Lat Machine Presa Larga|3x10|39 kg", "Chest Press|3x10|38,5 kg", "Rear Delt Machine|3x10|39 kg", "Curl bicipiti con il bilanciere|3x10|4 kg per lato"],
+    ["T-Bar Row presa stretta|6x4|30 kg|Main|83,3%", "Dips Assistite|3x10|30 kg", "Leg Extension|3x10|36 kg", "Leg Curl|2x10|23 kg", "Alzate Laterali al Cavo Basso|3x10|2,3 kg", "Superserie: Pushdown cavo alto corda + Curl martello manubri|3x10|Trici 15 kg / Bici 9 kg", "Barchetta|3x30 secondi|"] ] },
+  { n: 2, titolo: "Incremento volume & 6×5", days: [
+    ["Panca Piana|6x5|53,0 kg|Main|81,5%", "Squat corpo libero|3x10|+20 kg", "Trazioni Assistite|3x10|25 kg", "Spinte panca inclinata manubri (lv 5)|3x10|14 kg", "Alzate Laterali Manubri|3x10|7 kg", "Pushdown sbarra dritta|3x10|18 kg", "Plank|3x45 secondi|"],
+    ["Stacco da terra|6x5|72,5 kg|Main|80,8%", "Lento Avanti Manubri (lv 7)|3x8|16 kg", "Lat Machine Presa Larga|3x10|34 kg", "Chest Press|3x10|36 kg", "Rear Delt Machine|3x10|39 kg", "Curl bicipiti con il bilanciere|3x10|4 kg per lato"],
+    ["T-Bar Row presa stretta|6x5|30 kg|Main|83,3%", "Dips Assistite|3x10|30 kg", "Leg Extension|3x10|36 kg", "Leg Curl|2x10|23 kg", "Alzate Laterali al Cavo Basso|3x10|2,3 kg", "Superserie: Pushdown corda + Curl martello|3x10|Trici 15 kg / Bici 9 kg", "Barchetta|3x30 secondi|"] ] },
+  { n: 3, titolo: "Picco di volume & 6×5", days: [
+    ["Panca Piana|6x5|54,0 kg|Main|83%", "Squat corpo libero|3x10|+20 kg", "Trazioni Assistite|3x10|25 kg", "Spinte panca inclinata manubri (lv 5)|3x10|14 kg", "Alzate Laterali Manubri|3x10|7 kg", "Pushdown sbarra dritta|3x10|18 kg", "Plank|3x45 secondi|"],
+    ["Stacco da terra|6x5|75,0 kg|Main|83,3%", "Lento Avanti Manubri (lv 7)|3x8|16 kg", "Lat Machine Presa Larga|3x10|34 kg", "Chest Press|3x10|43 kg", "Rear Delt Machine|3x10|39 kg", "Curl bicipiti con il bilanciere|3x10|5 kg per lato"],
+    ["T-Bar Row presa stretta|6x5|32,5 kg|Main|83,3%", "Dips Assistite|3x10|30 kg", "Leg Extension|3x10|36 kg", "Leg Curl|2x10|23 kg", "Alzate Laterali al Cavo Basso|3x10|2,3 kg", "Superserie: Pushdown corda + Curl martello|3x10|Trici 15 kg / Bici 9 kg", "Barchetta|3x30 secondi|"] ] },
+  { n: 4, titolo: "Scarico & picco mese 1", days: [
+    ["Panca Piana|4x2|57,5 kg|Picco|89,5%", "Squat corpo libero|3x8|+20 kg", "Trazioni Assistite|3x8|25 kg", "Spinte panca inclinata manubri (lv 5)|3x8|14 kg", "Alzate Laterali Manubri|3x10|7 kg", "Pushdown sbarra dritta|3x10|18 kg", "Plank|3x45 secondi|"],
+    ["Stacco da terra|4x2|75,0 – 77,5 kg|Picco|84,6%", "Lento Avanti Manubri (lv 7)|3x8|16 kg", "Lat Machine Presa Larga|3x10|34 kg", "Chest Press|3x10|36 kg", "Rear Delt Machine|3x10|39 kg", "Curl bicipiti con il bilanciere|3x10|4 kg per lato"],
+    ["T-Bar Row presa stretta|4x2|35 kg|Picco|84,6%", "Dips Assistite|3x8|18 kg", "Leg Extension|3x10|36 kg", "Leg Curl|2x10|23 kg", "Alzate Laterali al Cavo Basso|3x10|2,3 kg", "Superserie: Pushdown corda + Curl martello|3x10|Trici 15 kg / Bici 9 kg", "Barchetta|3x30 secondi|"] ] },
+  { n: 5, titolo: "Accumulo intenso & 6×4", days: [
+    ["Panca Piana|6x4|55,0 kg|Main|84,2%", "Squat corpo libero|3x10|+22,5 kg", "Trazioni Assistite|3x10|22,5 kg", "Spinte panca inclinata manubri (lv 5)|3x10|16 kg", "Alzate Laterali Manubri|3x10|8 kg", "Pushdown sbarra dritta|3x10|20 kg", "Plank|3x50 secondi|"],
+    ["Stacco da terra|6x4|77,5 kg|Main|84,6%", "Lento Avanti Manubri (lv 7)|3x8|18 kg", "Lat Machine Presa Larga|3x10|37 kg", "Chest Press|3x10|39 kg", "Rear Delt Machine|3x10|42 kg", "Curl bicipiti con il bilanciere|3x10|5 kg per lato"],
+    ["T-Bar Row presa stretta|6x4|32,5 kg|Main|84,6%", "Dips Assistite|3x10|25 kg", "Leg Extension|3x10|39 kg", "Leg Curl|2x10|25 kg", "Alzate Laterali al Cavo Basso|3x10|3,3 kg", "Superserie: Pushdown corda + Curl martello|3x10|Trici 18 kg / Bici 10 kg", "Barchetta|3x35 secondi|"] ] },
+  { n: 6, titolo: "Incremento volume & 6×5", days: [
+    ["Panca Piana|6x5|55,0 kg|Main|84,2%", "Squat corpo libero|3x10|+22,5 kg", "Trazioni Assistite|3x10|22,5 kg", "Spinte panca inclinata manubri (lv 5)|3x10|16 kg", "Alzate Laterali Manubri|3x10|8 kg", "Pushdown sbarra dritta|3x10|20 kg", "Plank|3x50 secondi|"],
+    ["Stacco da terra|6x5|77,5 kg|Main|84,6%", "Lento Avanti Manubri (lv 7)|3x8|18 kg", "Lat Machine Presa Larga|3x10|37 kg", "Chest Press|3x10|39 kg", "Rear Delt Machine|3x10|42 kg", "Curl bicipiti con il bilanciere|3x10|5 kg per lato"],
+    ["T-Bar Row presa stretta|6x5|32,5 kg|Main|84,6%", "Dips Assistite|3x10|25 kg", "Leg Extension|3x10|39 kg", "Leg Curl|2x10|25 kg", "Alzate Laterali al Cavo Basso|3x10|3,3 kg", "Superserie: Pushdown corda + Curl martello|3x10|Trici 18 kg / Bici 10 kg", "Barchetta|3x35 secondi|"] ] },
+  { n: 7, titolo: "Picco di volume & 6×5", days: [
+    ["Panca Piana|6x5|56,0 kg|Main|86,0%", "Squat corpo libero|3x10|+25 kg", "Trazioni Assistite|3x10|20 kg", "Spinte panca inclinata manubri (lv 5)|3x10|16 kg", "Alzate Laterali Manubri|3x10|8 kg", "Pushdown sbarra dritta|3x10|20 kg", "Plank|3x50 secondi|"],
+    ["Stacco da terra|6x5|77,5 – 80,0 kg|Main|86,0%", "Lento Avanti Manubri (lv 7)|3x8|18 kg", "Lat Machine Presa Larga|3x10|37 kg", "Chest Press|3x10|39 kg", "Rear Delt Machine|3x10|42 kg", "Curl bicipiti con il bilanciere|3x10|5 kg per lato"],
+    ["T-Bar Row presa stretta|6x5|35 kg|Main|86,0%", "Dips Assistite|3x10|25 kg", "Leg Extension|3x10|39 kg", "Leg Curl|2x10|25 kg", "Alzate Laterali al Cavo Basso|3x10|3,3 kg", "Superserie: Pushdown corda + Curl martello|3x10|Trici 18 kg / Bici 10 kg", "Barchetta|3x35 secondi|"] ] },
+  { n: 8, titolo: "Peak finale", days: [
+    ["Panca Piana|4x2|57,5 – 60,0 kg|Peak finale|89,5%", "Squat corpo libero|3x8|+25 kg", "Trazioni Assistite|3x8|20 kg", "Spinte panca inclinata manubri (lv 5)|3x8|16 kg", "Alzate Laterali Manubri|3x10|8 kg", "Pushdown sbarra dritta|3x10|20 kg", "Plank|3x45 secondi|"],
+    ["Stacco da terra|4x2|80,0 – 82,5 kg|Peak finale|89,5%", "Lento Avanti Manubri (lv 7)|3x8|20 kg", "Lat Machine Presa Larga|3x10|40 kg", "Chest Press|3x10|42 kg", "Rear Delt Machine|3x10|45 kg", "Curl bicipiti con il bilanciere|3x10|5,5 kg per lato"],
+    ["T-Bar Row presa stretta|4x2|37,5 kg|Peak finale|89,5%", "Dips Assistite|3x8|20 kg", "Leg Extension|3x10|42 kg", "Leg Curl|2x10|27 kg", "Alzate Laterali al Cavo Basso|3x10|4 kg", "Superserie: Pushdown corda + Curl martello|3x10|Trici 20 kg / Bici 12 kg", "Barchetta|3x40 secondi|"] ] }
+];
+const TR_DAY_NAMES = ["Full Body", "Focus squat e spinta", "Focus trazione e volume"];
+// Ricerca su YouTube del tutorial in italiano per ogni esercizio
+const TR_VIDEO = {
+  "Panca Piana": "panca piana bilanciere esecuzione corretta",
+  "Squat corpo libero": "squat con manubrio goblet squat esecuzione corretta",
+  "Trazioni Assistite": "trazioni assistite macchina esecuzione corretta",
+  "Spinte panca inclinata manubri (lv 5)": "distensioni panca inclinata manubri esecuzione corretta",
+  "Alzate Laterali Manubri": "alzate laterali manubri esecuzione corretta",
+  "Pushdown sbarra dritta": "pushdown tricipiti sbarra dritta cavo esecuzione corretta",
+  "Plank": "plank esecuzione corretta",
+  "Stacco da terra": "stacco da terra esecuzione corretta",
+  "Lento Avanti Manubri (lv 7)": "lento avanti manubri seduto esecuzione corretta",
+  "Lat Machine Presa Larga": "lat machine presa larga esecuzione corretta",
+  "Chest Press": "chest press macchina esecuzione corretta",
+  "Rear Delt Machine": "rear delt machine reverse fly macchina esecuzione",
+  "Curl bicipiti con il bilanciere": "curl bilanciere bicipiti esecuzione corretta",
+  "T-Bar Row presa stretta": "t-bar row rematore presa stretta esecuzione corretta",
+  "Dips Assistite": "dips assistite macchina esecuzione corretta",
+  "Leg Extension": "leg extension esecuzione corretta",
+  "Leg Curl": "leg curl esecuzione corretta",
+  "Alzate Laterali al Cavo Basso": "alzate laterali cavo basso esecuzione corretta",
+  "Superserie: Pushdown cavo alto corda + Curl martello manubri": "pushdown corda e curl a martello esecuzione corretta",
+  "Superserie: Pushdown corda + Curl martello": "pushdown corda e curl a martello esecuzione corretta",
+  "Barchetta": "hollow hold barchetta addominali esecuzione corretta"
+};
+const trVideo = n => "https://www.youtube.com/results?search_query=" + encodeURIComponent(TR_VIDEO[n] || n + " esecuzione corretta");
+const TR_KEY = "dieta-emanuele-allenamento";
+
+function trEx(row) {
+  const [n, s, w, tag, pct] = row.split("|");
+  return { n, s: s.replace("x", "×"), w, tag, pct, sets: parseInt(s, 10) };
+}
+
+// Quello che era già fatto (✅) nella scheda, con pesi e appunti: "settimana-giorno-esercizio" (da 1)
+// s: serie fatte (se manca = tutte), w: peso usato, t: nota
+const TR_SEED = {
+  "1-1": [1,2,3,4,5,6,7].map(i => [i]),
+  "1-2": [1,2,3,4,5,6].map(i => [i]),
+  "1-3": [[1, { w: "35 kg", t: "Primi 3 set comodi, ultimi 2 a 35 kg" }], [2, { w: "27 kg", t: "Prime 2 a 30, ultima a 27" }],
+          [3, { s: 0, t: "La prima comoda, la seconda a quello dopo 36" }], [4], [5, { w: "4,5 kg", t: "La prima a 2,3 troppo leggero, poi a 4,5 kg: ho faticato e la 3ª non l'ho chiusa, ne ho fatte 5" }],
+          [6, { t: "Tricipiti non chiusi, bicipiti sì" }], [7]],
+  "2-1": [[1, { t: "La 5ª ripetizione l'ho chiusa a 3, ho faticato tanto" }], [2, { w: "30 kg" }], [3], [4], [5], [6], [7]],
+  "2-2": [[1], [2], [3], [4, { w: "43 kg" }], [5], [6]],
+  "2-3": [[1], [2, { w: "27 kg" }], [3, { w: "43 kg" }], [4], [5], [6], [7]],
+  "3-1": [[1, { s: 4, t: "Fatico troppo e divento sporco" }], [2], [3], [4], [5], [6], [7]],
+  "3-2": [[1], [2, { w: "18 kg", t: "Posso fare 18 kg" }], [3, { w: "45 kg" }], [4, { w: "50 kg", t: "1ª serie 10 ripetizioni, 2ª 8, 3ª 5" }], [5, { w: "45 kg" }], [6]],
+  "3-3": [[1], [2, { w: "18 kg" }], [3, { w: "43 kg" }], [4], [5, { w: "3,3 kg" }], [6, { w: "Trici 18 kg / Bici 10 kg" }]],
+  "4-1": [[1], [2, { w: "35 kg" }], [3, { w: "13,6 kg" }], [4, { w: "16 kg" }], [5, { w: "9 kg" }], [6]]
+};
+
+let training = load(TR_KEY, null);
+if (!training) {
+  training = { log: {} };
+  Object.entries(TR_SEED).forEach(([wd, rows]) => {
+    const [w, d] = wd.split("-").map(Number);
+    rows.forEach(([i, x = {}]) => {
+      const ex = trEx(TR_WEEKS[w - 1].days[d - 1][i - 1]);
+      training.log[`${w}-${d}-${i}`] = { s: x.s ?? ex.sets, w: x.w || "", t: x.t || "" };
+    });
+  });
+  store(TR_KEY, training);
+}
+const saveTr = () => store(TR_KEY, training);
+let trSel = null;
+
+function trLog(w, d, i) { return training.log[`${w}-${d}-${i}`] || { s: 0, w: "", t: "" }; }
+function trCount(w, d) {
+  let done = 0, tot = 0;
+  TR_WEEKS[w - 1].days[d - 1].forEach((r, i) => { const e = trEx(r); tot += e.sets; done += Math.min(e.sets, trLog(w, d, i + 1).s); });
+  return { done, tot };
+}
+// Il primo giorno non finito: è dove sei arrivato
+function trCurrent() {
+  for (let w = 1; w <= 8; w++) for (let d = 1; d <= 3; d++) { const c = trCount(w, d); if (c.done < c.tot) return { w, d }; }
+  return { w: 8, d: 3 };
+}
+const esc = t => String(t).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+
+function renderTraining() {
+  if (!trSel) trSel = trCurrent();
+  const { w, d } = trSel, cur = trCurrent(), week = TR_WEEKS[w - 1];
+  document.getElementById("tr-eyebrow").textContent = `Mese ${w <= 4 ? 1 : 2} · ${week.titolo}`;
+
+  document.getElementById("wk-strip").innerHTML = TR_WEEKS.map(x => {
+    let done = 0, tot = 0; [1, 2, 3].forEach(dd => { const c = trCount(x.n, dd); done += c.done; tot += c.tot; });
+    return `<button class="wk ${x.n === w ? "sel" : ""} ${x.n === cur.w ? "cur" : ""}" onclick="trPick(${x.n},null)"><b>S${x.n}</b><span class="bar"><i style="width:${done / tot * 100}%"></i></span></button>`;
+  }).join("");
+
+  document.getElementById("tr-days").innerHTML = [1, 2, 3].map(dd => {
+    const c = trCount(w, dd);
+    return `<button class="${dd === d ? "on" : ""}" onclick="trPick(${w},${dd})">Giorno ${dd}${c.done === c.tot ? " ✓" : ""}<small>${TR_DAY_NAMES[dd - 1]}</small></button>`;
+  }).join("");
+
+  const c = trCount(w, d);
+  document.getElementById("tr-summary").innerHTML = `
+    <div class="dayhead"><div><div class="eyebrow">Settimana ${w} · Giorno ${d}</div><h3 style="margin-top:2px">${TR_DAY_NAMES[d - 1]}</h3></div>
+      <span class="chip train">${c.done === c.tot ? "✅ Fatto" : `${c.done}/${c.tot} serie`}</span></div>
+    <div class="progress"><div style="width:${c.done / c.tot * 100}%"></div></div>
+    <div class="grid2" style="margin-top:12px">
+      <button class="btn" onclick="trAll(true)">Segna tutto fatto</button>
+      <button class="btn" onclick="trAll(false)">Azzera</button>
+    </div>`;
+
+  document.getElementById("tr-list").innerHTML = week.days[d - 1].map((r, idx) => {
+    const i = idx + 1, e = trEx(r), l = trLog(w, d, i), done = l.s >= e.sets;
+    const changed = l.w && l.w !== e.w;
+    let prev = "", prevUp = false;
+    for (let pw = w - 1; pw >= 1 && !prev; pw--) {
+      const pr = TR_WEEKS[pw - 1].days[d - 1][idx], pl = trLog(pw, d, i);
+      if (!pr || trEx(pr).n !== e.n) continue;
+      if (pl.w && pl.w !== trEx(pr).w) { prev = `Settimana ${pw}: ti eri segnato ${pl.w}`; prevUp = true; }
+      else if (pl.s) prev = `Settimana ${pw}: ${trEx(pr).w || "fatto"}`;
+    }
+    return `<div class="card ex ${e.tag ? "main" : ""} ${done ? "done" : ""}">
+      <div class="ex-head"><span class="ex-n">${done ? "✓" : i}</span><div style="flex:1">
+        <h3>${e.n}</h3>
+        <div class="ex-meta"><span class="pill">${e.s}</span>${e.w ? `<span class="pill w ${changed ? "old" : ""}">${e.w}</span>` : ""}${changed ? `<span class="pill hot">⬆ ${esc(l.w)}</span>` : ""}${e.tag ? `<span class="pill tag">${e.tag} · ${e.pct}</span>` : ""}</div>
+      </div></div>
+      <div class="sets">${Array.from({ length: e.sets }, (_, k) => `<button class="set ${k < l.s ? "on" : ""}" onclick="trSet(${i},${k})" aria-label="Serie ${k + 1}">${k + 1}</button>`).join("")}</div>
+      <div class="grid2">
+        <div class="field"><label for="trw-${i}">Peso nuovo</label><input id="trw-${i}" class="${changed ? "hot" : ""}" value="${esc(l.w)}" placeholder="${esc(e.w || "–")}" onchange="trField(${i},'w',this.value);renderTraining()"></div>
+        <div class="field"><label for="trt-${i}">Note</label><input id="trt-${i}" value="${esc(l.t)}" placeholder="come è andata" onchange="trField(${i},'t',this.value)"></div>
+      </div>
+      <a class="yt" href="${trVideo(e.n)}" target="_blank" rel="noopener">Come si fa</a>
+      ${prev ? `<div class="prev ${prevUp ? "up" : ""}">${prevUp ? "⬆" : "↩"} ${esc(prev)}</div>` : ""}
+    </div>`;
+  }).join("");
+}
+function trPick(w, d) { trSel = { w, d: d || (trCurrent().w === w ? trCurrent().d : 1) }; renderTraining(); window.scrollTo({ top: 0 }); }
+function trGoCurrent() { trSel = trCurrent(); renderTraining(); }
+function trEdit(i) { const k = `${trSel.w}-${trSel.d}-${i}`; return training.log[k] = training.log[k] || { s: 0, w: "", t: "" }; }
+function trSet(i, k) { const l = trEdit(i); l.s = l.s === k + 1 ? k : k + 1; saveTr(); renderTraining(); }
+function trField(i, f, v) { trEdit(i)[f] = v.trim(); saveTr(); }
+function trAll(on) {
+  if (!on && !confirm("Togliere tutte le serie segnate in questo giorno? Pesi e note restano.")) return;
+  TR_WEEKS[trSel.w - 1].days[trSel.d - 1].forEach((r, idx) => { trEdit(idx + 1).s = on ? trEx(r).sets : 0; });
+  saveTr(); renderTraining();
+}
+// Dalla schermata Oggi: allenamento 1/2/3 della dieta = giorno 1/2/3 della scheda
+function openTraining(typeId) { const cur = trCurrent(); trSel = { w: cur.w, d: Number(typeId.slice(1)) || cur.d }; tab("palestra"); }
+
+/* ========================================================================== */
 /* 8. INFO E IMPOSTAZIONI                                                     */
 /* ========================================================================== */
 
@@ -944,7 +1190,7 @@ function saveProfile() {
   p.sex = document.getElementById("p-sex").value; save(); alert("Salvato.");
 }
 function exportBackup() {
-  const data = JSON.stringify({ app: "dieta-emanuele", version: 2, date: new Date().toISOString(), state, weights, photos, measures });
+  const data = JSON.stringify({ app: "dieta-emanuele", version: 2, date: new Date().toISOString(), state, weights, photos, measures, training });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([data], { type: "application/json" }));
   a.download = `backup-dieta-${toKey(new Date())}.json`; a.click();
@@ -958,7 +1204,7 @@ function importBackup(ev) {
       const b = JSON.parse(e.target.result);
       if (b.app !== "dieta-emanuele" || !b.state) throw new Error();
       if (!confirm("Sostituire i dati di questo telefono con quelli del backup?")) return;
-      state = b.state; weights = b.weights || []; photos = b.photos || []; if (b.measures) { measures = b.measures; store(MEASURE_KEY, measures); }
+      state = b.state; weights = b.weights || []; photos = b.photos || []; if (b.measures) { measures = b.measures; store(MEASURE_KEY, measures); } if (b.training) { training = b.training; store(TR_KEY, training); }
       save(); store(WEIGHT_KEY, weights); store(PHOTOS_KEY, photos);
       alert("Backup caricato."); location.reload();
     } catch (err) { alert("Questo file non è un backup valido."); }
@@ -978,7 +1224,7 @@ function resetAll() {
 function tab(name) {
   document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === "view-" + name));
   document.querySelectorAll(".nav button").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
-  ({ oggi: renderOggi, settimana: renderWeek, spesa: renderShop, progressi: renderProgress, info: renderInfo })[name]();
+  ({ oggi: renderOggi, settimana: renderWeek, spesa: renderShop, progressi: renderProgress, palestra: renderTraining, info: renderInfo })[name]();
   window.scrollTo({ top: 0 });
 }
 
