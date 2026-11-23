@@ -526,7 +526,9 @@ const DAY_TYPES = {
   R1: { label: "1° giorno di riposo", short: "Riposo 1", kind: "rest",
     pranzo: { items: [
       { t: "Minestrone ricco di verdure e legumi con 50 g di riso integrale + 2 cucchiaini di parmigiano", k: 360 } ] },
-    cena: { free: true, items: [] }
+    cena: { items: [
+      { t: "Minestra di fagioli o di ceci: un barattolo di legumi con 60–70 g di pasta o riso integrale", k: 470 },
+      { t: "Un piatto di verdura a piacere", k: 40 } ] }
   },
   R2: { label: "2° giorno di riposo", short: "Riposo 2", kind: "rest",
     pranzo: { items: [
@@ -541,9 +543,7 @@ const DAY_TYPES = {
       { t: "Insalata greca: pomodoro, 150 g di feta, olive e cetrioli", k: 470 },
       { t: "100 g di pane di segale integrale", k: 250 },
       { t: "Un frutto", k: 70 } ] },
-    cena: { items: [
-      { t: "Minestra di fagioli o di ceci: un barattolo di legumi con 60–70 g di pasta o riso integrale", k: 470 },
-      { t: "Un piatto di verdura a piacere", k: 40 } ] }
+    cena: { free: true, items: [] }
   },
   R4: { label: "4° giorno di riposo", short: "Riposo 4", kind: "rest",
     pranzo: { items: [
@@ -614,7 +614,7 @@ const SHOP = [
     ["Mozzarella", "1"] ] },
   { cat: "Legumi, frutta secca e dispensa", i: "🥜", items: [
     ["Lenticchie o fagioli in barattolo", "1 per la minestra del giorno di riposo 2"],
-    ["Fagioli o ceci in barattolo", "1 per la minestra del giorno di riposo 3"],
+    ["Fagioli o ceci in barattolo", "1 per la minestra del giorno di riposo 1"],
     ["Noci", "1 confezione"],
     ["Frutta secca (nocciole, mandorle, pistacchi)", "circa 200 g"],
     ["Olive", "1 vasetto"],
