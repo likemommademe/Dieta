@@ -1071,17 +1071,18 @@ const TR_SEED = {
   "3-1": [[1, { s: 4, t: "Fatico troppo e divento sporco" }], [2], [3], [4], [5], [6], [7]],
   "3-2": [[1], [2, { w: "18 kg", t: "Posso fare 18 kg" }], [3, { w: "45 kg" }], [4, { w: "50 kg", t: "1ª serie 10 ripetizioni, 2ª 8, 3ª 5" }], [5, { w: "45 kg" }], [6]],
   "3-3": [[1], [2, { w: "18 kg" }], [3, { w: "43 kg" }], [4], [5, { w: "3,3 kg" }], [6, { w: "Trici 18 kg / Bici 10 kg" }]],
-  "4-1": [[1], [2, { w: "35 kg" }], [3, { w: "13,6 kg" }], [4, { w: "16 kg" }], [5, { w: "9 kg" }], [6]]
+  "4-1": [[1], [2, { w: "35 kg" }], [3, { w: "13,6 kg" }], [4, { w: "16 kg" }], [5, { w: "9 kg" }], [6], [7]]
 };
 
-let training = load(TR_KEY, null);
-if (!training) {
-  training = { log: {} };
+let training = load(TR_KEY, null) || { log: {} };
+if ((training.seed || 0) < 2) {
+  training.seed = 2;
   Object.entries(TR_SEED).forEach(([wd, rows]) => {
     const [w, d] = wd.split("-").map(Number);
     rows.forEach(([i, x = {}]) => {
       const ex = trEx(TR_WEEKS[w - 1].days[d - 1][i - 1]);
-      training.log[`${w}-${d}-${i}`] = { s: x.s ?? ex.sets, w: x.w || "", t: x.t || "" };
+      const k = `${w}-${d}-${i}`;
+      if (!training.log[k] || !training.log[k].s) training.log[k] = { s: x.s ?? ex.sets, w: x.w || "", t: x.t || "" };
     });
   });
   store(TR_KEY, training);
