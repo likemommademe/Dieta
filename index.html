@@ -655,6 +655,8 @@ if (!state.week || state.weekVersion !== WEEK_VERSION) { state.week = { ...DEFAU
 state.overrides = state.overrides || {};
 state.days = state.days || {};
 state.shop = state.shop || {};
+// Lunedì 23/11/2026: allenamento giorno 2 invece del riposo (una volta sola, poi si cambia da Oggi)
+if (!state.fix20261123) { if (!state.overrides["2026-11-23"]) state.overrides["2026-11-23"] = "A2"; state.fix20261123 = true; }
 let weights = load(WEIGHT_KEY, []);
 const MEASURE_KEY = "dieta-emanuele-misure";
 // down = meglio se scende, up = meglio se sale
