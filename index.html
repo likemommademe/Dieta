@@ -224,6 +224,60 @@
   .pill.hot { background: var(--hot); color: #fff; }
   .ex .field input.hot { border-color: var(--hot); background: var(--hot-soft); color: var(--hot); font-weight: 700; }
 
+  /* Riepilogo */
+  .seg2 { display: inline-grid; grid-template-columns: 1fr 1fr; gap: 3px; background: var(--surface-2); padding: 3px; border-radius: 12px; }
+  .seg2 button { border: 0; background: none; border-radius: 9px; padding: 5px 12px; font-weight: 700; font-size: 13px; cursor: pointer; color: var(--ink-soft); }
+  .seg2 button.on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+  .monthnav { display: flex; align-items: center; justify-content: space-between; margin: 12px 0 8px; }
+  .monthnav b { font-family: 'Chakra Petch', sans-serif; font-size: 18px; text-transform: uppercase; }
+  .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .cal .h { font-size: 11px; font-weight: 700; color: var(--ink-faint); text-align: center; text-transform: uppercase; }
+  .cal .c { aspect-ratio: 1; border-radius: 10px; display: grid; place-items: center; font-size: 13px; font-weight: 700; background: var(--surface-2); color: var(--ink-faint); position: relative; }
+  .cal .c.ok { background: var(--train); color: #fff; }
+  .cal .c.half { background: #FFE9A8; color: #8A6400; }
+  .cal .c.no { background: var(--hot-soft); color: var(--hot); }
+  .cal .c.fut { background: none; color: var(--line); }
+  .cal .c.today { outline: 2px solid var(--ink); outline-offset: 1px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--ink-soft); margin-top: 10px; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+  .yr { display: grid; grid-template-columns: 70px 1fr 64px; align-items: center; gap: 10px; padding: 6px 0; font-size: 13px; }
+  .yr .bar { height: 10px; background: var(--surface-2); border-radius: 99px; overflow: hidden; }
+  .yr .bar i { display: block; height: 100%; background: var(--train); border-radius: 99px; }
+  .yr span:last-child { text-align: right; color: var(--ink-soft); font-weight: 600; }
+
+  /* Foto */
+  .photos figure { cursor: pointer; }
+  .photos .cm { font-size: 11px; color: var(--ink-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .overlay { position: fixed; inset: 0; z-index: 50; background: #121414; display: none; flex-direction: column; color: #fff; padding: calc(env(safe-area-inset-top) + 10px) 16px calc(env(safe-area-inset-bottom) + 16px); overflow-y: auto; }
+  .overlay.open { display: flex; }
+  .ov-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; max-width: 560px; width: 100%; margin: 0 auto 10px; }
+  .ov-top b { font-family: 'Chakra Petch', sans-serif; font-size: 18px; text-transform: uppercase; }
+  .ov-btn { border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.08); color: #fff; border-radius: 999px; padding: 8px 14px; font-weight: 700; cursor: pointer; }
+  .ov-body { max-width: 560px; width: 100%; margin: 0 auto; }
+  .lb-img { position: relative; }
+  .lb-img img { width: 100%; max-height: 62vh; object-fit: contain; border-radius: 14px; display: block; background: #000; }
+  .lb-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; border: 0; background: rgba(0,0,0,.45); color: #fff; font-size: 20px; cursor: pointer; }
+  .lb-arrow.l { left: 8px; } .lb-arrow.r { right: 8px; }
+  .overlay .field label { color: rgba(255,255,255,.7); }
+  .overlay .field input, .overlay textarea { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2); color: #fff; border-radius: 12px; padding: 10px 12px; width: 100%; font: inherit; }
+  .overlay textarea { min-height: 70px; resize: vertical; }
+  .cmp { position: relative; width: 100%; aspect-ratio: 3/4; border-radius: 14px; overflow: hidden; background: #000; touch-action: none; user-select: none; }
+  .cmp img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+  .cmp .before { clip-path: inset(0 50% 0 0); }
+  .cmp .handle { position: absolute; top: 0; bottom: 0; left: 50%; width: 3px; background: #fff; transform: translateX(-50%); pointer-events: none; }
+  .cmp .handle::after { content: "⟷"; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 40px; height: 40px; border-radius: 50%; background: #fff; color: #121414; display: grid; place-items: center; font-size: 18px; font-weight: 700; }
+  .cmp .tagl, .cmp .tagr { position: absolute; top: 10px; background: rgba(0,0,0,.6); border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 700; }
+  .cmp .tagl { left: 10px; } .cmp .tagr { right: 10px; }
+  .side { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .side img { width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 12px; display: block; }
+  .side figure { margin: 0; } .side figcaption { font-size: 12px; color: rgba(255,255,255,.7); margin-top: 4px; }
+  .cmp-sel { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  .cmp-sel select { width: 100%; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2); color: #fff; border-radius: 12px; padding: 9px 10px; font: inherit; }
+  .cmp-sel select option { color: #121414; }
+  .cmp-diff { margin-top: 10px; font-size: 14px; color: rgba(255,255,255,.85); }
+  .overlay .seg2 { background: rgba(255,255,255,.1); } .overlay .seg2 button { color: rgba(255,255,255,.7); } .overlay .seg2 button.on { background: #fff; color: #121414; }
+
   /* Menu in basso */
   .nav { position: fixed; left: 0; right: 0; bottom: 0; background: color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); z-index: 10; }
   .nav-in { max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: repeat(6, 1fr); }
@@ -276,6 +330,12 @@
     <div class="top"><div><div class="eyebrow">Massa</div><h1>Progressi</h1></div></div>
 
     <div class="card">
+      <div class="dayhead"><h3><span class="em">📆</span>Riepilogo</h3>
+        <div class="seg2"><button id="rp-m" class="on" onclick="rpMode('mese')">Mese</button><button id="rp-y" onclick="rpMode('anno')">Anno</button></div></div>
+      <div id="riepilogo"></div>
+    </div>
+
+    <div class="card">
       <div class="dayhead"><h3><span class="em">🔥</span>Calorie mangiate</h3><span class="muted small">ultimi 7 giorni</span></div>
       <div id="kcal-chart"></div>
       <p class="note">Contano solo i pasti segnati come fatti. Le calorie sono stime, non dati della nutrizionista.</p>
@@ -309,7 +369,9 @@
       <div class="dayhead"><h3><span class="em">📸</span>Foto del fisico</h3>
         <label class="btn" style="cursor:pointer">Aggiungi<input type="file" accept="image/*" style="display:none" onchange="addPhoto(event)"></label>
       </div>
+      <button class="btn solid block" id="cmp-open" style="margin-top:12px;display:none" onclick="openCompare()">↔ Confronta due foto</button>
       <div class="photos" id="photos" style="margin-top:12px"></div>
+      <p class="note">Tocca una foto per aprirla, scrivere un commento o cambiarne la data.</p>
     </div>
   </section>
 
@@ -388,6 +450,9 @@
     <p class="note" style="text-align:center">Peso e foto non vengono cancellati.</p>
   </section>
 </div>
+
+<div class="overlay" id="lb"></div>
+<div class="overlay" id="cmp"></div>
 
 <nav class="nav"><div class="nav-in">
   <button data-tab="oggi" class="active" onclick="tab('oggi')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><path d="M12 8v4l2.5 2"/></svg>Oggi</button>
@@ -534,8 +599,12 @@ const DAY_TYPES = {
   },
   R1: { label: "1° giorno di riposo", short: "Riposo 1", kind: "rest",
     pranzo: { items: [
-      { t: "Minestrone ricco di verdure e legumi con 50 g di riso integrale + 2 cucchiaini di parmigiano", k: 360 } ] },
-    cena: { free: true, items: [] }
+      { t: "Insalata greca: pomodoro, 150 g di feta, olive e cetrioli", k: 470 },
+      { t: "100 g di pane di segale integrale", k: 250 },
+      { t: "Un frutto", k: 70 } ] },
+    cena: { items: [
+      { t: "Minestra di fagioli o di ceci: un barattolo di legumi con 60–70 g di pasta o riso integrale", k: 470 },
+      { t: "Un piatto di verdura a piacere", k: 40 } ] }
   },
   R2: { label: "2° giorno di riposo", short: "Riposo 2", kind: "rest",
     pranzo: { items: [
@@ -547,12 +616,8 @@ const DAY_TYPES = {
   },
   R3: { label: "3° giorno di riposo", short: "Riposo 3", kind: "rest",
     pranzo: { items: [
-      { t: "Insalata greca: pomodoro, 150 g di feta, olive e cetrioli", k: 470 },
-      { t: "100 g di pane di segale integrale", k: 250 },
-      { t: "Un frutto", k: 70 } ] },
-    cena: { items: [
-      { t: "Minestra di fagioli o di ceci: un barattolo di legumi con 60–70 g di pasta o riso integrale", k: 470 },
-      { t: "Un piatto di verdura a piacere", k: 40 } ] }
+      { t: "Minestrone ricco di verdure e legumi con 50 g di riso integrale + 2 cucchiaini di parmigiano", k: 360 } ] },
+    cena: { free: true, items: [] }
   },
   R4: { label: "4° giorno di riposo", short: "Riposo 4", kind: "rest",
     pranzo: { items: [
@@ -623,7 +688,7 @@ const SHOP = [
     ["Mozzarella", "1"] ] },
   { cat: "Legumi, frutta secca e dispensa", i: "🥜", items: [
     ["Lenticchie o fagioli in barattolo", "1 per la minestra del giorno di riposo 2"],
-    ["Fagioli o ceci in barattolo", "1 per la minestra del giorno di riposo 3"],
+    ["Fagioli o ceci in barattolo", "1 per la minestra del giorno di riposo 1"],
     ["Noci", "1 confezione"],
     ["Frutta secca (nocciole, mandorle, pistacchi)", "circa 200 g"],
     ["Olive", "1 vasetto"],
@@ -646,9 +711,9 @@ const SHOP = [
 const KEY = "dieta-emanuele-v2";
 const WEIGHT_KEY = "menu-oggi-weight-v21-Emanuele";   // stesso salvataggio della vecchia app
 const PHOTOS_KEY = "menu-oggi-photos-v21-Emanuele";   // stesso salvataggio della vecchia app
-// Settimana base (scelta il 26/11/2026), da domenica a sabato: allenamento lunedì, martedì e giovedì; cena libera il sabato. 0 = domenica
-const DEFAULT_WEEK = { 0: "R4", 1: "A1", 2: "A2", 3: "R3", 4: "A3", 5: "R2", 6: "R1" };
-const WEEK_VERSION = 6;
+// Settimana base (scelta il 26/11/2026), da domenica a sabato: allenamento lunedì, martedì e giovedì; mercoledì riposo 1 (insalata greca e minestra), sabato riposo 3 (minestrone e cena libera). 0 = domenica
+const DEFAULT_WEEK = { 0: "R4", 1: "A1", 2: "A2", 3: "R1", 4: "A3", 5: "R2", 6: "R3" };
+const WEEK_VERSION = 7;
 
 function load(key, fallback) { try { const v = JSON.parse(localStorage.getItem(key)); return v ?? fallback; } catch (e) { return fallback; } }
 function store(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch (e) { return false; } }
@@ -707,6 +772,15 @@ const sundayOf = d => addDays(d, -d.getDay());  // la settimana va da domenica a
 const DAY_NAMES = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"];
 const fmt = (d, o) => d.toLocaleDateString("it-IT", o);
 
+// Dal 1° ottobre 2026 a ieri la dieta è stata seguita sempre: segno tutti i pasti e gli integratori come fatti (una volta sola)
+if (!state.seedOttobre) {
+  for (let d = new Date(2026, 9, 1); toKey(d) <= "2026-11-25"; d.setDate(d.getDate() + 1)) {
+    const k = toKey(d), dd = state.days[k] = state.days[k] || { sel: {}, done: {}, extras: {} };
+    ["colazione", "spuntino", "pranzo", "merenda", "cena"].forEach(m => dd.done[m] = true);
+    ["creatina", "olio", "bcaa1", "bcaa2", "banana"].forEach(e => dd.extras[e] = true);
+  }
+  state.seedOttobre = true; save();
+}
 let selected = toKey(new Date());
 
 function typeOf(key) { return state.overrides[key] || state.week[fromKey(key).getDay()] || "A1"; }
@@ -782,7 +856,8 @@ function renderDay() {
       <div class="kcal-box"><b>${need}</b><span>🔥 fabbisogno</span></div>
     </div>
     <div class="progress"><div style="width:${Math.min(100, planned ? eaten / planned * 100 : 0)}%"></div></div>
-    ${t.kind === "train" ? `<button class="btn block" style="margin-top:12px" onclick="openTraining('${typeId}')">🏋️ Vedi l'allenamento: giorno ${typeId.slice(1)}</button>` : ""}
+    <button class="btn block" style="margin-top:12px" onclick="dayAll()">${MEALS.every(m => dd.done[m]) ? "✅ Giornata rispettata" : "Segna tutta la giornata come fatta"}</button>
+    ${t.kind === "train" ? `<button class="btn block" style="margin-top:8px" onclick="openTraining('${typeId}')">🏋️ Vedi l'allenamento: giorno ${typeId.slice(1)}</button>` : ""}
     <p class="note">Calorie stimate da noi, non indicate dalla nutrizionista.${state.overrides[key] ? ` · Giornata cambiata a mano. <a href="#" onclick="setType('');return false" style="color:inherit">Ripristina</a>` : ""}</p>`;
 
   document.getElementById("day-meals").innerHTML = MEALS.map(m => {
@@ -812,6 +887,7 @@ function setType(id) { if (id && id !== state.week[fromKey(selected).getDay()]) 
 function choose(m, i) { dayData(selected).sel[m] = i; save(); renderDay(); }
 function chooseVar(m, i) { dayData(selected).sel[m + "_v"] = i; save(); renderDay(); }
 function toggleDone(m) { const d = dayData(selected); d.done[m] = !d.done[m]; save(); renderDay(); }
+function dayAll() { const d = dayData(selected), on = !MEALS.every(m => d.done[m]); MEALS.forEach(m => d.done[m] = on); EXTRAS.forEach(e => d.extras[e.id] = on); save(); renderDay(); }
 function toggleExtra(id) { const d = dayData(selected); d.extras[id] = !d.extras[id]; save(); renderDay(); }
 function renderOggi() { renderStrip(); renderDay(); window.scrollTo({ top: 0 }); }
 
@@ -911,9 +987,12 @@ function renderProgress() {
     `<div class="row-hist"><span>${fmt(fromKey(w.date), { day: "numeric", month: "short", year: "numeric" })}</span><span><b>${w.weight} kg</b> <button class="x" onclick="delWeight(${i})" aria-label="Elimina">✕</button></span></div>`).join("");
 
   renderMeasures();
-  document.getElementById("photos").innerHTML = photos.length ? photos.map((p, i) => ({ p, i })).reverse().map(({ p, i }) =>
-    `<figure><img src="${p.src}" alt="Foto del ${fmt(new Date(p.date), { day: "numeric", month: "short" })}"><button class="x" onclick="delPhoto(${i})" aria-label="Elimina">✕</button>
-      <figcaption>${fmt(new Date(p.date), { day: "numeric", month: "short" })}${p.weight ? " · " + p.weight + " kg" : ""}</figcaption></figure>`).join("")
+  renderRiepilogo();
+  const order = photoOrder().reverse();
+  document.getElementById("cmp-open").style.display = photos.length > 1 ? "block" : "none";
+  document.getElementById("photos").innerHTML = order.length ? order.map(i => { const p = photos[i];
+    return `<figure onclick="openPhoto(${i})"><img src="${p.src}" alt="Foto del ${pDate(p)}">
+      <figcaption>${pDate(p)}${p.weight ? " · " + p.weight + " kg" : ""}${p.note ? `<div class="cm">💬 ${esc(p.note)}</div>` : ""}</figcaption></figure>`; }).join("")
     : `<p class="muted small" style="grid-column:1/-1;margin:0">Nessuna foto per ora.</p>`;
 }
 
@@ -987,13 +1066,145 @@ function addPhoto(ev) {
       c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
       photos.push({ date: new Date().toISOString(), src: c.toDataURL("image/jpeg", .6), weight: weights.length ? weights[weights.length - 1].weight : null });
       if (!store(PHOTOS_KEY, photos)) { photos.pop(); alert("Memoria piena: non riesco a salvare altre foto. Scarica un backup e cancellane qualcuna."); }
-      renderProgress();
+      renderProgress(); openPhoto(photos.length - 1);
     };
     img.src = e.target.result;
   };
   reader.readAsDataURL(file); ev.target.value = "";
 }
-function delPhoto(i) { if (confirm("Eliminare questa foto?")) { photos.splice(i, 1); store(PHOTOS_KEY, photos); renderProgress(); } }
+function delPhoto(i) { if (confirm("Eliminare questa foto?")) { photos.splice(i, 1); store(PHOTOS_KEY, photos); closeOv("lb"); renderProgress(); } }
+
+/* ---- Foto: apertura, commento, confronto ---- */
+const pDate = (p, o) => fmt(new Date(p.date), o || { day: "numeric", month: "short", year: "numeric" });
+const photoOrder = () => photos.map((p, i) => i).sort((a, b) => new Date(photos[a].date) - new Date(photos[b].date));
+function closeOv(id) { document.getElementById(id).classList.remove("open"); document.body.style.overflow = ""; }
+function openOv(id, html) { const o = document.getElementById(id); o.innerHTML = html; o.classList.add("open"); document.body.style.overflow = "hidden"; }
+function openPhoto(i) {
+  const p = photos[i], order = photoOrder(), pos = order.indexOf(i);
+  const prev = order[pos - 1], next = order[pos + 1];
+  openOv("lb", `
+    <div class="ov-top"><b>${pDate(p)}</b><button class="ov-btn" onclick="closeOv('lb')">Chiudi ✕</button></div>
+    <div class="ov-body">
+      <div class="lb-img"><img src="${p.src}" alt="Foto del ${pDate(p)}">
+        ${prev != null ? `<button class="lb-arrow l" onclick="openPhoto(${prev})" aria-label="Foto prima">‹</button>` : ""}
+        ${next != null ? `<button class="lb-arrow r" onclick="openPhoto(${next})" aria-label="Foto dopo">›</button>` : ""}</div>
+      <div class="grid2" style="margin-top:12px">
+        <div class="field"><label for="lb-date">Data</label><input id="lb-date" type="date" value="${toKey(new Date(p.date))}" onchange="setPhoto(${i},'date',this.value)"></div>
+        <div class="field"><label for="lb-w">Peso (kg)</label><input id="lb-w" type="number" step="0.1" inputmode="decimal" value="${p.weight ?? ""}" onchange="setPhoto(${i},'weight',this.value)"></div>
+      </div>
+      <div class="field"><label for="lb-note">Commento</label><textarea id="lb-note" placeholder="Come ti vedi? Cosa è cambiato?" onchange="setPhoto(${i},'note',this.value)">${esc(p.note || "")}</textarea></div>
+      <div class="grid2" style="margin-top:6px">
+        ${photos.length > 1 ? `<button class="ov-btn" onclick="closeOv('lb');openCompare(${order[0] === i ? order[order.length - 1] : order[0]},${i})">↔ Confronta con la ${order[0] === i ? "più recente" : "prima"}</button>` : "<span></span>"}
+        <button class="ov-btn" style="color:#FF8A80" onclick="delPhoto(${i})">Elimina</button>
+      </div>
+    </div>`);
+}
+function setPhoto(i, f, v) {
+  const p = photos[i];
+  if (f === "date") { if (!v) return; p.date = v + "T12:00:00"; }
+  else if (f === "weight") p.weight = v ? parseFloat(String(v).replace(",", ".")) : null;
+  else p.note = v.trim();
+  store(PHOTOS_KEY, photos); renderProgress();
+  if (f === "date") openPhoto(i);
+}
+let cmpA = null, cmpB = null, cmpView = "slider";
+function openCompare(a, b) {
+  const order = photoOrder();
+  cmpA = a ?? order[0]; cmpB = b ?? order[order.length - 1];
+  if (new Date(photos[cmpA].date) > new Date(photos[cmpB].date)) [cmpA, cmpB] = [cmpB, cmpA];
+  renderCompare();
+}
+function renderCompare() {
+  const A = photos[cmpA], B = photos[cmpB], order = photoOrder();
+  const opts = sel => order.map(i => `<option value="${i}" ${i === sel ? "selected" : ""}>${pDate(photos[i])}${photos[i].weight ? " · " + photos[i].weight + " kg" : ""}</option>`).join("");
+  const days = Math.round((new Date(B.date) - new Date(A.date)) / 864e5);
+  const dw = A.weight && B.weight ? Math.round((B.weight - A.weight) * 10) / 10 : null;
+  const view = cmpView === "slider"
+    ? `<div class="cmp" id="cmp-box"><img src="${B.src}" alt="Dopo"><img class="before" id="cmp-before" src="${A.src}" alt="Prima"><div class="handle" id="cmp-h"></div>
+        <span class="tagl">Prima</span><span class="tagr">Dopo</span></div>
+       <p class="cmp-diff small" style="margin-top:6px">Trascina il dito sulla foto per scoprire la differenza.</p>`
+    : `<div class="side"><figure><img src="${A.src}" alt="Prima"><figcaption>Prima · ${pDate(A)}</figcaption></figure><figure><img src="${B.src}" alt="Dopo"><figcaption>Dopo · ${pDate(B)}</figcaption></figure></div>`;
+  openOv("cmp", `
+    <div class="ov-top"><b>Confronto</b><button class="ov-btn" onclick="closeOv('cmp')">Chiudi ✕</button></div>
+    <div class="ov-body">
+      <div class="cmp-sel">
+        <div class="field"><label>Prima</label><select onchange="cmpA=+this.value;renderCompare()">${opts(cmpA)}</select></div>
+        <div class="field"><label>Dopo</label><select onchange="cmpB=+this.value;renderCompare()">${opts(cmpB)}</select></div>
+      </div>
+      <div style="text-align:center;margin-bottom:10px"><div class="seg2"><button class="${cmpView === "slider" ? "on" : ""}" onclick="cmpView='slider';renderCompare()">Scorri</button><button class="${cmpView === "side" ? "on" : ""}" onclick="cmpView='side';renderCompare()">Affiancate</button></div></div>
+      ${view}
+      <div class="cmp-diff"><b>${Math.abs(days)} giorni</b> tra le due foto${dw != null ? ` · peso <b>${dw > 0 ? "+" : ""}${String(dw).replace(".", ",")} kg</b>` : ""}</div>
+      ${A.note || B.note ? `<div class="cmp-diff small">${A.note ? `💬 Prima: ${esc(A.note)}<br>` : ""}${B.note ? `💬 Dopo: ${esc(B.note)}` : ""}</div>` : ""}
+    </div>`);
+  const box = document.getElementById("cmp-box");
+  if (box) {
+    const move = e => { const r = box.getBoundingClientRect(), x = Math.min(100, Math.max(0, ((e.touches ? e.touches[0].clientX : e.clientX) - r.left) / r.width * 100));
+      document.getElementById("cmp-before").style.clipPath = `inset(0 ${100 - x}% 0 0)`; document.getElementById("cmp-h").style.left = x + "%"; };
+    box.addEventListener("pointerdown", e => { move(e); box.setPointerCapture(e.pointerId); });
+    box.addEventListener("pointermove", e => { if (e.buttons || e.pointerType === "touch") move(e); });
+  }
+}
+
+/* ---- Riepilogo mensile e annuale ---- */
+// 2 = giornata rispettata (tutti i pasti fatti), 1 = in parte, 0 = niente segnato
+function dayStatus(k) { const d = state.days[k]; if (!d) return 0; const n = MEALS.filter(m => d.done[m]).length; return n === MEALS.length ? 2 : n ? 1 : 0; }
+let rpView = "mese", rpMonth = null;
+function rpMode(m) { rpView = m; document.getElementById("rp-m").classList.toggle("on", m === "mese"); document.getElementById("rp-y").classList.toggle("on", m === "anno"); renderRiepilogo(); }
+function rpShift(n) { rpMonth = new Date(rpMonth.getFullYear(), rpMonth.getMonth() + n, 1); renderRiepilogo(); }
+function rpYear(n) { rpMonth = new Date(rpMonth.getFullYear() + n, rpMonth.getMonth(), 1); renderRiepilogo(); }
+function countRange(from, to) {   // giorni passati (fino a oggi) tra from e to compresi
+  const todayK = toKey(new Date()); let ok = 0, half = 0, tot = 0, train = 0, rest = 0;
+  for (let d = new Date(from); d <= to; d = addDays(d, 1)) {
+    const k = toKey(d); if (k > todayK) break; if (k < "2026-10-01") continue;
+    tot++; const st = dayStatus(k);
+    if (st === 2) { ok++; DAY_TYPES[typeOf(k)].kind === "train" ? train++ : rest++; } else if (st === 1) half++;
+  }
+  return { ok, half, tot, train, rest };
+}
+function streak() {
+  let n = 0, d = new Date(); if (dayStatus(toKey(d)) !== 2) d = addDays(d, -1);
+  while (dayStatus(toKey(d)) === 2) { n++; d = addDays(d, -1); }
+  return n;
+}
+function renderRiepilogo() {
+  if (!rpMonth) { const t = new Date(); rpMonth = new Date(t.getFullYear(), t.getMonth(), 1); }
+  const el = document.getElementById("riepilogo"), todayK = toKey(new Date());
+  if (rpView === "mese") {
+    const y = rpMonth.getFullYear(), m = rpMonth.getMonth(), last = new Date(y, m + 1, 0), c = countRange(rpMonth, last);
+    let cells = ["D", "L", "M", "M", "G", "V", "S"].map(h => `<div class="h">${h}</div>`).join("");
+    for (let i = 0; i < rpMonth.getDay(); i++) cells += "<div></div>";
+    for (let d = 1; d <= last.getDate(); d++) {
+      const k = toKey(new Date(y, m, d)), st = dayStatus(k);
+      const cls = k > todayK ? "fut" : k < "2026-10-01" ? "" : st === 2 ? "ok" : st === 1 ? "half" : (k === todayK ? "" : "no");
+      cells += `<div class="c ${cls} ${k === todayK ? "today" : ""}">${d}</div>`;
+    }
+    el.innerHTML = `
+      <div class="monthnav"><button class="icon-btn" onclick="rpShift(-1)" aria-label="Mese prima">‹</button><b>${fmt(rpMonth, { month: "long", year: "numeric" })}</b><button class="icon-btn" onclick="rpShift(1)" aria-label="Mese dopo">›</button></div>
+      <div class="cal">${cells}</div>
+      <div class="legend"><span><i style="background:var(--train)"></i>Rispettata</span><span><i style="background:#FFE9A8"></i>In parte</span><span><i style="background:var(--hot-soft)"></i>Non segnata</span></div>
+      <div class="stats">
+        <div class="kcal-box"><b>${c.ok}/${c.tot}</b><span>giorni rispettati</span></div>
+        <div class="kcal-box"><b>${c.tot ? Math.round(c.ok / c.tot * 100) : 0}%</b><span>del mese</span></div>
+        <div class="kcal-box"><b>${streak()}</b><span>giorni di fila</span></div>
+      </div>
+      <p class="note">Giornata rispettata = tutti e 5 i pasti segnati come fatti. Di questo mese: ${c.train} di allenamento e ${c.rest} di riposo.</p>`;
+  } else {
+    const y = rpMonth.getFullYear(); let rows = "", T = { ok: 0, tot: 0 };
+    for (let m = 0; m < 12; m++) {
+      const c = countRange(new Date(y, m, 1), new Date(y, m + 1, 0)); T.ok += c.ok; T.tot += c.tot;
+      const name = fmt(new Date(y, m, 1), { month: "short" });
+      rows += `<div class="yr"><span style="text-transform:capitalize">${name}</span><span class="bar"><i style="width:${c.tot ? c.ok / c.tot * 100 : 0}%"></i></span><span>${c.tot ? `${c.ok}/${c.tot}` : "–"}</span></div>`;
+    }
+    el.innerHTML = `
+      <div class="monthnav"><button class="icon-btn" onclick="rpYear(-1)" aria-label="Anno prima">‹</button><b>${y}</b><button class="icon-btn" onclick="rpYear(1)" aria-label="Anno dopo">›</button></div>
+      <div class="stats" style="margin:0 0 10px">
+        <div class="kcal-box"><b>${T.ok}</b><span>giorni rispettati</span></div>
+        <div class="kcal-box"><b>${T.tot ? Math.round(T.ok / T.tot * 100) : 0}%</b><span>dell'anno</span></div>
+        <div class="kcal-box"><b>${streak()}</b><span>giorni di fila</span></div>
+      </div>${rows}
+      <p class="note">Si conta dal 1° ottobre 2026, quando hai iniziato la dieta.</p>`;
+  }
+}
 
 /* ========================================================================== */
 /* 8b. ALLENAMENTO (scheda di 8 settimane)                                    */
