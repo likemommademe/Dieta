@@ -294,6 +294,10 @@
   .side { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
   .side img { width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 12px; display: block; }
   .side figure { margin: 0; } .side figcaption { font-size: 12px; color: rgba(255,255,255,.7); margin-top: 4px; }
+  .imp { margin-top: 14px; background: rgba(255,255,255,.07); border-radius: 14px; padding: 12px 14px; }
+  .imp b { font-family: 'Chakra Petch', sans-serif; text-transform: uppercase; font-size: 16px; }
+  .imp p { margin: 6px 0 0; font-size: 14px; line-height: 1.45; }
+  .imp .ok { color: #7EE2A8; font-weight: 700; } .imp .ko { color: #FF9A8A; font-weight: 700; } .imp .src { font-size: 12px; color: rgba(255,255,255,.55); }
   .cmp-sel { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
   .cmp-sel select { width: 100%; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2); color: #fff; border-radius: 12px; padding: 9px 10px; font: inherit; }
   .cmp-sel select option { color: #121414; }
@@ -393,7 +397,7 @@
       </div>
       <button class="btn solid block" id="cmp-open" style="margin-top:12px;display:none" onclick="openCompare()">↔ Confronta due foto</button>
       <div class="photos" id="photos" style="margin-top:12px"></div>
-      <p class="note">Puoi sceglierne più di una insieme. Tocca una foto per aprirla, scrivere un commento o correggerne la data.</p>
+      <p class="note">Puoi sceglierne più di una insieme: dopo il caricamento si apre il confronto con la prima foto e ti dico cosa è migliorato, in base alle misure.</p>
     </div>
   </section>
 
@@ -1098,8 +1102,8 @@ function addPhoto(ev) {
     if (!file || full) {
       renderProgress();
       if (full) alert(`Memoria piena: ho salvato ${added} foto. Scarica un backup e cancellane qualcuna.`);
-      else if (added === 1) openPhoto(photos.length - 1);
-      else if (added > 1) alert(`${added} foto caricate. Toccane una per scrivere il commento.`);
+      else if (added && photos.length > 1) openCompare();
+      else if (added) openPhoto(photos.length - 1);
       return;
     }
     const reader = new FileReader();
@@ -1143,7 +1147,7 @@ function openPhoto(i) {
         <div class="field"><label for="lb-date">Data</label><input id="lb-date" type="date" value="${toKey(new Date(p.date))}" onchange="setPhoto(${i},'date',this.value)"></div>
         <div class="field"><label for="lb-w">Peso (kg)</label><input id="lb-w" type="number" step="0.1" inputmode="decimal" value="${p.weight ?? ""}" onchange="setPhoto(${i},'weight',this.value)"></div>
       </div>
-      <div class="field"><label for="lb-note">Commento</label><textarea id="lb-note" placeholder="Come ti vedi? Cosa è cambiato?" onchange="setPhoto(${i},'note',this.value)">${esc(p.note || "")}</textarea></div>
+      <div class="field"><label for="lb-note">Note</label><textarea id="lb-note" placeholder="Facoltative" onchange="setPhoto(${i},'note',this.value)">${esc(p.note || "")}</textarea></div>
       <div class="grid2" style="margin-top:6px">
         ${photos.length > 1 ? `<button class="ov-btn" onclick="closeOv('lb');openCompare(${order[0] === i ? order[order.length - 1] : order[0]},${i})">↔ Confronta con la ${order[0] === i ? "più recente" : "prima"}</button>` : "<span></span>"}
         <button class="ov-btn" style="color:#FF8A80" onclick="delPhoto(${i})">Elimina</button>
@@ -1159,6 +1163,26 @@ function setPhoto(i, f, v) {
   if (f === "date") openPhoto(i);
 }
 let cmpA = null, cmpB = null, cmpView = "slider";
+// Le misure più vicine alla data di una foto: l'ultima registrata entro quel giorno, altrimenti la prima dopo
+function measureNear(iso) {
+  const k = iso.slice(0, 10), list = [...measures].sort((a, b) => a.date.localeCompare(b.date));
+  let m = null; list.forEach(x => { if (x.date <= k) m = x; });
+  return m || list[0] || null;
+}
+function improvements(A, B) {
+  const ma = measureNear(A.date), mb = measureNear(B.date);
+  const rows = [];
+  if (ma && mb && ma.date !== mb.date) MEASURES.forEach(m => {
+    const d = delta(m, ma[m.id], mb[m.id]); if (d && d.d !== 0) rows.push({ txt: `${m.label} ${d.txt}`, good: d.cls === "good" });
+  });
+  if (!rows.length) return `<div class="imp"><b>Cosa è cambiato</b><p>Tra queste due foto non ci sono misure diverse da confrontare. Quando fai una foto nuova, aggiungi anche le misure in Progressi: qui ti dirò dove sei migliorato.</p></div>`;
+  const good = rows.filter(r => r.good), bad = rows.filter(r => r.good === false), neutral = rows.filter(r => r.good === null);
+  return `<div class="imp"><b>Cosa è cambiato</b>
+    ${good.length ? `<p class="ok">✅ Migliorato: ${good.map(r => r.txt).join(" · ")}</p>` : ""}
+    ${bad.length ? `<p class="ko">⚠️ Da tenere d'occhio: ${bad.map(r => r.txt).join(" · ")}</p>` : ""}
+    ${neutral.length ? `<p>${neutral.map(r => r.txt).join(" · ")}</p>` : ""}
+    <p class="src">Dalle misure del ${fmt(fromKey(ma.date), { day: "numeric", month: "short" })} e del ${fmt(fromKey(mb.date), { day: "numeric", month: "short" })}.</p></div>`;
+}
 function openCompare(a, b) {
   const order = photoOrder();
   cmpA = a ?? order[0]; cmpB = b ?? order[order.length - 1];
@@ -1185,6 +1209,7 @@ function renderCompare() {
       <div style="text-align:center;margin-bottom:10px"><div class="seg2"><button class="${cmpView === "slider" ? "on" : ""}" onclick="cmpView='slider';renderCompare()">Scorri</button><button class="${cmpView === "side" ? "on" : ""}" onclick="cmpView='side';renderCompare()">Affiancate</button></div></div>
       ${view}
       <div class="cmp-diff"><b>${Math.abs(days)} giorni</b> tra le due foto${dw != null ? ` · peso <b>${dw > 0 ? "+" : ""}${String(dw).replace(".", ",")} kg</b>` : ""}</div>
+      ${improvements(A, B)}
       ${A.note || B.note ? `<div class="cmp-diff small">${A.note ? `💬 Prima: ${esc(A.note)}<br>` : ""}${B.note ? `💬 Dopo: ${esc(B.note)}` : ""}</div>` : ""}
     </div>`);
   const box = document.getElementById("cmp-box");
