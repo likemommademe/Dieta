@@ -1155,13 +1155,14 @@ async function addPhoto(ev) {
   if (document.getElementById("view-progressi").classList.contains("active")) renderProgress();
 })();
 /* ---- Fotocamera con sagoma: ti metti dentro la sagoma, così tutte le foto sono inquadrate allo stesso modo ---- */
+// Sagoma ricalcata sulla foto di Emanuele del 26/11/2026 (mezzo busto, braccia lungo i fianchi)
 const SILHOUETTE = `<svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
   <g fill="rgba(255,255,255,.12)" stroke="#fff" stroke-width="2.5" stroke-dasharray="7 6" stroke-linejoin="round">
-    <ellipse cx="150" cy="92" rx="40" ry="50"/>
-    <path d="M131 138 L129 162 L80 178 Q52 187 48 216 L30 402 L72 402 L86 252 L93 302 L96 402 L204 402 L207 302 L214 252 L228 402 L270 402 L252 216 Q248 187 220 178 L171 162 L169 138 Z"/>
+    <ellipse cx="158" cy="146" rx="26" ry="37"/>
+    <path d="M142 180 L140 190 Q118 192 106 198 Q96 204 95 216 L90 250 L83 300 L78 340 L73 368 Q72 386 86 390 Q96 388 95 376 L98 330 L104 280 L111 232 L112 266 L112 296 L110 322 L105 340 L105 402 L210 402 L210 360 L205 330 L200 318 L200 300 L203 262 L204 236 L210 280 L216 320 L219 370 Q222 392 232 390 Q242 386 240 368 L234 330 L226 272 L219 220 Q216 204 206 196 Q192 190 178 190 L176 180 Z"/>
   </g>
-  <line x1="150" y1="0" x2="150" y2="400" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
-  <line x1="40" y1="178" x2="260" y2="178" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
+  <line x1="158" y1="0" x2="158" y2="400" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
+  <line x1="60" y1="192" x2="250" y2="192" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
 </svg>`;
 let cam = { stream: null, facing: "user", timer: 5, guide: "sagoma", shot: null };
 async function openCam() {
@@ -1174,7 +1175,7 @@ async function openCam() {
         <div id="cam-guide"></div>
         <div class="cam-count" id="cam-count"></div>
       </div>
-      <p class="cmp-diff small" id="cam-msg">Mettiti dentro la sagoma a mezzo busto: testa nell'ovale, spalle sulla linea, braccia lungo i fianchi.</p>
+      <p class="cmp-diff small" id="cam-msg">Mettiti dentro la sagoma: testa nell'ovale, spalle sulla linea, braccia lungo i fianchi e mani in fondo.</p>
       <div class="cam-row">
         <button class="ov-btn ${cam.guide === "sagoma" ? "on" : ""}" id="g-s" onclick="camGuide('sagoma')">Sagoma</button>
         ${last != null ? `<button class="ov-btn ${cam.guide === "ultima" ? "on" : ""}" id="g-u" onclick="camGuide('ultima')">Ultima foto</button>` : ""}
