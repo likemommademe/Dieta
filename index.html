@@ -311,16 +311,6 @@
   .overlay input[type=date]::-webkit-date-and-time-value { text-align: left; }
   .ov-top b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .ov-top .ov-btn { flex: none; }
-  .cam-box { position: relative; width: 100%; max-width: calc(68vh * 3 / 4); margin: 0 auto; aspect-ratio: 3 / 4; border-radius: 14px; overflow: hidden; background: #000; }
-  .cam-box video, .cam-box img, .cam-box svg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  .cam-box video.mirror { transform: scaleX(-1); }
-  .cam-count { position: absolute; inset: 0; display: grid; place-items: center; font-family: 'Chakra Petch', sans-serif; font-size: 120px; font-weight: 700; color: #fff; text-shadow: 0 4px 24px rgba(0,0,0,.6); pointer-events: none; }
-  .overlay .field select { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2); color: #fff; border-radius: 12px; padding: 10px 12px; width: 100%; font: inherit; }
-  .overlay .field select option { color: #121414; }
-  .cam-row { display: flex; gap: 6px; margin-top: 10px; }
-  .cam-row .ov-btn { flex: 1 1 0; min-width: 0; padding: 10px 6px; font-size: 14px; white-space: nowrap; }
-  .ov-btn.on { background: #fff; color: #121414; }
-  .shot { width: 74px; height: 74px; border-radius: 50%; border: 5px solid #fff; background: #FF3D5A; margin: 14px auto 0; display: block; cursor: pointer; }
   .cmp-sel { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
   .cmp-sel select { width: 100%; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2); color: #fff; border-radius: 12px; padding: 9px 10px; font: inherit; }
   .cmp-sel select option { color: #121414; }
@@ -410,8 +400,7 @@
       <div class="dayhead"><h3><span class="em">📸</span>Foto del fisico</h3>
         <label class="btn" style="cursor:pointer">Aggiungi<input type="file" accept="image/*" multiple style="display:none" onchange="addPhoto(event)"></label>
       </div>
-      <button class="btn solid block" style="margin-top:12px" onclick="openCam()">📷 Scatta con la sagoma</button>
-      <button class="btn block" id="cmp-open" style="margin-top:8px;display:none" onclick="openCompare()">↔ Confronta due foto</button>
+      <button class="btn solid block" id="cmp-open" style="margin-top:12px;display:none" onclick="openCompare()">↔ Confronta due foto</button>
       <div class="photos" id="photos" style="margin-top:12px"></div>
       <p class="note">Puoi sceglierne più di una insieme: restano come le carichi, quindi ritagliale tutte allo stesso modo prima. Dopo il caricamento si apre il confronto con la prima foto e ti dico cosa è migliorato, in base alle misure.</p>
     </div>
@@ -499,7 +488,6 @@
 
 <div class="overlay" id="lb"></div>
 <div class="overlay" id="cmp"></div>
-<div class="overlay" id="cam"></div>
 
 <nav class="nav"><div class="nav-in">
   <button data-tab="oggi" class="active" onclick="tab('oggi')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><path d="M12 8v4l2.5 2"/></svg>Oggi</button>
@@ -1156,123 +1144,7 @@ async function addPhoto(ev) {
   store(PHOTOS_KEY, photos);
   if (document.getElementById("view-progressi").classList.contains("active")) renderProgress();
 })();
-/* ---- Fotocamera con sagoma: ti metti dentro la sagoma, così tutte le foto sono inquadrate allo stesso modo ---- */
-// Sagoma ricalcata sulla foto di Emanuele del 26/11/2026 (mezzo busto, braccia lungo i fianchi)
-const SILHOUETTE = `<svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-  <g fill="rgba(255,255,255,.12)" stroke="#fff" stroke-width="2.5" stroke-dasharray="7 6" stroke-linejoin="round">
-    <ellipse cx="158" cy="146" rx="26" ry="37"/>
-    <path d="M142 180 L140 190 Q118 192 106 198 Q96 204 95 216 L90 250 L83 300 L78 340 L73 368 Q72 386 86 390 Q96 388 95 376 L98 330 L104 280 L111 232 L112 266 L112 296 L110 322 L105 340 L105 402 L210 402 L210 360 L205 330 L200 318 L200 300 L203 262 L204 236 L210 280 L216 320 L219 370 Q222 392 232 390 Q242 386 240 368 L234 330 L226 272 L219 220 Q216 204 206 196 Q192 190 178 190 L176 180 Z"/>
-  </g>
-  <line x1="158" y1="0" x2="158" y2="400" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
-  <line x1="60" y1="192" x2="250" y2="192" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
-</svg>`;
-let cam = { stream: null, facing: "user", timer: 5, guide: "sagoma", shot: null, ref: null };
-// Sagoma presa da una foto già salvata: il contorno del corpo lo trova MediaPipe sul telefono (la foto non esce da lì)
-let segPromise = null;
-function getSeg() {
-  if (!segPromise) segPromise = (async () => {
-    const v = await import("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs");
-    const files = await v.FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm");
-    return v.ImageSegmenter.createFromOptions(files, { baseOptions: { modelAssetPath: "https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/1/selfie_segmenter.tflite" }, runningMode: "IMAGE", outputConfidenceMasks: true, outputCategoryMask: false });
-  })().catch(e => { segPromise = null; throw e; });
-  return segPromise;
-}
-async function photoSilhouette(i) {
-  const p = photos[i]; if (p.sil) return p.sil;
-  const seg = await getSeg(), img = await loadImg(p.src), res = seg.segment(img);
-  const mk = res.confidenceMasks[0], w = mk.width, h = mk.height, m = mk.getAsFloat32Array();
-  const inside = new Uint8Array(w * h); for (let k = 0; k < w * h; k++) inside[k] = m[k] > .5 ? 1 : 0;
-  res.close && res.close();
-  // contorno: pixel della persona con almeno un vicino fuori
-  const c = document.createElement("canvas"); c.width = w; c.height = h;
-  const g = c.getContext("2d"), id = g.createImageData(w, h), d = id.data, r = Math.max(1, Math.round(w / 450));
-  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
-    const k = y * w + x; if (!inside[k]) continue;
-    const edge = x === 0 || y === 0 || x === w - 1 || y === h - 1 || !inside[k - 1] || !inside[k + 1] || !inside[k - w] || !inside[k + w];
-    if (edge) { for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) { const xx = x + dx, yy = y + dy; if (xx < 0 || yy < 0 || xx >= w || yy >= h) continue; const q = (yy * w + xx) * 4; d[q] = d[q + 1] = d[q + 2] = 255; d[q + 3] = 255; } }
-    else if (!d[k * 4 + 3]) { const q = k * 4; d[q] = d[q + 1] = d[q + 2] = 255; d[q + 3] = 30; }
-  }
-  g.putImageData(id, 0, 0);
-  const out = document.createElement("canvas"), sc = Math.min(1, 450 / w); out.width = Math.round(w * sc); out.height = Math.round(h * sc);
-  out.getContext("2d").drawImage(c, 0, 0, out.width, out.height);
-  p.sil = out.toDataURL("image/png"); store(PHOTOS_KEY, photos);
-  return p.sil;
-}
-async function openCam() {
-  const last = photoOrder().slice(-1)[0];
-  if (cam.ref == null || !photos[cam.ref]) cam.ref = photoOrder()[0] ?? null;
-  openOv("cam", `
-    <div class="ov-top"><b>Foto con la sagoma</b><button class="ov-btn" onclick="closeCam()">Chiudi ✕</button></div>
-    <div class="ov-body">
-      <div class="cam-box" id="cam-box">
-        <video id="cam-v" playsinline autoplay muted></video>
-        <div id="cam-guide"></div>
-        <div class="cam-count" id="cam-count"></div>
-      </div>
-      <p class="cmp-diff small" id="cam-msg">Mettiti dentro la sagoma: testa nell'ovale, spalle sulla linea, braccia lungo i fianchi e mani in fondo.</p>
-      <div class="cam-row">
-        <button class="ov-btn ${cam.guide === "sagoma" ? "on" : ""}" id="g-s" onclick="camGuide('sagoma')">Sagoma</button>
-        ${last != null ? `<button class="ov-btn ${cam.guide === "ultima" ? "on" : ""}" id="g-u" onclick="camGuide('ultima')">Trasparenza</button>` : ""}
-        <button class="ov-btn" onclick="camFlip()">↺ Gira</button>
-      </div>
-      ${last != null ? `<div class="field" style="margin-top:10px"><label for="cam-ref">Sagoma presa dalla foto del</label><select id="cam-ref" onchange="cam.ref=+this.value;camGuide(cam.guide)">${photoOrder().map(i => `<option value="${i}" ${i === cam.ref ? "selected" : ""}>${pDate(photos[i])}</option>`).join("")}</select></div>` : ""}
-      <div class="cam-row">
-        ${[0, 5, 10].map(t => `<button class="ov-btn ${cam.timer === t ? "on" : ""}" onclick="cam.timer=${t};this.parentNode.querySelectorAll('.ov-btn').forEach(b=>b.classList.remove('on'));this.classList.add('on')">${t ? `⏱ ${t} s` : "Subito"}</button>`).join("")}
-      </div>
-      <button class="shot" id="cam-shot" onclick="camShoot()" aria-label="Scatta"></button>
-    </div>`);
-  camGuide(cam.guide === "ultima" && last == null ? "sagoma" : cam.guide);
-  await camStart();
-}
-async function camStart() {
-  camStop();
-  try {
-    cam.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: cam.facing, width: { ideal: 1440 }, height: { ideal: 1920 } }, audio: false });
-    const v = document.getElementById("cam-v"); v.srcObject = cam.stream; v.classList.toggle("mirror", cam.facing === "user"); await v.play();
-  } catch (e) {
-    document.getElementById("cam-msg").textContent = "Non riesco ad aprire la fotocamera. Controlla di aver dato il permesso (Impostazioni → Safari → Fotocamera) e riprova.";
-  }
-}
-function camStop() { if (cam.stream) cam.stream.getTracks().forEach(t => t.stop()); cam.stream = null; }
-function closeCam() { camStop(); closeOv("cam"); }
-function camFlip() { cam.facing = cam.facing === "user" ? "environment" : "user"; camStart(); }
-async function camGuide(g) {
-  cam.guide = g; const ref = cam.ref, el = document.getElementById("cam-guide"), msg = document.getElementById("cam-msg");
-  ["g-s", "g-u"].forEach(id => { const b = document.getElementById(id); if (b) b.classList.toggle("on", (id === "g-s") === (g === "sagoma")); });
-  if (ref == null) { el.innerHTML = SILHOUETTE; return; }   // nessuna foto ancora: sagoma standard
-  if (g === "ultima") { el.innerHTML = `<img src="${photos[ref].src}" alt="" style="opacity:.4">`; msg.textContent = "Fai combaciare il corpo con la foto in trasparenza."; return; }
-  el.innerHTML = SILHOUETTE; msg.textContent = "Preparo la sagoma dalla tua foto…";
-  try {
-    const sil = await photoSilhouette(ref);
-    if (cam.guide === "sagoma" && cam.ref === ref) { el.innerHTML = `<img src="${sil}" alt="">`; msg.textContent = `Mettiti dentro la sagoma: è il contorno del tuo corpo nella foto del ${pDate(photos[ref])}.`; }
-  } catch (e) { msg.textContent = "Non riesco a ricavare la sagoma dalla foto (serve internet la prima volta): uso quella standard."; }
-}
-async function camShoot() {
-  const v = document.getElementById("cam-v"); if (!cam.stream || !v.videoWidth) return;
-  const btn = document.getElementById("cam-shot"), cnt = document.getElementById("cam-count"); btn.disabled = true;
-  for (let t = cam.timer; t > 0; t--) { cnt.textContent = t; await new Promise(r => setTimeout(r, 1000)); }
-  cnt.textContent = "";
-  // stesso taglio 3:4 che vedi a schermo
-  const vw = v.videoWidth, vh = v.videoHeight, r = 3 / 4;
-  let sw = vw, sh = vw / r; if (sh > vh) { sh = vh; sw = vh * r; }
-  const cv = document.createElement("canvas"); cv.width = Math.round(Math.min(900, sw)); cv.height = Math.round(cv.width / r);
-  const g = cv.getContext("2d");
-  if (cam.facing === "user") { g.translate(cv.width, 0); g.scale(-1, 1); }
-  g.drawImage(v, (vw - sw) / 2, (vh - sh) / 2, sw, sh, 0, 0, cv.width, cv.height);
-  cam.shot = cv.toDataURL("image/jpeg", .8);
-  document.getElementById("cam-box").insertAdjacentHTML("beforeend", `<img id="cam-prev" src="${cam.shot}" alt="Anteprima">`);
-  btn.outerHTML = `<div class="cam-row"><button class="ov-btn" onclick="openCam()">Rifai</button><button class="ov-btn on" onclick="camSave()">Salva foto</button></div>`;
-  camStop();
-}
-async function camSave() {
-  const im = await loadImg(cam.shot), date = toKey(new Date()) + "T12:00:00";
-  let w = null; weights.forEach(x => { if (x.date <= date.slice(0, 10)) w = x.weight; });
-  photos.push({ date, src: cam.shot, w: im.width, h: im.height, weight: w, sagoma: true });
-  if (!store(PHOTOS_KEY, photos)) { photos.pop(); return alert("Memoria piena: scarica un backup e cancella qualche foto."); }
-  closeCam(); renderProgress();
-  if (photos.length > 1) openCompare(); else openPhoto(photos.length - 1);
-}
-function delPhoto(i) { if (confirm("Eliminare questa foto?")) { photos.splice(i, 1); cam.ref = null; store(PHOTOS_KEY, photos); closeOv("lb"); renderProgress(); } }
+function delPhoto(i) { if (confirm("Eliminare questa foto?")) { photos.splice(i, 1); store(PHOTOS_KEY, photos); closeOv("lb"); renderProgress(); } }
 
 /* ---- Foto: apertura, commento, confronto ---- */
 const pDate = (p, o) => fmt(new Date(p.date), o || { day: "numeric", month: "short", year: "numeric" });
