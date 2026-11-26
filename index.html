@@ -1157,10 +1157,11 @@ async function addPhoto(ev) {
 /* ---- Fotocamera con sagoma: ti metti dentro la sagoma, così tutte le foto sono inquadrate allo stesso modo ---- */
 const SILHOUETTE = `<svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
   <g fill="rgba(255,255,255,.12)" stroke="#fff" stroke-width="2.5" stroke-dasharray="7 6" stroke-linejoin="round">
-    <ellipse cx="150" cy="58" rx="23" ry="29"/>
-    <path d="M138 86 L136 98 L104 108 Q92 112 90 126 L70 232 Q68 244 78 246 Q86 247 88 236 L108 150 L112 206 Q108 230 110 252 L114 386 Q114 394 124 394 L138 394 Q144 394 144 386 L148 268 L152 268 L156 386 Q156 394 162 394 L176 394 Q186 394 186 386 L190 252 Q192 230 188 206 L192 150 L212 236 Q214 247 222 246 Q232 244 230 232 L210 126 Q208 112 196 108 L164 98 L162 86 Z"/>
+    <ellipse cx="150" cy="92" rx="40" ry="50"/>
+    <path d="M131 138 L129 162 L80 178 Q52 187 48 216 L30 402 L72 402 L86 252 L93 302 L96 402 L204 402 L207 302 L214 252 L228 402 L270 402 L252 216 Q248 187 220 178 L171 162 L169 138 Z"/>
   </g>
   <line x1="150" y1="0" x2="150" y2="400" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
+  <line x1="40" y1="178" x2="260" y2="178" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
 </svg>`;
 let cam = { stream: null, facing: "user", timer: 5, guide: "sagoma", shot: null };
 async function openCam() {
@@ -1173,7 +1174,7 @@ async function openCam() {
         <div id="cam-guide"></div>
         <div class="cam-count" id="cam-count"></div>
       </div>
-      <p class="cmp-diff small" id="cam-msg">Mettiti dentro la sagoma: testa nell'ovale, piedi in fondo, braccia leggermente aperte.</p>
+      <p class="cmp-diff small" id="cam-msg">Mettiti dentro la sagoma a mezzo busto: testa nell'ovale, spalle sulla linea, braccia lungo i fianchi.</p>
       <div class="cam-row">
         <button class="ov-btn ${cam.guide === "sagoma" ? "on" : ""}" id="g-s" onclick="camGuide('sagoma')">Sagoma</button>
         ${last != null ? `<button class="ov-btn ${cam.guide === "ultima" ? "on" : ""}" id="g-u" onclick="camGuide('ultima')">Ultima foto</button>` : ""}
