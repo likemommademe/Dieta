@@ -525,12 +525,8 @@ const DAY_TYPES = {
   },
   R1: { label: "1° giorno di riposo", short: "Riposo 1", kind: "rest",
     pranzo: { items: [
-      { t: "Insalata greca: pomodoro, 150 g di feta, olive e cetrioli", k: 470 },
-      { t: "100 g di pane di segale integrale", k: 250 },
-      { t: "Un frutto", k: 70 } ] },
-    cena: { items: [
-      { t: "Minestra di fagioli o di ceci: un barattolo di legumi con 60–70 g di pasta o riso integrale", k: 470 },
-      { t: "Un piatto di verdura a piacere", k: 40 } ] }
+      { t: "Minestrone ricco di verdure e legumi con 50 g di riso integrale + 2 cucchiaini di parmigiano", k: 360 } ] },
+    cena: { free: true, items: [] }
   },
   R2: { label: "2° giorno di riposo", short: "Riposo 2", kind: "rest",
     pranzo: { items: [
@@ -542,8 +538,12 @@ const DAY_TYPES = {
   },
   R3: { label: "3° giorno di riposo", short: "Riposo 3", kind: "rest",
     pranzo: { items: [
-      { t: "Minestrone ricco di verdure e legumi con 50 g di riso integrale + 2 cucchiaini di parmigiano", k: 360 } ] },
-    cena: { free: true, items: [] }
+      { t: "Insalata greca: pomodoro, 150 g di feta, olive e cetrioli", k: 470 },
+      { t: "100 g di pane di segale integrale", k: 250 },
+      { t: "Un frutto", k: 70 } ] },
+    cena: { items: [
+      { t: "Minestra di fagioli o di ceci: un barattolo di legumi con 60–70 g di pasta o riso integrale", k: 470 },
+      { t: "Un piatto di verdura a piacere", k: 40 } ] }
   },
   R4: { label: "4° giorno di riposo", short: "Riposo 4", kind: "rest",
     pranzo: { items: [
@@ -614,7 +614,7 @@ const SHOP = [
     ["Mozzarella", "1"] ] },
   { cat: "Legumi, frutta secca e dispensa", i: "🥜", items: [
     ["Lenticchie o fagioli in barattolo", "1 per la minestra del giorno di riposo 2"],
-    ["Fagioli o ceci in barattolo", "1 per la minestra del giorno di riposo 1"],
+    ["Fagioli o ceci in barattolo", "1 per la minestra del giorno di riposo 3"],
     ["Noci", "1 confezione"],
     ["Frutta secca (nocciole, mandorle, pistacchi)", "circa 200 g"],
     ["Olive", "1 vasetto"],
@@ -638,8 +638,8 @@ const KEY = "dieta-emanuele-v2";
 const WEIGHT_KEY = "menu-oggi-weight-v21-Emanuele";   // stesso salvataggio della vecchia app
 const PHOTOS_KEY = "menu-oggi-photos-v21-Emanuele";   // stesso salvataggio della vecchia app
 // Settimana base, da domenica a sabato: allenamento martedì, giovedì e venerdì, riposo gli altri giorni. 0 = domenica
-const DEFAULT_WEEK = { 0: "R4", 1: "R2", 2: "A1", 3: "R1", 4: "A2", 5: "A3", 6: "R3" };
-const WEEK_VERSION = 3;
+const DEFAULT_WEEK = { 0: "R4", 1: "R2", 2: "A1", 3: "R3", 4: "A2", 5: "A3", 6: "R1" };
+const WEEK_VERSION = 4;
 
 function load(key, fallback) { try { const v = JSON.parse(localStorage.getItem(key)); return v ?? fallback; } catch (e) { return fallback; } }
 function store(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch (e) { return false; } }
@@ -655,8 +655,8 @@ if (!state.week || state.weekVersion !== WEEK_VERSION) { state.week = { ...DEFAU
 state.overrides = state.overrides || {};
 state.days = state.days || {};
 state.shop = state.shop || {};
-// Lunedì 23/11/2026: allenamento giorno 2 invece del riposo (una volta sola, poi si cambia da Oggi)
-if (!state.fix20261123) { if (!state.overrides["2026-11-23"]) state.overrides["2026-11-23"] = "A2"; state.fix20261123 = true; }
+// 26/11/2026: si riparte dal piano base, tolgo i cambi fatti a mano da oggi in poi (una volta sola)
+if (!state.reset20261126) { Object.keys(state.overrides).forEach(k => { if (k >= "2026-11-26") delete state.overrides[k]; }); state.reset20261126 = true; }
 let weights = load(WEIGHT_KEY, []);
 const MEASURE_KEY = "dieta-emanuele-misure";
 // down = meglio se scende, up = meglio se sale
