@@ -389,11 +389,11 @@
 
     <div class="card">
       <div class="dayhead"><h3><span class="em">📸</span>Foto del fisico</h3>
-        <label class="btn" style="cursor:pointer">Aggiungi<input type="file" accept="image/*" style="display:none" onchange="addPhoto(event)"></label>
+        <label class="btn" style="cursor:pointer">Aggiungi<input type="file" accept="image/*" multiple style="display:none" onchange="addPhoto(event)"></label>
       </div>
       <button class="btn solid block" id="cmp-open" style="margin-top:12px;display:none" onclick="openCompare()">↔ Confronta due foto</button>
       <div class="photos" id="photos" style="margin-top:12px"></div>
-      <p class="note">Tocca una foto per aprirla, scrivere un commento o cambiarne la data.</p>
+      <p class="note">Puoi sceglierne più di una insieme. Tocca una foto per aprirla, scrivere un commento o correggerne la data.</p>
     </div>
   </section>
 
@@ -803,6 +803,16 @@ if (!state.seedOttobre) {
   }
   state.seedOttobre = true; save();
 }
+// Storico detto dall'utente il 26/11/2026 (una volta sola): dal 1/10 al 18/11 dieta seguita solo in parte
+// (colazione, pranzo e cena sì, spuntini no), dal 19/11 al 25/11 tutti i pasti
+if (!state.seedStorico) {
+  for (let d = new Date(2026, 9, 1); toKey(d) <= "2026-11-25"; d.setDate(d.getDate() + 1)) {
+    const k = toKey(d), dd = state.days[k] = state.days[k] || { sel: {}, done: {}, extras: {} };
+    const full = k >= "2026-11-19";
+    ["colazione", "spuntino", "pranzo", "merenda", "cena"].forEach(m => dd.done[m] = full || !["spuntino", "merenda"].includes(m));
+  }
+  state.seedStorico = true; save();
+}
 let selected = toKey(new Date());
 
 // Settimana usata fino al 25/11/2026 (allenamento martedì, giovedì e venerdì), con i nomi delle giornate di adesso
@@ -1080,21 +1090,38 @@ function addWeight() {
 function delWeight(i) { if (confirm("Eliminare questa pesata?")) { weights.splice(i, 1); store(WEIGHT_KEY, weights); renderProgress(); } }
 
 function addPhoto(ev) {
-  const file = ev.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const img = new Image();
-    img.onload = () => {
-      const c = document.createElement("canvas"), scale = Math.min(1, 600 / img.width);
-      c.width = img.width * scale; c.height = img.height * scale;
-      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-      photos.push({ date: new Date().toISOString(), src: c.toDataURL("image/jpeg", .6), weight: weights.length ? weights[weights.length - 1].weight : null });
-      if (!store(PHOTOS_KEY, photos)) { photos.pop(); alert("Memoria piena: non riesco a salvare altre foto. Scarica un backup e cancellane qualcuna."); }
-      renderProgress(); openPhoto(photos.length - 1);
+  const files = [...ev.target.files]; ev.target.value = ""; if (!files.length) return;
+  const weightAt2 = iso => { let w = null; weights.forEach(x => { if (x.date <= iso.slice(0, 10)) w = x.weight; }); return w; };
+  let added = 0, full = false;
+  const next = () => {
+    const file = files.shift();
+    if (!file || full) {
+      renderProgress();
+      if (full) alert(`Memoria piena: ho salvato ${added} foto. Scarica un backup e cancellane qualcuna.`);
+      else if (added === 1) openPhoto(photos.length - 1);
+      else if (added > 1) alert(`${added} foto caricate. Toccane una per scrivere il commento.`);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const c = document.createElement("canvas"), scale = Math.min(1, 600 / img.width);
+        c.width = img.width * scale; c.height = img.height * scale;
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        // data dello scatto presa dal file (se c'è), altrimenti oggi
+        const when = file.lastModified ? new Date(file.lastModified) : new Date();
+        const date = toKey(when) + "T12:00:00";
+        photos.push({ date, src: c.toDataURL("image/jpeg", .6), weight: weightAt2(date) });
+        if (store(PHOTOS_KEY, photos)) added++; else { photos.pop(); full = true; }
+        next();
+      };
+      img.onerror = next;
+      img.src = e.target.result;
     };
-    img.src = e.target.result;
+    reader.readAsDataURL(file);
   };
-  reader.readAsDataURL(file); ev.target.value = "";
+  next();
 }
 function delPhoto(i) { if (confirm("Eliminare questa foto?")) { photos.splice(i, 1); store(PHOTOS_KEY, photos); closeOv("lb"); renderProgress(); } }
 
@@ -1219,7 +1246,7 @@ function renderRiepilogo() {
     for (let m = 0; m < 12; m++) {
       const c = countRange(new Date(y, m, 1), new Date(y, m + 1, 0)); T.ok += c.ok; T.tot += c.tot; T.train += c.train; T.rest += c.rest;
       const name = fmt(new Date(y, m, 1), { month: "short" });
-      rows += `<div class="yr"><span style="text-transform:capitalize">${name}</span><span class="bar"><i class="d" style="width:${c.tot ? c.ok / c.tot * 100 : 0}%"></i></span><span>${c.tot ? `${c.ok}/${c.tot}` : "–"}</span><span class="tr">${c.tot ? `💪${c.train}` : ""}</span></div>`;
+      rows += `<div class="yr"><span style="text-transform:capitalize">${name}</span><span class="bar" style="display:flex"><i class="d" style="width:${c.tot ? c.ok / c.tot * 100 : 0}%;border-radius:0"></i><i class="d" style="width:${c.tot ? c.half / c.tot * 100 : 0}%;opacity:.3;border-radius:0"></i></span><span>${c.tot ? `${c.ok}/${c.tot}` : "–"}</span><span class="tr">${c.tot ? `💪${c.train}` : ""}</span></div>`;
     }
     el.innerHTML = `
       <div class="monthnav"><button class="icon-btn" onclick="rpYear(-1)" aria-label="Anno prima">‹</button><b>${y}</b><button class="icon-btn" onclick="rpYear(1)" aria-label="Anno dopo">›</button></div>
@@ -1228,7 +1255,7 @@ function renderRiepilogo() {
         <div class="kcal-box"><b style="color:var(--day-rest)">${T.rest}</b><span>giorni di riposo</span></div>
         <div class="kcal-box"><b style="color:var(--diet)">${T.ok}/${T.tot}</b><span>dieta rispettata</span></div>
       </div>${rows}
-      <p class="note">La barra blu è la dieta rispettata nel mese, 💪 gli allenamenti. Si conta dal 1° ottobre 2026, quando hai iniziato la dieta.</p>`;
+      <p class="note">Blu pieno = dieta rispettata, blu chiaro = seguita in parte, 💪 = allenamenti. Si conta dal 1° ottobre 2026, quando hai iniziato la dieta.</p>`;
   }
 }
 
