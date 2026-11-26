@@ -33,6 +33,7 @@
     --day-train-soft: #FDE8E8;
     --day-rest: #3BA9E0;
     --day-rest-soft: #E1F3FC;
+    --diet: #2457D6;
     --hot-soft: #FDE9E5;
     --on-accent: #FFFFFF;
     --radius: 18px;
@@ -249,15 +250,20 @@
   .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
   .cal .h { font-size: 11px; font-weight: 700; color: var(--ink-faint); text-align: center; text-transform: uppercase; }
   .cal .c { aspect-ratio: 1; border-radius: 10px; display: grid; place-items: center; font-size: 13px; font-weight: 700; background: var(--surface-2); color: var(--ink-faint); position: relative; }
-  .cal .c.ok { background: var(--train); color: #fff; }
-  .cal .c.half { background: #FFE9A8; color: #8A6400; }
-  .cal .c.no { background: var(--hot-soft); color: var(--hot); }
+  .cal .c { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
+  .cal .c.train { background: var(--day-train-soft); color: var(--day-train); }
+  .cal .c.rest { background: var(--day-rest-soft); color: var(--day-rest); }
+  .cal .c .ck { width: 16px; height: 16px; border-radius: 50%; background: var(--diet); color: #fff; font-size: 10px; line-height: 16px; text-align: center; }
+  .cal .c .ck.half { background: none; border: 2px solid var(--diet); color: var(--diet); line-height: 12px; width: 16px; height: 16px; box-sizing: border-box; }
+  .cal .c .ck.none { visibility: hidden; }
+  .yr .bar i.d { background: var(--diet); }
+  .yr .tr { color: var(--day-train); font-weight: 700; }
   .cal .c.fut { background: none; color: var(--line); }
   .cal .c.today { outline: 2px solid var(--ink); outline-offset: 1px; }
   .legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--ink-soft); margin-top: 10px; }
   .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
   .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
-  .yr { display: grid; grid-template-columns: 70px 1fr 64px; align-items: center; gap: 10px; padding: 6px 0; font-size: 13px; }
+  .yr { display: grid; grid-template-columns: 44px 1fr 52px 44px; align-items: center; gap: 10px; padding: 6px 0; font-size: 13px; }
   .yr .bar { height: 10px; background: var(--surface-2); border-radius: 99px; overflow: hidden; }
   .yr .bar i { display: block; height: 100%; background: var(--train); border-radius: 99px; }
   .yr span:last-child { text-align: right; color: var(--ink-soft); font-weight: 600; }
@@ -799,7 +805,10 @@ if (!state.seedOttobre) {
 }
 let selected = toKey(new Date());
 
-function typeOf(key) { return state.overrides[key] || state.week[fromKey(key).getDay()] || "A1"; }
+// Settimana usata fino al 25/11/2026 (allenamento martedì, giovedì e venerdì), con i nomi delle giornate di adesso
+const OLD_WEEK = { 0: "R4", 1: "R2", 2: "A1", 3: "R1", 4: "A2", 5: "A3", 6: "R3" };
+const baseType = key => (key < "2026-11-26" ? OLD_WEEK : state.week)[fromKey(key).getDay()] || "A1";
+function typeOf(key) { return state.overrides[key] || baseType(key); }
 function mealOf(typeId, meal) {
   const t = DAY_TYPES[typeId];
   return (meal === "pranzo" || meal === "cena") ? t[meal] : COMMON[t.kind][meal];
@@ -898,7 +907,7 @@ function renderDay() {
 function pick(k) { selected = k; renderOggi(); }
 function shiftWeek(n) { selected = toKey(addDays(fromKey(selected), n * 7)); renderOggi(); }
 function goToday() { selected = toKey(new Date()); renderOggi(); }
-function setType(id) { if (id && id !== state.week[fromKey(selected).getDay()]) state.overrides[selected] = id; else delete state.overrides[selected]; save(); renderOggi(); }
+function setType(id) { if (id && id !== baseType(selected)) state.overrides[selected] = id; else delete state.overrides[selected]; save(); renderOggi(); }
 function choose(m, i) { dayData(selected).sel[m] = i; save(); renderDay(); }
 function chooseVar(m, i) { dayData(selected).sel[m + "_v"] = i; save(); renderDay(); }
 function toggleDone(m) { const d = dayData(selected); d.done[m] = !d.done[m]; save(); renderDay(); }
@@ -1172,7 +1181,8 @@ function countRange(from, to) {   // giorni passati (fino a oggi) tra from e to 
   for (let d = new Date(from); d <= to; d = addDays(d, 1)) {
     const k = toKey(d); if (k > todayK) break; if (k < "2026-10-01") continue;
     tot++; const st = dayStatus(k);
-    if (st === 2) { ok++; DAY_TYPES[typeOf(k)].kind === "train" ? train++ : rest++; } else if (st === 1) half++;
+    DAY_TYPES[typeOf(k)].kind === "train" ? train++ : rest++;
+    if (st === 2) ok++; else if (st === 1) half++;
   }
   return { ok, half, tot, train, rest };
 }
@@ -1189,35 +1199,36 @@ function renderRiepilogo() {
     let cells = ["D", "L", "M", "M", "G", "V", "S"].map(h => `<div class="h">${h}</div>`).join("");
     for (let i = 0; i < rpMonth.getDay(); i++) cells += "<div></div>";
     for (let d = 1; d <= last.getDate(); d++) {
-      const k = toKey(new Date(y, m, d)), st = dayStatus(k);
-      const cls = k > todayK ? "fut" : k < "2026-10-01" ? "" : st === 2 ? "ok" : st === 1 ? "half" : (k === todayK ? "" : "no");
-      cells += `<div class="c ${cls} ${k === todayK ? "today" : ""}">${d}</div>`;
+      const k = toKey(new Date(y, m, d)), st = dayStatus(k), kind = DAY_TYPES[typeOf(k)].kind;
+      const past = k <= todayK && k >= "2026-10-01";
+      const ck = !past ? "" : st === 2 ? `<span class="ck">✓</span>` : st === 1 ? `<span class="ck half">½</span>` : `<span class="ck none"></span>`;
+      cells += `<div class="c ${k > todayK ? "fut" : past ? kind : ""} ${k === todayK ? "today" : ""}">${d}${ck}</div>`;
     }
     el.innerHTML = `
       <div class="monthnav"><button class="icon-btn" onclick="rpShift(-1)" aria-label="Mese prima">‹</button><b>${fmt(rpMonth, { month: "long", year: "numeric" })}</b><button class="icon-btn" onclick="rpShift(1)" aria-label="Mese dopo">›</button></div>
       <div class="cal">${cells}</div>
-      <div class="legend"><span><i style="background:var(--train)"></i>Rispettata</span><span><i style="background:#FFE9A8"></i>In parte</span><span><i style="background:var(--hot-soft)"></i>Non segnata</span></div>
+      <div class="legend"><span><i style="background:var(--day-train)"></i>Allenamento</span><span><i style="background:var(--day-rest)"></i>Riposo</span><span><i style="background:var(--diet);border-radius:50%"></i>Dieta rispettata</span></div>
       <div class="stats">
-        <div class="kcal-box"><b>${c.ok}/${c.tot}</b><span>giorni rispettati</span></div>
-        <div class="kcal-box"><b>${c.tot ? Math.round(c.ok / c.tot * 100) : 0}%</b><span>del mese</span></div>
-        <div class="kcal-box"><b>${streak()}</b><span>giorni di fila</span></div>
+        <div class="kcal-box"><b style="color:var(--day-train)">${c.train}</b><span>allenamenti</span></div>
+        <div class="kcal-box"><b style="color:var(--day-rest)">${c.rest}</b><span>giorni di riposo</span></div>
+        <div class="kcal-box"><b style="color:var(--diet)">${c.ok}/${c.tot}</b><span>dieta rispettata</span></div>
       </div>
-      <p class="note">Giornata rispettata = tutti e 5 i pasti segnati come fatti. Di questo mese: ${c.train} di allenamento e ${c.rest} di riposo.</p>`;
+      <p class="note">Dieta rispettata = tutti e 5 i pasti segnati come fatti (½ = solo in parte). ${streak()} giorni di fila. Allenamento o riposo secondo la giornata di dieta di quel giorno.</p>`;
   } else {
-    const y = rpMonth.getFullYear(); let rows = "", T = { ok: 0, tot: 0 };
+    const y = rpMonth.getFullYear(); let rows = "", T = { ok: 0, tot: 0, train: 0, rest: 0 };
     for (let m = 0; m < 12; m++) {
-      const c = countRange(new Date(y, m, 1), new Date(y, m + 1, 0)); T.ok += c.ok; T.tot += c.tot;
+      const c = countRange(new Date(y, m, 1), new Date(y, m + 1, 0)); T.ok += c.ok; T.tot += c.tot; T.train += c.train; T.rest += c.rest;
       const name = fmt(new Date(y, m, 1), { month: "short" });
-      rows += `<div class="yr"><span style="text-transform:capitalize">${name}</span><span class="bar"><i style="width:${c.tot ? c.ok / c.tot * 100 : 0}%"></i></span><span>${c.tot ? `${c.ok}/${c.tot}` : "–"}</span></div>`;
+      rows += `<div class="yr"><span style="text-transform:capitalize">${name}</span><span class="bar"><i class="d" style="width:${c.tot ? c.ok / c.tot * 100 : 0}%"></i></span><span>${c.tot ? `${c.ok}/${c.tot}` : "–"}</span><span class="tr">${c.tot ? `💪${c.train}` : ""}</span></div>`;
     }
     el.innerHTML = `
       <div class="monthnav"><button class="icon-btn" onclick="rpYear(-1)" aria-label="Anno prima">‹</button><b>${y}</b><button class="icon-btn" onclick="rpYear(1)" aria-label="Anno dopo">›</button></div>
       <div class="stats" style="margin:0 0 10px">
-        <div class="kcal-box"><b>${T.ok}</b><span>giorni rispettati</span></div>
-        <div class="kcal-box"><b>${T.tot ? Math.round(T.ok / T.tot * 100) : 0}%</b><span>dell'anno</span></div>
-        <div class="kcal-box"><b>${streak()}</b><span>giorni di fila</span></div>
+        <div class="kcal-box"><b style="color:var(--day-train)">${T.train}</b><span>allenamenti</span></div>
+        <div class="kcal-box"><b style="color:var(--day-rest)">${T.rest}</b><span>giorni di riposo</span></div>
+        <div class="kcal-box"><b style="color:var(--diet)">${T.ok}/${T.tot}</b><span>dieta rispettata</span></div>
       </div>${rows}
-      <p class="note">Si conta dal 1° ottobre 2026, quando hai iniziato la dieta.</p>`;
+      <p class="note">La barra blu è la dieta rispettata nel mese, 💪 gli allenamenti. Si conta dal 1° ottobre 2026, quando hai iniziato la dieta.</p>`;
   }
 }
 
