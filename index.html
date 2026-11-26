@@ -26,6 +26,10 @@
     --rest-soft: #E4EFFB;
     --accent: #2FA36B;
     --hot: #E0452B;
+    --day-train: #E5484D;
+    --day-train-soft: #FDE8E8;
+    --day-rest: #3BA9E0;
+    --day-rest-soft: #E1F3FC;
     --hot-soft: #FDE9E5;
     --on-accent: #FFFFFF;
     --radius: 18px;
@@ -67,16 +71,18 @@
   .dayb { border: 1px solid transparent; background: none; border-radius: 14px; padding: 6px 0 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
   .dayb .dn { font-size: 11px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; }
   .dayb .dd { font-size: 16px; font-weight: 700; }
-  .dayb .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .dayb .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dayb.train .dd { color: var(--day-train); } .dayb.rest .dd { color: var(--day-rest); }
+  .dayb.train.sel { background: var(--day-train-soft); border-color: var(--day-train-soft); } .dayb.rest.sel { background: var(--day-rest-soft); border-color: var(--day-rest-soft); }
   .dayb.today .dd { text-decoration: underline; text-underline-offset: 3px; }
   .dayb.sel { background: var(--surface); border-color: var(--line); box-shadow: var(--shadow); }
-  .dot.train { background: var(--train); } .dot.rest { background: var(--rest); }
+  .dot.train { background: var(--day-train); } .dot.rest { background: var(--day-rest); }
 
   /* Testata del giorno */
   .dayhead { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
   .chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; font-size: 13px; font-weight: 700; }
-  .chip.train { background: var(--train-soft); color: var(--train); }
-  .chip.rest { background: var(--rest-soft); color: var(--rest); }
+  .chip.train { background: var(--day-train-soft); color: var(--day-train); }
+  .chip.rest { background: var(--day-rest-soft); color: var(--day-rest); }
   .type-select { border: 1px solid var(--line); background: var(--surface-2); border-radius: 12px; padding: 8px 10px; max-width: 190px; }
   .kcal-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 14px; }
   .kcal-box { background: var(--surface-2); border-radius: 14px; padding: 10px 12px; }
@@ -748,7 +754,7 @@ function renderStrip() {
   let h = "";
   for (let i = 0; i < 7; i++) {
     const d = addDays(mon, i), k = toKey(d), kind = DAY_TYPES[typeOf(k)].kind;
-    h += `<button class="dayb ${k === selected ? "sel" : ""} ${k === todayK ? "today" : ""}" onclick="pick('${k}')">
+    h += `<button class="dayb ${kind} ${k === selected ? "sel" : ""} ${k === todayK ? "today" : ""}" onclick="pick('${k}')">
       <span class="dn">${DAY_NAMES[d.getDay()].slice(0, 3)}</span><span class="dd">${d.getDate()}</span><span class="dot ${kind}"></span></button>`;
   }
   document.getElementById("strip").innerHTML = h;
@@ -863,7 +869,7 @@ function barChart(rows) {
   let s = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Calorie degli ultimi 7 giorni">`;
   rows.forEach((r, i) => {
     const h = (H - pb - 14) * r.v / max, x = i * bw + bw * .2, y = H - pb - h;
-    s += `<rect x="${x}" y="${y}" width="${bw * .6}" height="${Math.max(h, 2)}" rx="6" fill="var(--${r.kind})" opacity="${r.v ? 1 : .25}"/>`;
+    s += `<rect x="${x}" y="${y}" width="${bw * .6}" height="${Math.max(h, 2)}" rx="6" fill="var(--day-${r.kind})" opacity="${r.v ? 1 : .25}"/>`;
     if (r.v) s += `<text x="${x + bw * .3}" y="${y - 4}" text-anchor="middle">${r.v}</text>`;
     s += `<text x="${x + bw * .3}" y="${H - 6}" text-anchor="middle">${r.label}</text>`;
   });
@@ -1140,7 +1146,7 @@ function renderTraining() {
   const c = trCount(w, d);
   document.getElementById("tr-summary").innerHTML = `
     <div class="dayhead"><div><div class="eyebrow">Settimana ${w} · Giorno ${d}</div><h3 style="margin-top:2px">${TR_DAY_NAMES[d - 1]}</h3></div>
-      <span class="chip train">${c.done === c.tot ? "✅ Fatto" : `${c.done}/${c.tot} serie`}</span></div>
+      <span class="chip ${c.done === c.tot ? "" : "train"}" style="${c.done === c.tot ? "background:var(--train-soft);color:var(--train)" : ""}">${c.done === c.tot ? "✅ Fatto" : `${c.done}/${c.tot} serie`}</span></div>
     <div class="progress"><div style="width:${c.done / c.tot * 100}%"></div></div>
     <div class="grid2" style="margin-top:12px">
       <button class="btn" onclick="trAll(true)">Segna tutto fatto</button>
