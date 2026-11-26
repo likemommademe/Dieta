@@ -298,6 +298,8 @@
   .imp b { font-family: 'Chakra Petch', sans-serif; text-transform: uppercase; font-size: 16px; }
   .imp p { margin: 6px 0 0; font-size: 14px; line-height: 1.45; }
   .imp .ok { color: #7EE2A8; font-weight: 700; } .imp .ko { color: #FF9A8A; font-weight: 700; } .imp .src { font-size: 12px; color: rgba(255,255,255,.55); }
+  #toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 84px); transform: translateX(-50%); background: #121414; color: #fff; padding: 10px 16px; border-radius: 999px; font-weight: 700; font-size: 14px; z-index: 60; display: none; box-shadow: var(--shadow); }
+  .photos img { aspect-ratio: 3/4; }
   .cmp-sel { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
   .cmp-sel select { width: 100%; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2); color: #fff; border-radius: 12px; padding: 9px 10px; font: inherit; }
   .cmp-sel select option { color: #121414; }
@@ -397,7 +399,7 @@
       </div>
       <button class="btn solid block" id="cmp-open" style="margin-top:12px;display:none" onclick="openCompare()">↔ Confronta due foto</button>
       <div class="photos" id="photos" style="margin-top:12px"></div>
-      <p class="note">Puoi sceglierne più di una insieme: dopo il caricamento si apre il confronto con la prima foto e ti dico cosa è migliorato, in base alle misure.</p>
+      <p class="note">Puoi sceglierne più di una insieme. Le ritaglio tutte allo stesso modo, con spalle e fianchi nello stesso punto. Dopo il caricamento si apre il confronto con la prima foto e ti dico cosa è migliorato, in base alle misure.</p>
     </div>
   </section>
 
@@ -1025,7 +1027,7 @@ function renderProgress() {
     `<div class="row-hist"><span>${fmt(fromKey(w.date), { day: "numeric", month: "short", year: "numeric" })}</span><span><b>${w.weight} kg</b> <button class="x" onclick="delWeight(${i})" aria-label="Elimina">✕</button></span></div>`).join("");
 
   renderMeasures();
-  renderRiepilogo();
+  renderRiepilogo(); alignOld();
   const order = photoOrder().reverse();
   document.getElementById("cmp-open").style.display = photos.length > 1 ? "block" : "none";
   document.getElementById("photos").innerHTML = order.length ? order.map(i => { const p = photos[i];
@@ -1093,39 +1095,127 @@ function addWeight() {
 }
 function delWeight(i) { if (confirm("Eliminare questa pesata?")) { weights.splice(i, 1); store(WEIGHT_KEY, weights); renderProgress(); } }
 
-function addPhoto(ev) {
+/* ---- Foto: ritaglio allineato ----
+   Ogni foto diventa 600×800 con il busto sempre nello stesso punto e della stessa grandezza:
+   centro del busto (tra spalle e fianchi) in (300, 350), busto lungo 200 px.
+   Spalle e fianchi li trova il riconoscimento della posa di MediaPipe, che gira sul telefono:
+   la foto non viene mandata da nessuna parte. */
+const OUT_W = 600, OUT_H = 800, ANCHOR_X = 300, ANCHOR_Y = 350, TORSO = 200;
+let posePromise = null;
+function getPose() {
+  if (!posePromise) posePromise = (async () => {
+    const v = await import("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs");
+    const files = await v.FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm");
+    return v.PoseLandmarker.createFromOptions(files, { baseOptions: { modelAssetPath: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task" }, runningMode: "IMAGE", numPoses: 1 });
+  })().catch(e => { posePromise = null; throw e; });
+  return posePromise;
+}
+const loadImg = src => new Promise((ok, ko) => { const i = new Image(); i.onload = () => ok(i); i.onerror = ko; i.src = src; });
+function coverCrop(img) { const k = Math.max(OUT_W / img.width, OUT_H / img.height); return { k, cx: img.width / 2, cy: img.height / 2 + (ANCHOR_Y - OUT_H / 2) / k }; }
+async function autoCrop(img) {
+  try {
+    const pose = await getPose(), r = pose.detect(img), lm = r.landmarks && r.landmarks[0];
+    if (!lm) return { ...coverCrop(img), auto: false };
+    const P = i => ({ x: lm[i].x * img.width, y: lm[i].y * img.height, ok: (lm[i].visibility ?? 1) > .4 });
+    const ls = P(11), rs = P(12), lh = P(23), rh = P(24);
+    const S = { x: (ls.x + rs.x) / 2, y: (ls.y + rs.y) / 2 };
+    let H = { x: (lh.x + rh.x) / 2, y: (lh.y + rh.y) / 2 };
+    if (!(lh.ok || rh.ok)) { const sw = Math.hypot(ls.x - rs.x, ls.y - rs.y); H = { x: S.x, y: S.y + sw * 1.3 }; }  // foto a mezzo busto
+    const torso = Math.hypot(S.x - H.x, S.y - H.y);
+    if (!(ls.ok || rs.ok) || torso < 10) return { ...coverCrop(img), auto: false };
+    return { k: TORSO / torso, cx: (S.x + H.x) / 2, cy: (S.y + H.y) / 2, auto: true };
+  } catch (e) { return { ...coverCrop(img), auto: false }; }
+}
+function renderCrop(img, c) {
+  const cv = document.createElement("canvas"); cv.width = OUT_W; cv.height = OUT_H;
+  const g = cv.getContext("2d"); g.fillStyle = "#1b1f1d"; g.fillRect(0, 0, OUT_W, OUT_H);
+  g.setTransform(c.k, 0, 0, c.k, ANCHOR_X - c.cx * c.k, ANCHOR_Y - c.cy * c.k); g.drawImage(img, 0, 0);
+  return cv.toDataURL("image/jpeg", .7);
+}
+function shrink(img, max) {
+  const sc = Math.min(1, max / Math.max(img.width, img.height)), cv = document.createElement("canvas");
+  cv.width = Math.round(img.width * sc); cv.height = Math.round(img.height * sc);
+  cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height); return cv.toDataURL("image/jpeg", .7);
+}
+function toast(t) {
+  let el = document.getElementById("toast");
+  if (!el) { el = document.createElement("div"); el.id = "toast"; document.body.appendChild(el); }
+  el.textContent = t; el.style.display = t ? "block" : "none";
+}
+async function addPhoto(ev) {
   const files = [...ev.target.files]; ev.target.value = ""; if (!files.length) return;
   const weightAt2 = iso => { let w = null; weights.forEach(x => { if (x.date <= iso.slice(0, 10)) w = x.weight; }); return w; };
-  let added = 0, full = false;
-  const next = () => {
-    const file = files.shift();
-    if (!file || full) {
-      renderProgress();
-      if (full) alert(`Memoria piena: ho salvato ${added} foto. Scarica un backup e cancellane qualcuna.`);
-      else if (added && photos.length > 1) openCompare();
-      else if (added) openPhoto(photos.length - 1);
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = e => {
-      const img = new Image();
-      img.onload = () => {
-        const c = document.createElement("canvas"), scale = Math.min(1, 600 / img.width);
-        c.width = img.width * scale; c.height = img.height * scale;
-        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-        // data dello scatto presa dal file (se c'è), altrimenti oggi
-        const when = file.lastModified ? new Date(file.lastModified) : new Date();
-        const date = toKey(when) + "T12:00:00";
-        photos.push({ date, src: c.toDataURL("image/jpeg", .6), weight: weightAt2(date) });
-        if (store(PHOTOS_KEY, photos)) added++; else { photos.pop(); full = true; }
-        next();
-      };
-      img.onerror = next;
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  };
-  next();
+  let added = 0, full = false, notFound = 0;
+  for (let n = 0; n < files.length && !full; n++) {
+    const file = files[n];
+    toast(`Ritaglio le foto… ${n + 1}/${files.length}`);
+    try {
+      const raw = await loadImg(URL.createObjectURL(file));
+      const orig = await loadImg(shrink(raw, 1000));
+      const crop = await autoCrop(orig); if (!crop.auto) notFound++;
+      const when = file.lastModified ? new Date(file.lastModified) : new Date();   // data dello scatto dal file
+      const date = toKey(when) + "T12:00:00";
+      photos.push({ date, orig: orig.src, crop, src: renderCrop(orig, crop), weight: weightAt2(date), al: 1 });
+      if (store(PHOTOS_KEY, photos)) added++; else { photos.pop(); full = true; }
+    } catch (e) { /* file non leggibile: lo salto */ }
+  }
+  toast(""); renderProgress();
+  if (full) alert(`Memoria piena: ho salvato ${added} foto. Scarica un backup e cancellane qualcuna.`);
+  if (notFound) alert(`In ${notFound} foto non ho trovato bene il corpo: aprile e usa «Sistema ritaglio».`);
+  if (added && photos.length > 1) openCompare(); else if (added) openPhoto(photos.length - 1);
+}
+// Le foto caricate prima del ritaglio automatico: le allineo una volta sola
+let aligning = false;
+async function alignOld() {
+  if (aligning || !photos.some(p => !p.al)) return; aligning = true;
+  const todo = photos.filter(p => !p.al);
+  for (let n = 0; n < todo.length; n++) {
+    toast(`Allineo le foto già caricate… ${n + 1}/${todo.length}`);
+    const p = todo[n];
+    try { const orig = await loadImg(p.src); p.orig = p.src; p.crop = await autoCrop(orig); p.src = renderCrop(orig, p.crop); p.al = 1; } catch (e) { p.al = 1; }
+  }
+  store(PHOTOS_KEY, photos); toast(""); aligning = false; renderProgress();
+}
+// Regolazione a mano: trascini la foto e cambi lo zoom, con un'altra foto in trasparenza sopra come guida
+let ed = null;
+async function openCropEditor(i) {
+  const p = photos[i], order = photoOrder(), refIdx = order.find(j => j !== i);
+  const img = await loadImg(p.orig || p.src);
+  ed = { i, img, c: { ...(p.crop || coverCrop(img)) } };
+  openOv("lb", `
+    <div class="ov-top"><b>Sistema ritaglio</b><button class="ov-btn" onclick="openPhoto(${i})">Annulla</button></div>
+    <div class="ov-body">
+      <div class="cmp" id="ed-box"><canvas id="ed-cv" width="${OUT_W}" height="${OUT_H}" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
+        ${refIdx != null ? `<img id="ed-ref" src="${photos[refIdx].src}" alt="" style="opacity:.35">` : ""}
+        <div style="position:absolute;left:0;right:0;top:${ANCHOR_Y / OUT_H * 100}%;border-top:1px dashed rgba(255,255,255,.5)"></div></div>
+      <p class="cmp-diff small">Trascina la foto con il dito per spostarla. ${refIdx != null ? `In trasparenza c'è la foto del ${pDate(photos[refIdx])}: fai combaciare spalle e fianchi.` : ""}</p>
+      <div class="field"><label for="ed-z">Zoom</label><input id="ed-z" type="range" min="-100" max="100" value="0" oninput="edZoom(this.value)" style="padding:0"></div>
+      ${refIdx != null ? `<div class="field"><label for="ed-o">Trasparenza della guida</label><input id="ed-o" type="range" min="0" max="80" value="35" oninput="document.getElementById('ed-ref').style.opacity=this.value/100" style="padding:0"></div>` : ""}
+      <div class="grid2" style="margin-top:10px">
+        <button class="ov-btn" onclick="edAuto()">Automatico</button>
+        <button class="ov-btn" style="background:#fff;color:#121414" onclick="edSave()">Salva</button>
+      </div>
+    </div>`);
+  ed.k0 = ed.c.k; edDraw();
+  const box = document.getElementById("ed-box"); let last = null;
+  box.addEventListener("pointerdown", e => { last = { x: e.clientX, y: e.clientY }; box.setPointerCapture(e.pointerId); });
+  box.addEventListener("pointermove", e => {
+    if (!last) return; const sc = OUT_W / box.getBoundingClientRect().width;
+    ed.c.cx -= (e.clientX - last.x) * sc / ed.c.k; ed.c.cy -= (e.clientY - last.y) * sc / ed.c.k; last = { x: e.clientX, y: e.clientY }; edDraw();
+  });
+  box.addEventListener("pointerup", () => last = null);
+}
+function edDraw() {
+  const g = document.getElementById("ed-cv").getContext("2d"), c = ed.c;
+  g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = "#1b1f1d"; g.fillRect(0, 0, OUT_W, OUT_H);
+  g.setTransform(c.k, 0, 0, c.k, ANCHOR_X - c.cx * c.k, ANCHOR_Y - c.cy * c.k); g.drawImage(ed.img, 0, 0);
+}
+function edZoom(v) { ed.c.k = ed.k0 * Math.pow(2, v / 100); edDraw(); }
+async function edAuto() { toast("Cerco spalle e fianchi…"); ed.c = await autoCrop(ed.img); ed.k0 = ed.c.k; document.getElementById("ed-z").value = 0; toast(""); edDraw(); if (!ed.c.auto) alert("Non ho trovato bene il corpo: sistemalo a mano."); }
+function edSave() {
+  const p = photos[ed.i]; if (!p.orig) p.orig = p.src;
+  p.crop = ed.c; p.src = renderCrop(ed.img, ed.c); p.al = 1;
+  if (!store(PHOTOS_KEY, photos)) alert("Memoria piena: non riesco a salvare."); renderProgress(); openPhoto(ed.i);
 }
 function delPhoto(i) { if (confirm("Eliminare questa foto?")) { photos.splice(i, 1); store(PHOTOS_KEY, photos); closeOv("lb"); renderProgress(); } }
 
@@ -1149,6 +1239,7 @@ function openPhoto(i) {
       </div>
       <div class="field"><label for="lb-note">Note</label><textarea id="lb-note" placeholder="Facoltative" onchange="setPhoto(${i},'note',this.value)">${esc(p.note || "")}</textarea></div>
       <div class="grid2" style="margin-top:6px">
+        <button class="ov-btn" style="grid-column:1/-1" onclick="openCropEditor(${i})">✂︎ Sistema ritaglio</button>
         ${photos.length > 1 ? `<button class="ov-btn" onclick="closeOv('lb');openCompare(${order[0] === i ? order[order.length - 1] : order[0]},${i})">↔ Confronta con la ${order[0] === i ? "più recente" : "prima"}</button>` : "<span></span>"}
         <button class="ov-btn" style="color:#FF8A80" onclick="delPhoto(${i})">Elimina</button>
       </div>
@@ -1546,6 +1637,8 @@ function tab(name) {
   window.scrollTo({ top: 0 });
 }
 
+// chiedo al browser di non cancellare da solo i dati salvati
+try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
 renderOggi();
 </script>
 </body>
