@@ -279,7 +279,7 @@
   .ov-btn { border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.08); color: #fff; border-radius: 999px; padding: 8px 14px; font-weight: 700; cursor: pointer; }
   .ov-body { max-width: 560px; width: 100%; margin: 0 auto; }
   .lb-img { position: relative; }
-  .lb-img img { width: 100%; max-height: 78vh; aspect-ratio: 3/4; object-fit: cover; border-radius: 14px; display: block; background: #000; }
+  .lb-img img { width: auto; max-width: 100%; height: auto; max-height: 58vh; margin: 0 auto; aspect-ratio: 3/4; object-fit: cover; border-radius: 14px; display: block; background: #000; }
   .lb-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; border: 0; background: rgba(0,0,0,.45); color: #fff; font-size: 20px; cursor: pointer; }
   .lb-arrow.l { left: 8px; } .lb-arrow.r { right: 8px; }
   .overlay .field label { color: rgba(255,255,255,.7); }
@@ -301,6 +301,16 @@
   .imp .ok { color: #7EE2A8; font-weight: 700; } .imp .ko { color: #FF9A8A; font-weight: 700; } .imp .src { font-size: 12px; color: rgba(255,255,255,.55); }
   #toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 84px); transform: translateX(-50%); background: #121414; color: #fff; padding: 10px 16px; border-radius: 999px; font-weight: 700; font-size: 14px; z-index: 60; display: none; box-shadow: var(--shadow); }
   .photos img { aspect-ratio: 3/4; }
+  .lb-actions { display: flex; gap: 6px; margin: 10px 0 12px; }
+  .lb-actions .ov-btn { flex: 1 1 0; min-width: 0; padding: 10px 6px; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ov-btn.danger { color: #FF8A80; }
+  .overlay .grid2 > *, .cmp-sel > * { min-width: 0; }
+  .overlay input, .overlay select, .overlay textarea { min-width: 0; max-width: 100%; box-sizing: border-box; -webkit-appearance: none; appearance: none; }
+  .overlay input[type=range] { -webkit-appearance: auto; appearance: auto; }
+  .overlay input[type=date] { display: block; min-height: 42px; text-align: left; }
+  .overlay input[type=date]::-webkit-date-and-time-value { text-align: left; }
+  .ov-top b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ov-top .ov-btn { flex: none; }
   .cmp-sel { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
   .cmp-sel select { width: 100%; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2); color: #fff; border-radius: 12px; padding: 9px 10px; font: inherit; }
   .cmp-sel select option { color: #121414; }
@@ -1251,16 +1261,16 @@ function openPhoto(i) {
       <div class="lb-img"><img src="${p.src}" alt="Foto del ${pDate(p)}">
         ${prev != null ? `<button class="lb-arrow l" onclick="openPhoto(${prev})" aria-label="Foto prima">‹</button>` : ""}
         ${next != null ? `<button class="lb-arrow r" onclick="openPhoto(${next})" aria-label="Foto dopo">›</button>` : ""}</div>
-      <div class="grid2" style="margin-top:12px">
+      <div class="lb-actions">
+        ${photos.length > 1 ? `<button class="ov-btn" onclick="closeOv('lb');openCompare(${order[0] === i ? order[order.length - 1] : order[0]},${i})">Confronta</button>` : ""}
+        <button class="ov-btn" onclick="openCropEditor(${i})">Ritaglio</button>
+        <button class="ov-btn danger" onclick="delPhoto(${i})">Elimina</button>
+      </div>
+      <div class="grid2 lb-fields">
         <div class="field"><label for="lb-date">Data</label><input id="lb-date" type="date" value="${toKey(new Date(p.date))}" onchange="setPhoto(${i},'date',this.value)"></div>
         <div class="field"><label for="lb-w">Peso (kg)</label><input id="lb-w" type="number" step="0.1" inputmode="decimal" value="${p.weight ?? ""}" onchange="setPhoto(${i},'weight',this.value)"></div>
       </div>
       <div class="field"><label for="lb-note">Note</label><textarea id="lb-note" placeholder="Facoltative" onchange="setPhoto(${i},'note',this.value)">${esc(p.note || "")}</textarea></div>
-      <div class="grid2" style="margin-top:6px">
-        <button class="ov-btn" style="grid-column:1/-1" onclick="openCropEditor(${i})">✂︎ Sistema ritaglio</button>
-        ${photos.length > 1 ? `<button class="ov-btn" onclick="closeOv('lb');openCompare(${order[0] === i ? order[order.length - 1] : order[0]},${i})">↔ Confronta con la ${order[0] === i ? "più recente" : "prima"}</button>` : "<span></span>"}
-        <button class="ov-btn" style="color:#FF8A80" onclick="delPhoto(${i})">Elimina</button>
-      </div>
     </div>`);
 }
 function setPhoto(i, f, v) {
