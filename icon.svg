@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#2FA36B"/>
+  <circle cx="256" cy="256" r="196" fill="#3DB87B"/>
+  <!-- foglia -->
+  <g transform="translate(-46 -6) rotate(35 256 270)">
+    <path d="M256 92 C 336 140 336 228 256 272 C 176 228 176 140 256 92 Z" fill="#E2F5EA"/>
+    <path d="M256 120 L256 262" stroke="#3DB87B" stroke-width="9" stroke-linecap="round"/>
+  </g>
+  <!-- manubrio -->
+  <rect x="150" y="322" width="212" height="24" rx="12" fill="#FFFFFF"/>
+  <rect x="118" y="284" width="40" height="100" rx="14" fill="#FFFFFF"/>
+  <rect x="354" y="284" width="40" height="100" rx="14" fill="#FFFFFF"/>
+  <rect x="88" y="302" width="34" height="64" rx="12" fill="#E5484D"/>
+  <rect x="390" y="302" width="34" height="64" rx="12" fill="#E5484D"/>
+</svg>
