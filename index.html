@@ -308,7 +308,7 @@
 
   /* Menu in basso */
   .nav { position: fixed; left: 0; right: 0; bottom: 0; background: color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); z-index: 10; }
-  .nav-in { max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: repeat(6, 1fr); }
+  .nav-in { max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); }
   .nav button { border: 0; background: none; padding: 9px 0 10px; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; font-weight: 700; color: var(--ink-faint); cursor: pointer; }
   .nav button svg { width: 22px; height: 22px; }
   .nav button.active { color: var(--train); }
@@ -334,14 +334,6 @@
     <div class="card" id="day-extras"></div>
   </section>
 
-  <!-- ============ SETTIMANA ============ -->
-  <section class="view" id="view-settimana">
-    <div class="top">
-      <div><div class="eyebrow">Piano della Dott.ssa Marinazzo</div><h1>La settimana</h1></div>
-    </div>
-    <p class="muted small" style="margin-top:-6px">Tocca un giorno per vedere tutti i pasti. Dove ci sono le opzioni numerate, se ne sceglie una.</p>
-    <div id="week-list"></div>
-  </section>
 
   <!-- ============ SPESA ============ -->
   <section class="view" id="view-spesa">
@@ -430,6 +422,10 @@
   <section class="view" id="view-info">
     <div class="top"><div><div class="eyebrow">Regole e impostazioni</div><h1>Info</h1></div></div>
 
+    <h2 class="section-title"><span class="ico sm">🗓️</span>La settimana del piano</h2>
+    <p class="muted small" style="margin-top:-4px">Tocca un giorno per vedere tutti i pasti. Dove ci sono le opzioni numerate, se ne sceglie una.</p>
+    <div id="week-list"></div>
+
     <div class="card">
       <h3 style="margin-bottom:6px"><span class="em">📌</span>Raccomandazioni</h3>
       <ul class="items">
@@ -484,7 +480,6 @@
 
 <nav class="nav"><div class="nav-in">
   <button data-tab="oggi" class="active" onclick="tab('oggi')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><path d="M12 8v4l2.5 2"/></svg>Oggi</button>
-  <button data-tab="settimana" onclick="tab('settimana')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Settimana</button>
   <button data-tab="spesa" onclick="tab('spesa')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 11H6.2z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>Spesa</button>
   <button data-tab="palestra" onclick="tab('palestra')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6.5 7v10M17.5 7v10M3.5 9.5v5M20.5 9.5v5M6.5 12h11"/></svg>Palestra</button>
   <button data-tab="progressi" onclick="tab('progressi')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18l5-6 4 3 7-8"/><path d="M15 7h5v5"/></svg>Progressi</button>
@@ -1633,7 +1628,7 @@ function resetAll() {
 function tab(name) {
   document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === "view-" + name));
   document.querySelectorAll(".nav button").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
-  ({ oggi: renderOggi, settimana: renderWeek, spesa: renderShop, progressi: renderProgress, palestra: () => { if (!trKeep) trSel = null; trKeep = false; renderTraining(); }, info: renderInfo })[name]();
+  ({ oggi: renderOggi, spesa: renderShop, progressi: renderProgress, palestra: () => { if (!trKeep) trSel = null; trKeep = false; renderTraining(); }, info: () => { renderWeek(); renderInfo(); } })[name]();
   window.scrollTo({ top: 0 });
 }
 
