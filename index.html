@@ -272,20 +272,20 @@
   /* Foto */
   .photos figure { cursor: pointer; }
   .photos .cm { font-size: 11px; color: var(--ink-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .overlay { position: fixed; inset: 0; z-index: 50; background: #121414; display: none; flex-direction: column; color: #fff; padding: calc(env(safe-area-inset-top) + 10px) 16px calc(env(safe-area-inset-bottom) + 16px); overflow-y: auto; }
+  .overlay { position: fixed; inset: 0; z-index: 50; background: #121414; display: none; flex-direction: column; color: #fff; padding: calc(env(safe-area-inset-top) + 10px) 8px calc(env(safe-area-inset-bottom) + 16px); overflow-y: auto; }
   .overlay.open { display: flex; }
   .ov-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; max-width: 560px; width: 100%; margin: 0 auto 10px; }
   .ov-top b { font-family: 'Chakra Petch', sans-serif; font-size: 18px; text-transform: uppercase; }
   .ov-btn { border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.08); color: #fff; border-radius: 999px; padding: 8px 14px; font-weight: 700; cursor: pointer; }
   .ov-body { max-width: 560px; width: 100%; margin: 0 auto; }
   .lb-img { position: relative; }
-  .lb-img img { width: 100%; max-height: 62vh; object-fit: contain; border-radius: 14px; display: block; background: #000; }
+  .lb-img img { width: 100%; max-height: 78vh; aspect-ratio: 3/4; object-fit: cover; border-radius: 14px; display: block; background: #000; }
   .lb-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; border: 0; background: rgba(0,0,0,.45); color: #fff; font-size: 20px; cursor: pointer; }
   .lb-arrow.l { left: 8px; } .lb-arrow.r { right: 8px; }
   .overlay .field label { color: rgba(255,255,255,.7); }
   .overlay .field input, .overlay textarea { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2); color: #fff; border-radius: 12px; padding: 10px 12px; width: 100%; font: inherit; }
   .overlay textarea { min-height: 70px; resize: vertical; }
-  .cmp { position: relative; width: 100%; aspect-ratio: 3/4; border-radius: 14px; overflow: hidden; background: #000; touch-action: none; user-select: none; }
+  .cmp { position: relative; width: 100%; max-width: calc(72vh * 3 / 4); margin: 0 auto; aspect-ratio: 3/4; border-radius: 14px; overflow: hidden; background: #000; touch-action: none; user-select: none; }
   .cmp img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
   .cmp .before { clip-path: inset(0 50% 0 0); }
   .cmp .handle { position: absolute; top: 0; bottom: 0; left: 50%; width: 3px; background: #fff; transform: translateX(-50%); pointer-events: none; }
@@ -1096,7 +1096,14 @@ function delWeight(i) { if (confirm("Eliminare questa pesata?")) { weights.splic
    centro del busto (tra spalle e fianchi) in (300, 350), busto lungo 200 px.
    Spalle e fianchi li trova il riconoscimento della posa di MediaPipe, che gira sul telefono:
    la foto non viene mandata da nessuna parte. */
-const OUT_W = 600, OUT_H = 800, ANCHOR_X = 300, ANCHOR_Y = 350, TORSO = 200;
+const OUT_W = 600, OUT_H = 800, ANCHOR_X = 300, ANCHOR_Y = 360, TORSO = 260, AL_VERSION = 2;
+// La foto deve riempire tutto il riquadro: zoom minimo e ritaglio tenuto dentro l'immagine
+function fillFrame(c, img) {
+  const k = Math.max(c.k, OUT_W / img.width, OUT_H / img.height);
+  const cx = Math.min(Math.max(c.cx, ANCHOR_X / k), img.width - (OUT_W - ANCHOR_X) / k);
+  const cy = Math.min(Math.max(c.cy, ANCHOR_Y / k), img.height - (OUT_H - ANCHOR_Y) / k);
+  return { ...c, k, cx, cy };
+}
 let posePromise = null;
 function getPose() {
   if (!posePromise) posePromise = (async () => {
@@ -1119,7 +1126,7 @@ async function autoCrop(img) {
     if (!(lh.ok || rh.ok)) { const sw = Math.hypot(ls.x - rs.x, ls.y - rs.y); H = { x: S.x, y: S.y + sw * 1.3 }; }  // foto a mezzo busto
     const torso = Math.hypot(S.x - H.x, S.y - H.y);
     if (!(ls.ok || rs.ok) || torso < 10) return { ...coverCrop(img), auto: false };
-    return { k: TORSO / torso, cx: (S.x + H.x) / 2, cy: (S.y + H.y) / 2, auto: true };
+    return fillFrame({ k: TORSO / torso, cx: (S.x + H.x) / 2, cy: (S.y + H.y) / 2, auto: true }, img);
   } catch (e) { return { ...coverCrop(img), auto: false }; }
 }
 function renderCrop(img, c) {
@@ -1151,7 +1158,7 @@ async function addPhoto(ev) {
       const crop = await autoCrop(orig); if (!crop.auto) notFound++;
       const when = file.lastModified ? new Date(file.lastModified) : new Date();   // data dello scatto dal file
       const date = toKey(when) + "T12:00:00";
-      photos.push({ date, orig: orig.src, crop, src: renderCrop(orig, crop), weight: weightAt2(date), al: 1 });
+      photos.push({ date, orig: orig.src, crop, src: renderCrop(orig, crop), weight: weightAt2(date), al: AL_VERSION });
       if (store(PHOTOS_KEY, photos)) added++; else { photos.pop(); full = true; }
     } catch (e) { /* file non leggibile: lo salto */ }
   }
@@ -1163,12 +1170,18 @@ async function addPhoto(ev) {
 // Le foto caricate prima del ritaglio automatico: le allineo una volta sola
 let aligning = false;
 async function alignOld() {
-  if (aligning || !photos.some(p => !p.al)) return; aligning = true;
-  const todo = photos.filter(p => !p.al);
+  if (aligning || !photos.some(p => (p.al || 0) < AL_VERSION)) return; aligning = true;
+  const todo = photos.filter(p => (p.al || 0) < AL_VERSION);
   for (let n = 0; n < todo.length; n++) {
-    toast(`Allineo le foto già caricate… ${n + 1}/${todo.length}`);
+    toast(`Sistemo le foto già caricate… ${n + 1}/${todo.length}`);
     const p = todo[n];
-    try { const orig = await loadImg(p.src); p.orig = p.src; p.crop = await autoCrop(orig); p.src = renderCrop(orig, p.crop); p.al = 1; } catch (e) { p.al = 1; }
+    try {
+      if (!p.orig) p.orig = p.src;
+      const orig = await loadImg(p.orig);
+      p.crop = p.manual && p.crop ? fillFrame(p.crop, orig) : await autoCrop(orig);
+      p.src = renderCrop(orig, p.crop);
+    } catch (e) {}
+    p.al = AL_VERSION;
   }
   store(PHOTOS_KEY, photos); toast(""); aligning = false; renderProgress();
 }
@@ -1207,10 +1220,10 @@ function edDraw() {
   g.setTransform(c.k, 0, 0, c.k, ANCHOR_X - c.cx * c.k, ANCHOR_Y - c.cy * c.k); g.drawImage(ed.img, 0, 0);
 }
 function edZoom(v) { ed.c.k = ed.k0 * Math.pow(2, v / 100); edDraw(); }
-async function edAuto() { toast("Cerco spalle e fianchi…"); ed.c = await autoCrop(ed.img); ed.k0 = ed.c.k; document.getElementById("ed-z").value = 0; toast(""); edDraw(); if (!ed.c.auto) alert("Non ho trovato bene il corpo: sistemalo a mano."); }
+async function edAuto() { toast("Cerco spalle e fianchi…"); ed.c = await autoCrop(ed.img); photos[ed.i].manual = false; ed.k0 = ed.c.k; document.getElementById("ed-z").value = 0; toast(""); edDraw(); if (!ed.c.auto) alert("Non ho trovato bene il corpo: sistemalo a mano."); }
 function edSave() {
   const p = photos[ed.i]; if (!p.orig) p.orig = p.src;
-  p.crop = ed.c; p.src = renderCrop(ed.img, ed.c); p.al = 1;
+  p.crop = ed.c; p.src = renderCrop(ed.img, ed.c); p.al = AL_VERSION; p.manual = true;
   if (!store(PHOTOS_KEY, photos)) alert("Memoria piena: non riesco a salvare."); renderProgress(); openPhoto(ed.i);
 }
 function delPhoto(i) { if (confirm("Eliminare questa foto?")) { photos.splice(i, 1); store(PHOTOS_KEY, photos); closeOv("lb"); renderProgress(); } }
