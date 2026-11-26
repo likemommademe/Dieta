@@ -311,6 +311,14 @@
   .overlay input[type=date]::-webkit-date-and-time-value { text-align: left; }
   .ov-top b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .ov-top .ov-btn { flex: none; }
+  .cam-box { position: relative; width: 100%; max-width: calc(68vh * 3 / 4); margin: 0 auto; aspect-ratio: 3 / 4; border-radius: 14px; overflow: hidden; background: #000; }
+  .cam-box video, .cam-box img, .cam-box svg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .cam-box video.mirror { transform: scaleX(-1); }
+  .cam-count { position: absolute; inset: 0; display: grid; place-items: center; font-family: 'Chakra Petch', sans-serif; font-size: 120px; font-weight: 700; color: #fff; text-shadow: 0 4px 24px rgba(0,0,0,.6); pointer-events: none; }
+  .cam-row { display: flex; gap: 6px; margin-top: 10px; }
+  .cam-row .ov-btn { flex: 1 1 0; min-width: 0; padding: 10px 6px; font-size: 14px; white-space: nowrap; }
+  .ov-btn.on { background: #fff; color: #121414; }
+  .shot { width: 74px; height: 74px; border-radius: 50%; border: 5px solid #fff; background: #FF3D5A; margin: 14px auto 0; display: block; cursor: pointer; }
   .cmp-sel { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
   .cmp-sel select { width: 100%; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2); color: #fff; border-radius: 12px; padding: 9px 10px; font: inherit; }
   .cmp-sel select option { color: #121414; }
@@ -400,7 +408,8 @@
       <div class="dayhead"><h3><span class="em">📸</span>Foto del fisico</h3>
         <label class="btn" style="cursor:pointer">Aggiungi<input type="file" accept="image/*" multiple style="display:none" onchange="addPhoto(event)"></label>
       </div>
-      <button class="btn solid block" id="cmp-open" style="margin-top:12px;display:none" onclick="openCompare()">↔ Confronta due foto</button>
+      <button class="btn solid block" style="margin-top:12px" onclick="openCam()">📷 Scatta con la sagoma</button>
+      <button class="btn block" id="cmp-open" style="margin-top:8px;display:none" onclick="openCompare()">↔ Confronta due foto</button>
       <div class="photos" id="photos" style="margin-top:12px"></div>
       <p class="note">Puoi sceglierne più di una insieme: restano come le carichi, quindi ritagliale tutte allo stesso modo prima. Dopo il caricamento si apre il confronto con la prima foto e ti dico cosa è migliorato, in base alle misure.</p>
     </div>
@@ -488,6 +497,7 @@
 
 <div class="overlay" id="lb"></div>
 <div class="overlay" id="cmp"></div>
+<div class="overlay" id="cam"></div>
 
 <nav class="nav"><div class="nav-in">
   <button data-tab="oggi" class="active" onclick="tab('oggi')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><path d="M12 8v4l2.5 2"/></svg>Oggi</button>
@@ -1144,6 +1154,81 @@ async function addPhoto(ev) {
   store(PHOTOS_KEY, photos);
   if (document.getElementById("view-progressi").classList.contains("active")) renderProgress();
 })();
+/* ---- Fotocamera con sagoma: ti metti dentro la sagoma, così tutte le foto sono inquadrate allo stesso modo ---- */
+const SILHOUETTE = `<svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <g fill="rgba(255,255,255,.12)" stroke="#fff" stroke-width="2.5" stroke-dasharray="7 6" stroke-linejoin="round">
+    <ellipse cx="150" cy="58" rx="23" ry="29"/>
+    <path d="M138 86 L136 98 L104 108 Q92 112 90 126 L70 232 Q68 244 78 246 Q86 247 88 236 L108 150 L112 206 Q108 230 110 252 L114 386 Q114 394 124 394 L138 394 Q144 394 144 386 L148 268 L152 268 L156 386 Q156 394 162 394 L176 394 Q186 394 186 386 L190 252 Q192 230 188 206 L192 150 L212 236 Q214 247 222 246 Q232 244 230 232 L210 126 Q208 112 196 108 L164 98 L162 86 Z"/>
+  </g>
+  <line x1="150" y1="0" x2="150" y2="400" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
+</svg>`;
+let cam = { stream: null, facing: "user", timer: 5, guide: "sagoma", shot: null };
+async function openCam() {
+  const last = photoOrder().slice(-1)[0];
+  openOv("cam", `
+    <div class="ov-top"><b>Foto con la sagoma</b><button class="ov-btn" onclick="closeCam()">Chiudi ✕</button></div>
+    <div class="ov-body">
+      <div class="cam-box" id="cam-box">
+        <video id="cam-v" playsinline autoplay muted></video>
+        <div id="cam-guide"></div>
+        <div class="cam-count" id="cam-count"></div>
+      </div>
+      <p class="cmp-diff small" id="cam-msg">Mettiti dentro la sagoma: testa nell'ovale, piedi in fondo, braccia leggermente aperte.</p>
+      <div class="cam-row">
+        <button class="ov-btn ${cam.guide === "sagoma" ? "on" : ""}" id="g-s" onclick="camGuide('sagoma')">Sagoma</button>
+        ${last != null ? `<button class="ov-btn ${cam.guide === "ultima" ? "on" : ""}" id="g-u" onclick="camGuide('ultima')">Ultima foto</button>` : ""}
+        <button class="ov-btn" onclick="camFlip()">↺ Gira</button>
+      </div>
+      <div class="cam-row">
+        ${[0, 5, 10].map(t => `<button class="ov-btn ${cam.timer === t ? "on" : ""}" onclick="cam.timer=${t};this.parentNode.querySelectorAll('.ov-btn').forEach(b=>b.classList.remove('on'));this.classList.add('on')">${t ? `⏱ ${t} s` : "Subito"}</button>`).join("")}
+      </div>
+      <button class="shot" id="cam-shot" onclick="camShoot()" aria-label="Scatta"></button>
+    </div>`);
+  camGuide(cam.guide === "ultima" && last == null ? "sagoma" : cam.guide);
+  await camStart();
+}
+async function camStart() {
+  camStop();
+  try {
+    cam.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: cam.facing, width: { ideal: 1440 }, height: { ideal: 1920 } }, audio: false });
+    const v = document.getElementById("cam-v"); v.srcObject = cam.stream; v.classList.toggle("mirror", cam.facing === "user"); await v.play();
+  } catch (e) {
+    document.getElementById("cam-msg").textContent = "Non riesco ad aprire la fotocamera. Controlla di aver dato il permesso (Impostazioni → Safari → Fotocamera) e riprova.";
+  }
+}
+function camStop() { if (cam.stream) cam.stream.getTracks().forEach(t => t.stop()); cam.stream = null; }
+function closeCam() { camStop(); closeOv("cam"); }
+function camFlip() { cam.facing = cam.facing === "user" ? "environment" : "user"; camStart(); }
+function camGuide(g) {
+  cam.guide = g; const last = photoOrder().slice(-1)[0];
+  document.getElementById("cam-guide").innerHTML = g === "ultima" && last != null ? `<img src="${photos[last].src}" alt="" style="opacity:.4">` : SILHOUETTE;
+  ["g-s", "g-u"].forEach(id => { const b = document.getElementById(id); if (b) b.classList.toggle("on", (id === "g-s") === (g === "sagoma")); });
+}
+async function camShoot() {
+  const v = document.getElementById("cam-v"); if (!cam.stream || !v.videoWidth) return;
+  const btn = document.getElementById("cam-shot"), cnt = document.getElementById("cam-count"); btn.disabled = true;
+  for (let t = cam.timer; t > 0; t--) { cnt.textContent = t; await new Promise(r => setTimeout(r, 1000)); }
+  cnt.textContent = "";
+  // stesso taglio 3:4 che vedi a schermo
+  const vw = v.videoWidth, vh = v.videoHeight, r = 3 / 4;
+  let sw = vw, sh = vw / r; if (sh > vh) { sh = vh; sw = vh * r; }
+  const cv = document.createElement("canvas"); cv.width = Math.round(Math.min(900, sw)); cv.height = Math.round(cv.width / r);
+  const g = cv.getContext("2d");
+  if (cam.facing === "user") { g.translate(cv.width, 0); g.scale(-1, 1); }
+  g.drawImage(v, (vw - sw) / 2, (vh - sh) / 2, sw, sh, 0, 0, cv.width, cv.height);
+  cam.shot = cv.toDataURL("image/jpeg", .8);
+  document.getElementById("cam-box").insertAdjacentHTML("beforeend", `<img id="cam-prev" src="${cam.shot}" alt="Anteprima">`);
+  btn.outerHTML = `<div class="cam-row"><button class="ov-btn" onclick="openCam()">Rifai</button><button class="ov-btn on" onclick="camSave()">Salva foto</button></div>`;
+  camStop();
+}
+async function camSave() {
+  const im = await loadImg(cam.shot), date = toKey(new Date()) + "T12:00:00";
+  let w = null; weights.forEach(x => { if (x.date <= date.slice(0, 10)) w = x.weight; });
+  photos.push({ date, src: cam.shot, w: im.width, h: im.height, weight: w, sagoma: true });
+  if (!store(PHOTOS_KEY, photos)) { photos.pop(); return alert("Memoria piena: scarica un backup e cancella qualche foto."); }
+  closeCam(); renderProgress();
+  if (photos.length > 1) openCompare(); else openPhoto(photos.length - 1);
+}
 function delPhoto(i) { if (confirm("Eliminare questa foto?")) { photos.splice(i, 1); store(PHOTOS_KEY, photos); closeOv("lb"); renderProgress(); } }
 
 /* ---- Foto: apertura, commento, confronto ---- */
