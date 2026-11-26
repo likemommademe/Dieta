@@ -54,6 +54,8 @@
   .top { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; margin: 4px 0 16px; }
   .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
   .top h1 { font-size: 32px; line-height: 1.05; margin-top: 2px; }
+  .top { flex-wrap: wrap; } .top > div { min-width: 0; } .top h1 { overflow-wrap: anywhere; }
+  .wk, .dayb { min-width: 0; }
   .section-title { font-size: 20px; margin: 26px 0 10px; }
 
   /* Card */
@@ -86,8 +88,22 @@
   .chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; font-size: 13px; font-weight: 700; }
   .chip.train { background: var(--day-train-soft); color: var(--day-train); }
   .chip.rest { background: var(--day-rest-soft); color: var(--day-rest); }
-  .type-select { border: 1px solid var(--line); background: var(--surface-2); border-radius: 12px; padding: 8px 10px; max-width: 190px; }
-  .kcal-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 14px; }
+  .type-select { display: block; width: 100%; border: 1px solid var(--line); background: var(--surface-2); border-radius: 12px; padding: 10px 12px; font-size: 15px; font-weight: 600; }
+  .day-type { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 22px; text-transform: uppercase; padding: 8px 14px; border-radius: 14px; overflow-wrap: anywhere; }
+  .day-type.train { background: var(--day-train-soft); color: var(--day-train); }
+  .day-type.rest { background: var(--day-rest-soft); color: var(--day-rest); }
+  .type-label { display: block; font-size: 12px; font-weight: 700; color: var(--ink-soft); margin: 12px 0 4px; }
+  .kcal-box i { display: block; font-style: normal; font-size: 15px; line-height: 1; margin-bottom: 4px; }
+  @media (max-width: 360px) {
+    .kcal-row { gap: 6px; } .kcal-box { padding: 8px; } .kcal-box b { font-size: 19px; } .kcal-box span { font-size: 11px; display: block; -webkit-hyphens: auto; hyphens: auto; }
+    .day-type { font-size: 19px; }
+    .weekbar { gap: 4px; } .weekbar .icon-btn { width: 30px; height: 30px; } .strip { gap: 1px; }
+    .dayb .dn { font-size: 9px; letter-spacing: -.02em; } .dayb .dd { font-size: 15px; }
+    .top h1 { font-size: 28px; }
+  }
+  .btn { white-space: normal; overflow-wrap: anywhere; }
+  .chip { white-space: nowrap; }
+  .kcal-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
   .kcal-box { background: var(--surface-2); border-radius: 14px; padding: 10px 12px; }
   .kcal-box b { display: block; font-family: 'Chakra Petch', sans-serif; font-size: 22px; line-height: 1.1; }
   .kcal-box span { font-size: 12px; color: var(--ink-soft); }
@@ -844,16 +860,15 @@ function renderDay() {
   document.getElementById("today-title").textContent = isToday ? "Il menù di oggi" : `Menù di ${DAY_NAMES[d.getDay()].toLowerCase()}`;
 
   const planned = dayKcal(key, false), eaten = dayKcal(key, true), need = needKcal(key);
-  const opts = TYPE_ORDER.map(id => `<option value="${id}" ${id === typeId ? "selected" : ""}>Cambia: ${DAY_TYPES[id].short}</option>`).join("");
+  const opts = TYPE_ORDER.map(id => `<option value="${id}" ${id === typeId ? "selected" : ""}>${DAY_TYPES[id].short}</option>`).join("");
   document.getElementById("day-summary").innerHTML = `
-    <div class="dayhead">
-      <span class="chip ${t.kind}">${t.kind === "train" ? "💪 Allenamento" : "🌿 Riposo"} · ${t.short.split(" ")[1]}</span>
-      <select class="type-select" onchange="setType(this.value)" aria-label="Cambia giornata">${opts}</select>
-    </div>
+    <div class="day-type ${t.kind}">${t.kind === "train" ? "💪" : "🌿"} ${t.short}</div>
+    <label class="type-label" for="type-sel">Cambia giornata</label>
+    <select id="type-sel" class="type-select" onchange="setType(this.value)">${opts}</select>
     <div class="kcal-row">
-      <div class="kcal-box"><b>${eaten}</b><span>✅ mangiate</span></div>
-      <div class="kcal-box"><b>${planned}</b><span>📋 previste</span></div>
-      <div class="kcal-box"><b>${need}</b><span>🔥 fabbisogno</span></div>
+      <div class="kcal-box"><i>✅</i><b>${eaten}</b><span>mangiate</span></div>
+      <div class="kcal-box"><i>📋</i><b>${planned}</b><span>previste</span></div>
+      <div class="kcal-box"><i>🔥</i><b>${need}</b><span>fabbisogno</span></div>
     </div>
     <div class="progress"><div style="width:${Math.min(100, planned ? eaten / planned * 100 : 0)}%"></div></div>
     <button class="btn block" style="margin-top:12px" onclick="dayAll()">${MEALS.every(m => dd.done[m]) ? "✅ Giornata rispettata" : "Segna tutta la giornata come fatta"}</button>
