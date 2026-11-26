@@ -646,9 +646,9 @@ const SHOP = [
 const KEY = "dieta-emanuele-v2";
 const WEIGHT_KEY = "menu-oggi-weight-v21-Emanuele";   // stesso salvataggio della vecchia app
 const PHOTOS_KEY = "menu-oggi-photos-v21-Emanuele";   // stesso salvataggio della vecchia app
-// Settimana base (scelta il 26/11/2026), da domenica a sabato: allenamento lunedì, martedì e giovedì. 0 = domenica
-const DEFAULT_WEEK = { 0: "R4", 1: "A1", 2: "A2", 3: "R1", 4: "A3", 5: "R2", 6: "R3" };
-const WEEK_VERSION = 5;
+// Settimana base (scelta il 26/11/2026), da domenica a sabato: allenamento lunedì, martedì e giovedì; cena libera il sabato. 0 = domenica
+const DEFAULT_WEEK = { 0: "R4", 1: "A1", 2: "A2", 3: "R3", 4: "A3", 5: "R2", 6: "R1" };
+const WEEK_VERSION = 6;
 
 function load(key, fallback) { try { const v = JSON.parse(localStorage.getItem(key)); return v ?? fallback; } catch (e) { return fallback; } }
 function store(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch (e) { return false; } }
